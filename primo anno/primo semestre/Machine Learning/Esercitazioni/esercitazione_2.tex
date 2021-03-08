@@ -1,0 +1,51 @@
+\section{Esercitazione 2 - Find-S }
+Siano appurate le conoscenze delle informazioni della lezione scorsa. Andiamo a utilizzare l'algoritmo Find-S.
+
+\subsection{Esercizio 1}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|l|l|l|}
+\hline
+\textbf{Ex Numb} & \textbf{$A_1$} & \textbf{$A_2$} & \textbf{$A_3$} & \textbf{$A_4$} & \textbf{Label} \\ \hline
+\textbf{$x_1$}     & 1            & 0            & 1            & 0            & 1              \\ \hline
+\textbf{$x_2$}     & 0            & 1            & 0            & 0            & 0              \\ \hline
+\textbf{$x_3$}     & 1            & 0            & 1            & 1            & 0              \\ \hline
+\textbf{$x_4$}     & 0            & 0            & 0            & 0            & 1              \\ \hline
+\textbf{$x_5$}     & 0            & 0            & 1            & 0            & 1              \\ \hline
+\end{tabular}
+\end{table}
+
+Seguendo l'algoritmo find-s, dobbiamo inizializzare h come ipotesi più specifica, nel nostro caso\\  $S = \{\langle \varnothing \, , \varnothing \, ,\varnothing \, ,\varnothing \, \rangle\}$. Ci si presenta il primo esempio $x_1 = (1,0,1,0)$ e la sua corrispettiva label $t(x_1) = 1$. Questo non soddisfa il vincolo di S, e quindi in $S$ faccio il \textit{replace} del valore del primo attributo di $x_1$ con quello di $S$. Visto che $S$ è però l'ipotesi più specifica dovrò farlo per tutti i vincoli, ottenendo che $S$ diventa, di fatto, una copia di $x_1$: $S = \{\langle 1,0,1,0\rangle\}$ \\
+Si presenta la seconda ipotesi $x_2 =(0,1,0,0)$,che ha label pari a 0, quindi $t(x_2)=0$. Essendo un esempio negativo viene ignorato dall'algoritmo, lasciando inalterato $S$.\\Analogo ragionamento per il terzo esempio.\\
+Per quanto riguarda invece il quarto esempio $x_4 = (0,0,0,0)$, con la label $t(x_4) = 1$, varierà la nostra S. 
+Dove si ha lo stesso valore lo tengo in $S$, altrimenti pongo il caso generico $?$, ci porta quindi ad avere una $S$ nella seguente forma: $S = \{\langle ?,0,?,0\rangle\}$ \\
+Si presenta il quinto esempio $x_5=(0,0,1,0)$ che ha label 1, quindi $t(x_5)=1$. Procedo come sopra e ottengo, infine: $S=\{\langle ?,0,?,0\rangle\}$. \\ \newline Si arriva quindi a dire che $S=\{\langle ?,0,?,0\rangle\}$ è la nuova ipotesi più specifica che verrà restituita dall'algoritmo \textbf{find-S}.
+
+\subsection{Esercizio 2}
+Ipotesi finale restituita da algoritmo find-s, cosa devo fare: $S=\{\langle ?,0,?,0\rangle\}$\\
+Attraverso tre esempi positivi $t(x_i) = 1$, e due negativi $t(x_i) = 0$, raggiungere alla ipotesi dichiarata S.\\
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|l|l|l|}
+\hline
+\textbf{Ex Numb} & \textbf{$A_1$} & \textbf{$A_2$} & \textbf{$A_3$} & \textbf{$A_4$} & \textbf{Label} \\ \hline
+\textbf{$x_1$}     & 1            & 0            & 1            & 1            & 1              \\ \hline
+\textbf{$x_2$}     & 0            & 1            & 0            & 0            & 0              \\ \hline
+\textbf{$x_3$}     & 1            & 0            & 1            & 1            & 1              \\ \hline
+\textbf{$x_4$}     & 0            & 0            & 0            & 0            & 0              \\ \hline
+\textbf{$x_5$}     & 0            & 0            & 0            & 0            & 1              \\ \hline
+\end{tabular}
+\end{table}
+Con gli ultimi due che rappresentano, in un contesto reale, un \textbf{errore} e un \textbf{rumore}, in quanto gli stessi valori portano ad avere le due \textit{label} opposte, si ha quindi inconsistenza. Sono infatti detti \textbf{esempi inconsistenti} e vengono completamente ignorati da \textbf{find-S}.
+
+L'algoritmo riporta alcuni difetti:
+\begin{itemize} 
+    \item potrebbero esserci altre ipotesi consistenti rispetto a quella in output 
+    \item i training set inconsistenti possono ingannare l'algoritmo 
+\end{itemize} D'altro canto: 
+\begin{itemize} 
+    \item garantisce in output l'ipotesi più specifica consistente con gli esempi positivi 
+    \item l'ipotesi finale è consistente anche con gli esempi negativi, a patto che il \textit{target concept} sia contenuto in $H$ e che gli esempi siano corretti 
+\end{itemize}

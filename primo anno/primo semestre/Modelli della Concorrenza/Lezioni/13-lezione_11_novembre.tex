@@ -1,0 +1,105 @@
+\section{Lezione del 11 novembre}
+\subsection{Proprietà auspicate di una relazione di equivalenza}
+Una proprietà di equivalenza tra processi CCS èp nella forma: $\simeq \;\subseteq  Proc_{CCS} \times  Proc_{CCS}$\\
+Dati due processi $p,q\ \in Proc_{CCS}$, se $LTS(p)=LTS(q)$ (i due LTS sono isomorfi), allora $ p\simeq q$. In questo contesto si considerano solo le azioni di interazione tra componenti del sistema o in relazione con l’ambiente che si sta modellando e si astrae dagli stati.
+Inoltre: 
+\begin{itemize}
+    \item $p\simeq q\implies Tracce(p)=Tracce(q)$, ovvero le stesse sequenze di azioni si devono poter eseguire su entrambi i processi. 
+    \item $p\simeq q \implies p$ e $q$ devono avere la stessa possibilità di generare deadlock nell’interazione con l’ambiente (ovvero l’insieme dei processi con cui $p$ e $q$ possono interagire). Quindi sostituendo $p$ con $q$, qualora il primo non avesse deadlock, anche il secondo non avrà deadlock.
+    \item $\simeq$ dev’essere una congruenza rispetto agli operatori del CCS, ovvero dev’essere possibile sostituire un sottoprocesso con un suo equivalente senza modificare il comportamento complessivo del sistema. 
+\end{itemize}
+La prima equivalenza introdotta è l'equivalenza forte rispetto alle tracce, essa si presenta nella forma $\forall p,q\in Proc_{CCS}$, e abbiamo:
+\begin{itemize}
+    \item $LTS(p)=LTS(q)\implies p\stackrel{T}\sim q$
+    \item Si osservano solo le tracce, quindi si estrae dagli stati.
+    \item $p\stackrel{T}{\sim} q \iff Tracce(p)=Tracce(q)$
+    \item È una congruenza rispetto agli operatori CCS.
+    \item MA questa nozione di equivalenza non garantisce di preservare il deadlock (o l’assenza di deadlock) nell’interazione con l’ambiente.
+\end{itemize}
+Si introduce quindi una equivalenza diversa, ovvero l'equivalenza forte rispetto alla bisimulazione o Bisimulazione forte (introdotta da Milner), in questo abbiamo che se $\forall p,q \in Proc_{CCS}$,e per la \textbf{Bisimulazione forte} abbiamo quanto segue:
+\begin{itemize}
+    \item $LTS(p)=LTS(q)\implies p\stackrel{Bis}\sim q$
+    \item Astrae dagli stati.
+    \item $p\stackrel{Bis}\sim q \implies Tracce(p)=Tracce(q)$. \\
+        In altri termini si ha che $p\stackrel{Bis}\sim q \implies p\stackrel{T}\sim q$ e quindi $\stackrel{Bis}{\sim} \; \subseteq \; \stackrel{T}{\sim}$, cioè non si possono avere processi bisimili che non abbiano le stesse tracce.
+    \item il vantaggio principale è che la bisimulazione, a differenza delle tracce, preserva il deadlock o l’assenza di deadlock nell’interazione con l’ambiente.
+    \item È una congruenza rispetto agli operatori del CCS. 
+    \item Ma  $\stackrel{Bis}\sim$ è troppo restrittiva infatti (come anche $\stackrel{T}\sim$)  non astrae rispetto alle azioni non osservabili, di  sincronizzazione, $\tau$. \\ Infatti per esempio, $a\cdot b\cdot Nil \stackrel{Bis}{\not\sim} a\cdot \tau\cdot b\cdot Nil$. 
+\end{itemize}
+È stata quindi introdotta la regola di transizione debole $(\stackrel{a}{\Rightarrow})$, l’equivalenza debole rispetto alle tracce $(\stackrel{T}{\approx})$ e la bisimulazione debole $(\stackrel{Bis}{\approx})$.\\
+\subsection{Nozioni sulle equivalenze}
+\subsubsection{ Equivalenza rispetto alle tracce \texorpdfstring{($\stackrel{T}\sim$ e $\stackrel{T}{\approx}$)}{}}
+L’equivalenza forte rispetto alle tracce è più restrittiva rispetto all’equivalenza debole rispetto alle tracce: $p \stackrel{T}\sim q \implies p \stackrel{T}{\approx} q$ e quindi $\stackrel{T}\sim \; \subseteq \;  \stackrel{T}{\approx}$.
+Anche Equivalenza debole rispetto alle tracce debole $\forall p,q\in Proc_{CCS}$
+\begin{itemize}
+    \item $LTS(p)=LTS(q)\implies p \stackrel{T}{\approx} q$
+    \item Astrae dagli stati.
+    \item È una congruenza rispetto agli operatori del CCS.
+    \item MA non garantisce di preservare il deadlock o l’assenza di deadlock nell’interazione con l’ambiente.
+\end{itemize}
+
+\subsubsection{Bisimulazione forte e debole \texorpdfstring{$\stackrel{Bis}{\sim}$ e  $\stackrel{Bis}{\approx}$}{}}
+La bisimulazione forte è più restrittiva della bisimulazione debole: $p \stackrel{Bis}\sim q \implies p \stackrel{Bis}{\approx} q$ e quindi $\stackrel{Bis}\sim \; \subseteq \;  \stackrel{Bis}{\approx}$. \\
+Inoltre La bisimulazione forte (debole) è più restrittiva dell’equivalenza forte (debole) rispetto alle tracce, infatti si ha:
+$p \stackrel{Bis}\sim q \implies p \stackrel{T}\sim q$ e $p \stackrel{Bis}\approx q\implies p \stackrel{T}\approx q$, quindi si ha che $\stackrel{Bis}\sim \; \subseteq \; \stackrel{T}\sim$ e $\stackrel{Bis}\approx \; \subseteq \; \stackrel{T}\approx$.
+\subsubsection{Processi deterministici ed equivalenze}
+Un processo $p\in Proc_{CCS}$ è un processo deterministico $$\iff \forall x\in Act = A \cup \bar{A} \cup \{\tau\}, \mbox{ se } p\stackrel{x}{\rightarrow}p'\mbox{ e }p\stackrel{x}{\rightarrow}p''\mbox{ allora }p'=p''$$
+Quindi se si può passare a $p'$ o $p''$ con la stessa azione allora necessariamente questi due processi coincidono. Ma cosa succede se io confronto tra loro solamente processi deterministici? Quello che possiamo dire è che se io confronto processi deterministici con l'equivalenza rispetto alle tracce e risultano equivalenti risptto alle tracce, allora sono anche equivalenti anche rispetto alla bisimulazione. Questo è descritto nella seguetne preposizione in modo formale:\\
+\textbf{Proposizione}
+Siano $p,q\in Proc_{CCS}$. 
+Se $p$ e $q$ sono deterministici e $p \stackrel{T}{\sim} q$ (quindi anche $p \stackrel{T}{\approx} q$), allora $p \stackrel{Bis}{\sim} q$ (quindi anche $p \stackrel{Bis}{\approx} q$).
+
+\subsubsection{Proprietà della bisimulazione debole \texorpdfstring{$\stackrel{Bis}{\approx}$}{}}
+\begin{itemize}
+    \item Essendo l’unione di tutte le relazioni di bisimulazione, è la più grande relazione di bisimulazione debole ed è una relazione di equivalenza, essendo     riflessiva, simmetrica e transitiva.
+    \item Come per la bisimulazione forte, preserva la possibilità di generare o meno deadlock nell’interazione con l’ambiente.
+    Quindi sostituendo un processo che (non) genera deadlock con un suo bisimile, si ha che anche il nuovo sistema (non) andrà in deadlock; ciò non è vero per l’equivalenza sulle tracce.
+    \item A differenza della bisimulazione forte, astrae da azioni non osservabili ($\tau$) e da cicli inosservabili ($\tau$ loop). 
+    In caso di ciclo infinito di $\tau$, si parla di divergenza. Ad esempio, dati due processi $Nil$ e $p=\tau\cdot p$ ($p$ è un processo infinito di sole $\tau$, una divergenza), si ha che $Nil \stackrel{Bis}{\approx} p$.
+\end{itemize}
+
+Una relazione di equivalenza $R\subseteq Proc_{CCS}\times Proc_{CCS}$ è una congruenza se $\forall$ contesto CCS $C[$ \textbullet $ ]$ (con una certa variabile \textbullet), allora succede che se $p\ R\ q \implies C[p]\; R \;C[q]$ con $p,q\in Proc_{CCS}$. Quindi comunque si prenda una specifica CCS si devono poter sostituire a piacere i due processi. Da questo deriviamo un teorema che dice:
+\begin{teorema}{Teorema}{}
+\par
+    $\forall\,p,q\in Proc_{CCS}$ se $p \stackrel{Bis}{\approx} q$, allora:
+    \begin{itemize}
+        \item $\forall\, \alpha \in Act=A\cup\bar{A}\cup\{\tau\}$,	$\alpha \cdot p \stackrel{Bis}{\approx} \alpha \cdot q$
+        \item  $\forall\,r\in Proc_{CCS}$,	$p|r \stackrel{Bis}{\approx} q|r \; \land \; r|p \stackrel{Bis}{\approx} r|q$
+        \item $\forall\,f$ funzione di rietichettatura,	$p[f] \stackrel{Bis}{\approx} q[f]$\\
+            Le funzioni di rietichettatura preservano nomi, co-nomi e $\tau$(l’immagine di un co-nome è uguale al co-nome dell’immagine) .
+        \item $p\setminus_L \stackrel{Bis}{\approx} q \setminus_L$,	$\forall\,L\subseteq A$\\
+            La restrizione rispetto a $L$ comporta che il processo può eseguire le azioni in $L$ solo se sono sincronizzazioni interne. Non può essere sincoronizzato con l'ambiente.
+    \end{itemize}
+\end{teorema}
+A differenza della bisimulazione forte, la bisimulazione debole non è una congruenza rispetto agli operatori del CCS, in quanto non è una congruenza rispetto all’operatore scelta ($+$). Inoltre, la bisimulazione debole non è una congruenza per la ricorsione.\\
+
+Si vuole trovare una relazione di congruenza, definita come relazione binaria tra processi CCS, che sia la più grande relazione contenuta nella bisimulazione e che sia una congruenza rispetto a tutti gli operatori: $$\stackrel{C}{\approx} \; \subseteq \; \stackrel{Bis}{\approx} \; \subseteq Proc_{CCS}\times Proc_{CCS}$$
+
+Per il CCS puro senza ricorsione, Milner ha introdotto un insieme finito di assiomi che possono essere visti come regole di riscrittura che preservano la congruenza all’osservazione, che è la più grande congruenza contenuta nella bisimulazione. 
+Questo insieme di assiomi è quindi un insieme finito per il quale, presi due processi $p,q\in Proc_{CCS}$, se si riesce (utilizzando gli assiomi) a trasformare l’uno nell’altro, allora si ha che $p$ e $q$ non sono solo bisimili ma anche congruenti (potendo quindi sostituire l’uno con l’altro in qualsiasi contesto che non includa la ricorsione). \\
+Questo insieme di assiomi, detto $Ax$, è:
+\begin{itemize}
+    \item corretto: se utilizzando l’insieme di assiomi si deduce che $p=q$ allora $p$ è congruente a $q$ rispetto alla nozione di congruenza $\stackrel{C}{\approx}$: $Ax\vdash p=q\implies p \stackrel{C}{\approx} q$
+    \item completo: presi due processi che sono congruenti secondo la nozione di congruenza $\stackrel{C}{\approx}$, allora sicuramente l’insieme di assiomi è completo in quanto permette di trascrivere $p$ in $q$: $p \stackrel{C}{\approx} q\implies Ax\vdash p=q$
+    \end{itemize}
+    Assiomi della relazione di congruenza $\stackrel{C}{\approx}$:
+    \begin{itemize}
+    \item associatività di scelta e composizione parallela:	$p+(q+r) \stackrel{C}{\approx} (p+q)+r$	e	$p|(q|r) \stackrel{C}{\approx} (p|q)|r$
+    \item commutatività di scelta e composizione parallela:	$p+q \stackrel{C}{\approx} q+p$	e	$p|q \stackrel{C}{\approx} q|p$
+    \item assorbimento riguardo la scelta:	$p+p \stackrel{C}{\approx} p$ \\
+        Non si ha l’assorbimento riguardo la composizione parallela, infatti $p|p \stackrel{C}{\not \approx} p$
+    \item assorbimento del $Nil$ riguardo la scelta e la composizione parallela:	$p+Nil \stackrel{C}{\approx} p$	e	$p|Nil \stackrel{C}{\approx} p$
+    \item assioma che risolve il problema di avere una scelta con un una $\tau$ iniziale nella sequenza ($\tau$ non può essere eliminata): $p+\tau\cdot p \stackrel{C}{\approx} \tau\cdot p$
+    \item assioma che  tratta le $\tau$ interne alla sequenza (possono essere eliminate):	$\mu\cdot \tau\cdot p \stackrel{C}{\approx} \mu\cdot p$, $\forall\,\mu\in Act$
+    \item $\mu\cdot(p+\tau\cdot q) \stackrel{C}{\approx} \mu\cdot(p+\tau\cdot q)+\mu\cdot q$
+    \item se i due processi $p$ e $q$ sono delle somme, ovvero: $\displaystyle p=\sum_i a_i\cdot p_i, \; a\in Act$ e $\displaystyle q=\sum_j b_j\cdot q_j,\; b\in Act$ si hanno i seguenti ulteriori assiomi:
+        \begin{itemize}
+            \item teorema di espansione di Milner:	$p|q \stackrel{C}{\approx} \displaystyle \sum_i \alpha_i\cdot (p_i|q)+\sum_j \beta_j \cdot (p|q_j) + \sum_{\alpha_i=\bar{\beta_j}} \tau \cdot(p_i|q_j)$\\
+                Se $a_i$ e $b_j$ sono l’uno il complemento dell’altro allora si possono sincronizzare su di essi i processi, che diventano una $\tau$ e proseguendo con $p_i|q_j$.
+            \item $\displaystyle p[f] \stackrel{C}{\approx} \sum_if(a_i)\cdot(p_i[f]), \; \forall\,f$ funzione di etichettatura\\
+                Rietichettare tutto il processo $p$ corrisponde al fatto di ottenere congruo il processo, che ottengo etichettando ogni i-sima azione delle componenti che sono in alternativa, concatenato con il processo relativo rietichettato con $f$.
+            \item $\displaystyle p_{\backslash L} \stackrel{C}{\approx} \sum_{a_i,\overline{a_i}\not\in L}a_i\cdot(p_{i\backslash L}),\,\,\,\forall\,L\subseteq A$\\
+                Si considerano solo le azioni per le quali non si ha alcuna restrizione.
+        \end{itemize}
+\end{itemize}
+Per cui la bisimulazione risulta tale per cui se si utilizza $\stackrel{C}{\approx}$ si può modellare un sistema a passi successivi sapendo che è possibile sostituire un sottoprocesso con un altro ottenendo ancora un sistema bisimile al precedente.

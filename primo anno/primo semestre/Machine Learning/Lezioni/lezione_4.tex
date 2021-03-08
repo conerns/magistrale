@@ -1,0 +1,153 @@
+\section{Reti Neurali}
+Data la potenza potenza del calcolo elettronico, infatti si è capaci di eseguire calcoli numerici complessi (anni per un uomo) in frazioni di secondo l memorizzazione grandi quantità di data, bisogna. Questa potenza di calcolo ha però diversi limiti, come il riconoscimento accurati di persone oggetti e suoni in presenza di rumore.  \\
+Per cercare di superare questo problema, si potrebbe addestrare questa potenza di calcolo attraverso le reti neurali. 
+
+\subsection{Neuroni formali}
+Per i neuroni formali utilizziamo un modello matematico. Questo modello matematico è stato proposto da \textbf{McCulloch} e \textbf{Pitts} e definisce formalmente un \textbf{neurone binario a soglia} come una quadrupla: \[\langle n, C, W, \theta \rangle\] dove: 
+\begin{itemize} 
+    \item $n$ specifica il \textbf{nome} del neurone stesso, una sorta di identificativo \item $C$ specifica l'\textbf{insieme degli input} $c_i$ 
+    \item $W$ specifica il \textbf{vettore dei pesi} $w_i$, associati ad ogni input $c_i$. È una rappresentazione formale dei pesi delle sinapsi (e si nota che possono essere sia positivi che negativi) 
+    \item $\theta$ specifica la \textbf{soglia}, utile per definire quando un neurone manda effettivamente il segnale
+\end{itemize}
+
+Per definire i due stati del neuroni si usa l'insieme dei valori $\{0,1\}$ oppure l'insieme \{-1,1\}, si ha infatti un neurone binario. Inoltre avendo il vettore $w_i$ di pesi, per gli input
+siamo in grado di definire la funzione di transizione, dove viene riportato il concetto di soglia (effetto soglia): 
+$s(t+1)=1 \mbox{ \textnormal{sse} }\sum w_i\cdot s_i(t)\geq \theta$
+
+La formula indica che in un tempo successivo $t+1$ (con $s(t)$ che definisce uno $stato$ al tempo $t$) ho che il neurone emette il segnale (stato pari ad 1) sse al tempo precedente $t$ ho avuto una somma pesata degli input $c_i(t)$ maggiore della soglia $\theta$. (l'output del neurone rappresenta quindi il suo stato)\\ 
+
+Possiamo rappresentare la funzione tramite una funzione a scalino, questo perché  l'insieme degli stati è rappresentato in modo binario. 
+$f(x)=  \begin{cases}
+            1 &\mbox{ se } x > \theta\\
+            0 &\mbox{ altrimenti}
+        \end{cases} \quad \mbox{   dove } 
+    \quad x=\sum w_i\cdot c_i$
+In alternativa potremmo trovarci ad avere un insieme di stati non più binario, ma che si estende all'insieme $\mathbb{R}$. Si potrebbe quindi avere una \textbf{funzione logistica o sigmoide}, nella forma: $f(x)=\frac{1}{1+e^{-x}} \quad \mbox{con } \quad x=\sum w_i\cdot c_i$
+
+\subsection{Reti neurali artificiali}
+Di per se i neuroni ci forniscono pochi vantaggi, motivo per cui si studiano all'interno di una rete neurale in modo che possano fornire un vantaggio non indifferente. 
+Si hanno alcune \textbf{caratteristiche strutturali} delle reti neurali artificiali: 
+\begin{itemize} 
+    \item hanno un gran numero di unità, una struttura complicata
+    \item permettono operazioni elementari 
+    \item hanno un alto livello di interconnessione 
+\end{itemize} 
+Ci sono anche alcune \textbf{caratteristiche dinamiche}: 
+\begin{itemize} 
+    \item si hanno cambiamenti di stato in funzione dello stato dei neuroni collegati in input 
+    \item si ha una funzione di uscita per ogni unità 
+    \item si ha la modifica dello schema di connessione, tramite la modifica dei pesi, per l'apprendimento 
+\end{itemize}
+
+Il percettrone è un tipo di classificatore binario che mappa i suoi ingressi ${\displaystyle x}$ (un vettore di tipo reale) in un valore di output ${\displaystyle f\left(x\right)}$ (uno scalare di tipo reale) calcolato con ${\displaystyle f\left(x\right)=\chi \left(\langle w,x\rangle +b\right)}$ dove \textbf{w} è un vettore di pesi con valori reali, l'operatore ${\displaystyle \langle \cdot ,\cdot \rangle }$ è il prodotto scalare (che calcola una somma pesata degli input), \textbf{b} è il 'bias', un termine costante che non dipende da alcun valore in input e ${\displaystyle \chi \left(y\right)}$ è la funzione di output. \\
+
+Bisogna avvicinarsi alla matematica per convincersi che per il percettrone esiste un buon metodo di addestramento tale da portare la rete/il neurone ad apprendere. Formalmente abbiamo quindi:
+
+\begin{itemize} 
+    \item una \textbf{matrice dei pesi} $W$, con i valori indicati tramite $w_{ij}$, per gli archi che collegano i neuroni. I pesi sono i \textit{pesi correnti} (un vettore di pesi per ogni neurone e quindi una matrice, che risulta a singolo colonna se ho un solo neurone) 
+    \item un \textbf{vettore delle soglie} $\Theta$, con i valori indicati tramite $\theta_i$, una per ogni neurone 
+    \item l'\textbf{input netto per il neurone $i$ al tempo $t$}, indicato con\\ $n_i(t)=\sum_{j=1}^n w_{ij}\cdot x_j(t)-\theta_i$, quindi si ha che la soglia influisce già nell'input del neurone
+    \item la \textbf{funzione di transizione} indicata con $x_i(t+1)=g(n_i(t))$ 
+\end{itemize} 
+
+L'output di un neurone è, a conti fatti, uno stato per un altro neurone.\\ Si hanno alcuni elementi caratterizzanti di una rete neurale: 
+\begin{itemize} 
+    \item il \textbf{tipo di unità} 
+    \item la \textbf{topologia}, ovvero la direzione delle connessioni (\textit{feedforward \textnormal{o} feedback}), il numero di neuroni (\textit{monostrato \textnormal{o} multistrato})
+    \item le \textbf{modalità di attivazione}, che può essere \textit{seriale ciclica, seriale probabilistica, parallela \textnormal{o} mista} 
+    \item un \textbf{algoritmo di apprendimento}, per capire come variare il valore dei pesi 
+\end{itemize}
+
+\subsection{Percettrone}
+La soglia diventa il peso di una speciale connessione(la soglia) all'ingresso, è importante che ciò avvenga per ciascun neurone.
+
+La soglia $w$ è trattata come il peso di una unità di input in stato fisso $-$1. La transizione di stato è determinata dal risultato del prodotto interno tra il vettore dei pesi $w$ e il vettore degli stati di input $x$ • Da un punto di vista geometrico, il vettore dei pesi determina un iperpiano che separa i possibili vettori di input in due classi, a seconda che formino con $w$ un angolo acuto oppure ottuso.
+
+\subsubsection{Algebra lineare}
+Per capire meglio questo concetto ci serve un ripasso di algebra lineare:
+Sia lo spazio vettoriale $\mathbb{R}^2$, formato quindi da elementi, dette coordinate, che sono coppie ordinate $(x_1,x_2)$ (rappresentabili con un punto nel piano o con un segmento orientato con partenza nell'origine e destinazione nelle coordinate del punto nel piano).\\ Sull'insieme possiamo eseguire delle operazioni:
+\begin{itemize}
+    \item Addizione:  $P+Q=(x_1 + x_3, x_2 + x_4)$
+    \item Moltiplicazione per uno scalare: $\lambda\in\mathbb{R}$: $\lambda\cdot R=(\lambda\cdot x_1,\lambda\cdot x_2)$
+    \item Prodotto interno in $R^n$: prodotto interno tra due vettori in $R^n$ è un numero reale risultante di:         \\ $\langle P,Q\rangle\equiv P\cdot Q^T = \sum_{i=1}^n r_i\cdot q_i$ 
+\end{itemize}
+
+Ricordiamo inoltre la norma in $R^n$, che corrisponde a un numero reale non negativo:
+Ricordiamo la \textit{norma} di un vettore $X$: $|X|= \equiv \sqrt{X \cdot  X^T}=\sqrt{\displaystyle \sum_{i=1}^n x_i \cdot x_i}=\sqrt{\langle X,X\rangle}$
+
+Con $X=0$ indichiamo il \textit{vettore nullo} (che ha anche norma nulla).\\
+
+Definiamo il \textit{versore} (\textit{vettore unitario}) come: $\frac{X}{|X|},\quad X\mathbb{N}eq 0$. In $\mathbb{R}^2$ l'angolo $\theta$ sotteso tra due vettori $X$ e $Y$ è:  $\cos\theta=\frac{\langle X,Y\rangle}{|X|\cdot |Y|}$. \\  
+La proiezione di un vettore $v$ su  $u$ è:  $v_u=|v| \cdot \cos\theta$
+
+\subsubsection{Rette e iperpiani}
+
+Una retta r che passa per l’origine in $R^2$ può essere definita assegnando un vettore $w = (w_1, w_2)$ ad essa ortogonale. Infatti tutti i punti (vettori) $x = (x_1, x,2)$ sulla retta sono ortogonali a $w$. Di conseguenza $$\langle w,x\rangle = w\cdot x^T = w_1x_1 + w_2x_2 = 0$$ 
+Quindi la retta (ovvero il piano associato  W) mi separa i due semispazi, a seconda che $\langle x, w\rangle$ sia strettamente positivo o strettamente negativo.\\ 
+
+\subsubsection{Apprendimento nel percettrone}
+
+I pesi vengono fissati a caso e poi modificati. L'apprendimento è guidato da un insegnante e La procedura da seguire è la seguente :
+\begin{itemize}
+    \item Obiettivo è classificare vettori di input in due classi, A e B
+    \item Si sottomette una sequenza infinita {$x_k$} di vettori tale che ve ne siano un numero infinito sia di A che di B 
+    \item Per ogni valore in ingresso $x_k$ la rete calcola la risposta $y_k$ applicando la soglia
+    \item Se la risposta è errata, si modificano i pesi, incrementando i pesi delle unità di input attive se si è risposto 0 anziché 1, decrementandole nel caso duale: $w'= w \pm x$
+\end{itemize}
+
+Come abbiamo visto l'output è rappresentato da un vettore booleano rappresentante 1 in posizione $k$ in corrispondenza del neurone $k$-simo che ha inviato il segnale o 0 altrimenti. A questo risultato si giunge tramite un certo input pesato e, essendo un training supervisionato, esso viene verificato. Qualora un risultato non vada bene bisogna procedere cambiando i pesi. Il problema è appunto la scelta dei pesi, che non sono conoscibili a priori. Preso un neurone $k$ che porta un risultato errato posso definire una \textbf{function error} come: $E=y_k-t_k$ dove: 
+\begin{itemize} 
+    \item $y_k$ è l'output del neurone 
+    \item $t_k$ è il target atteso per quel neurone 
+\end{itemize} 
+Per tale neurone bisognerà sistemare tutti i pesi $w_{ik}$. Se $E$ è negativa allora il neurone avrebbe dovuto emettere il segnale ma non lo ha fatto e quindi bisogna aumentare il peso e viceversa. Bisogna però considerare che l'input potrebbe essere negativo e quindi anche i pesi devono poter essere negativi. Perfezioniamo quindi il conto della differenza di peso necessaria con la moltiplicazione di $E$ (messa in negativo in modo da eventualmente sistemare il segno per input negativi) per l'input: $\Delta w_{ik}=-(y_k-t_k)\times c_i$. \\ 
+In questo discorso bisogna inserire anche la soglia, importante per input specifici (basti pensare ad un input pari a 0 che annullerebbe ogni cambio di peso secondo la formula precedente). Per ora trascureremo tali casi anche se una semplice soluzione per un caso limite come quello di avere solo input nulli, è quella di aggiungere un \textbf{nodo bias}, di valore $-1$, collegato ai neuroni con peso nullo.\\ Viene anche introdotto il \textbf{learning rate (\textit{tasso di apprendimento})} $\eta$, utile per stabilire la velocità di apprendimento della rete. Si ottiene quindi: $w_{ij}\gets w_{ij}-\eta\cdot(y_j-t_j)\times c_i$. In pratica $\eta$ decide quanto cambiare il peso (e se si vuole trascurare il parametro basta porre $\eta = 1$). L'uso di tale parametro migliora la stabilità della \textit{rete neurale} che non avrà cambi di peso eccessivi, anche se questo comporta tempi di apprendimento più estesi. Si ha che ad ogni iterazione ci si aspetta un miglioramento della \textit{rete neurale} (e questo miglioramento è dimostrabile). Viene imposto quindi un limite $T$ di iterazioni entro le quali interrompere l'apprendimento anche se non si è arrivati al risultato corretto.\\
+Vediamo due teoremi utili per lo studio dell'apprendimento del percettrone su due classi $A$ e $B$, banalmente rappresentanti, nella nostra situazione binaria e semplificata, il caso in cui si abbia il neurone che emette il segnale (valore 1 in output) o altrimenti (valore 0 in output). 
+\begin{enumerate}
+    \item Teorema di convergenza: Comunque si scelgano i pesi iniziali, se le classi A e B sono discriminabili, la procedura di apprendimento termina dopo un numero finito di passi.
+    Siaano possibili:
+    \begin{itemize}
+        \item \textbf{input}: $x = (x_1, \dots, x_d)$
+        \item \textbf{input esteso}: $x = (x_1, \dots, x_d, -1)$
+        \item \textbf{pesi}: $w = (w_1, \dots, w_d, \theta)$
+    \end{itemize}
+    Se l’insieme degli input estesi è ripartito in due classi linearmente separabili, A e B, allora è possibile trovare un vettore di pesi $w$ tale che $w \cdot x \geq 0$ se $x \in A$; mentre $w \cdot x < 0$, se $x \in B$. \\
+    Costruzione di un percettrone:
+    \begin{enumerate}
+        \item  Si parte con $w$ arbitrario.
+        \item Si classifica un input $x$, dove la risposta corretta si presenta: $w' := w$, mentre quella errata: $w' := w+x$ se $x\in A$; 	$w' := w-x$ se $x \in B$
+        \item Si prova un nuovo input.
+    \end{enumerate}
+    \textbf{Correttezza del teorema di convergenza}\\
+    Siano $x \in A$ e $w \cdot x <0$. Poiché $x \cdot x \geq 0$, vale che $w' \cdot x = (w+x) \cdot x = w \cdot x + x \cdot x > w \cdot x$. Quindi $w'$ classifica $x$ in modo più corretto rispetto a $w$. Ma altri input potrebbero essere classificati meno correttamente.\\
+
+    Si consideri $A' = A \cup B'$ e $B' = \{-x \; | \; x \in B \}$. Si cerca $v$ tale che $v \cdot x \geq 0$, $\forall x \in A$.
+    \begin{itemize}
+        \item $\{x_i\}_{i \in \mathbb{N}}$: sequenza di addestramento che contiene infiniti elementi sia di $A$ che di $B'$, con $x_i \in A'$.
+        \item $\{w_i\}_{i \in \mathbb{N}}$: sequenza dei pesi, con $w_0 = 0$ come scelta iniziale arbitraria, $w_{k+1}=w_k$ se $w_k \cdot x_k \geq 0$ e $w_k + x_k$ altrimenti.
+        \item $\{v_i\}_{i \in \mathbb{N}}$: sequenza dei vettori dei pesi modificati (peso corrente).
+        \item $\{t_i\}_{i \in \mathbb{N}}$: sottosequenza di training corrispondente (numerazione dei punti/momenti di errore).
+    \end{itemize}
+Il vettore di pesi viene cambiato quando ci sono errori e in quei casi vengono aggiornati anche $v_i$ e $t_i$. Questo significa che $\forall j, v_j t_j < 0$, si ottiene  $v_{j+1} = v_j + tj = v_{j-1} + t_{j-1} + t_j = \dots = (\displaystyle \sum_{k=0}^j t_k)$.\\
+
+\textbf{Tesi}: la sequenza $\{v_i\}$ è finita, ovvero che non si andrà avanti all’infinito a trovare punti di errore.
+\textbf{Dimostrazione}: Sia $w$ una qualsiasi soluzione (che esiste per ipotesi). 
+Vale $x \cdot w \geq 0$, $\forall x \in A'$.
+Si ponga $\alpha = \min (x \cdot w \; | \, x \in A')$. 
+\begin{itemize}
+    \item $v_{j+1} \cdot w = (\displaystyle \sum_{k=0}^j t_k) \cdot w \geq (j+1) \cdot \alpha$
+    \item $(v_{j+1} \cdot w)^2 \leq |v_{j+1}|^2 \cdot |w|^2$	(Cauchy - Schwarz)
+    \item $|v_{j+1}|^2 \geq \displaystyle \frac{(j+1)^2 \cdot \alpha^2}{|w|^2}$
+\end{itemize}
+
+Si ponga $M = \max \{|x|^2 : x \in A'\}$.
+\begin{itemize}
+    \item$|v_{j+1}|^2=|v_j + t_j|^2 = |v_j|^2 + 2v_j \cdot t_j + |t_j|^2 \leq |v_j|^2 + |t_j|^2$, con $(v_j \cdot t_j <0)$
+    \item $|v_{j+1}|^2 \leq \displaystyle \sum_{k=1}^j |t_j|^2 \leq j \cdot M$
+    \item $f(j) = \displaystyle \frac{j^2 \alpha^2}{|w|^2} \leq |v_{j+1}|^2 \leq j\cdot M = g(j)$, questo con $\displaystyle \frac{j^2 \alpha^2}{|w|^2}$ quadratico in $j$ e con $j\cdot M$ lineare in $j$
+\end{itemize}
+Dopo al massimo $\beta = \displaystyle \frac{M \cdot |W|^2}{\alpha^2} \geq j$ modificazioni di peso, il percettrone classifica correttamente ogni input. 
+        \item Teorema di Minsky e Papert: La classe delle forme discriminabili da un percettrone semplice è limitata alle forme linearmente separabili 
+\end{enumerate}
+
+% manca l'esempio da 1h20' 

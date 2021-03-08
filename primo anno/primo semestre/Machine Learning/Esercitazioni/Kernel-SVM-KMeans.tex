@@ -1,0 +1,81 @@
+\section{Kernel/SVM \& KMeans}
+\subsection{Iperpiano}
+L'iperpiano, a seconda dello spazio di rappresentazione, ha diverse rappresentazioni, infatti in uno spazio euclideo a $n$ dimensioni, è un sottoinsieme dello spazio a $n-1$ dimensioni, che divide lo spazio in due parti non connesse. Si tratta di un set di punti che soddisfa l’equazione: $\bold{w} \cdot \bold{x} + b = 0$.
+\begin{itemize}
+    \item In una dimensione, è un punto.
+    \item In tre dimensioni, è un piano.
+    \item 
+In più di tre dimensioni, si chiama iperpiano.
+\end{itemize}
+
+Nello spazio a due dimensioni:
+\begin{equation*}
+    \begin{split}
+        \bold{w} \cdot \bold{x} + b = 0 & \implies w_0 x + w_1 y + b = 0\\
+        & \implies w_1 y = -w_0 x - b\\
+        & \implies y = \displaystyle -\frac{w_0}{w_1}x - \frac{b}{w_1}
+    \end{split}
+\end{equation*}
+Ponendo $a = \displaystyle -\frac{w_0}{w_1}$ e $c = \displaystyle - \frac{b}{w_1}$, si ottiene \[y = ax + c\]
+
+Se un punto si trova sull’iperpiano, $\bold{w} \cdot \bold{x} + b$ è uguale a zero, altrimenti produce un risultato $\neq 0$. 
+\subsection{Classificazione usando un iperpiano}
+Quello che siamo intenti a capire è: quale iperpiano è il miglior iperpiano possibile? Per dare risposta alla nostra domanda ci basiamo sulla classificazione, denotiamo quindi la nostra idea con il seguente esempio. L'esempio racchiude i concetti base.\\
+
+È possibile definire la funzione di un’ipotesi $h$ come: 
+$h(\bold{x_i}) = 
+    \begin{cases} 
+        + 1 & \text{ if }\ \bold{w} \cdot \bold{x_i} + b \geq 0 \\ 
+        - 1 & \text{ if }\ \bold{w} \cdot \bold{x_i} + b < 0
+    \end{cases}
+$\\
+
+che equivale a $h(\bold{x_i}) = \text{sign}(\bold{w} \cdot \bold{x_i} + b)$.\\
+\subsubsection{Classificazione sicura e margine}
+Dato un esempio di training $(x,y)$ e un iperpiano definito da un vettore $\bold{w}$ e un bias $b$, si può computare il numero $\beta = \bold{w} \cdot \bold{x} + b$ per sapere quanto dista il punto dall’iperpiano.\\
+Se si moltiplica $\beta$ per il valore di $y$, si ottiene il margine funzionale $f = y \times \beta = y (\bold{w} \cdot \bold{x} + b)$, dove il simbolo di $f$ sarà sempre positivo se i punti sono classificati correttamente e negativo altrimenti. Questo lo facciamo perché la definizione che abbiamo dato di $\beta$ da sola non ci basta per la decisione dell'iperpiano.\\
+Infatti, se $y = 1$, per far sì che il margine funzionale sia ampio (e quindi la predizione confidente e corretta), serve che $\bold{w} \cdot \bold{x} + b$ sia un numero positivo grande.\\
+Se $y = -1$, per far sì che il margine funzionale sia ampio, serve che $\bold{w} \cdot \bold{x} + b$ sia un numero negativo grande. \\
+Inoltre, se $y (\bold{w} \cdot \bold{x} + b) > 0$, allora la predizione su $(x,y)$ è corretta.\\
+
+Margine funzionale rispetto all’$i$-esima osservazione: $\hat \gamma^{(i)} = y^{(i)}(\bold{w^T x} + b)$.\\
+Margine funzionale rispetto all’intero insieme di esempi: $\displaystyle \hat \gamma = \operatorname*{min}_{i = 1, \dots, m}\hat \gamma^{(i)}$.\\
+
+La predizione della classe dipende solo dal segno di $h$ (infatti $h(\bold{x_i}) = \text{sign}(\bold{w} \cdot \bold{x_i} + b)$).
+Utilizzare multipli di $\bold{w}$ e di $b$, permette di aumentare la larghezza del margine ma in realtà ciò non implica una maggior confidenza nelle predizioni in quanto $h(\bold{wx} + b) = h(a \bold{wx} + ab)$ (hanno lo stesso segno) e $(\bold{w}, b)$ e $(a\bold{w}, ab)$ rappresentano lo stesso iperpiano.
+
+Dato che per lo stesso iperpiano si voleva considerare un margine di confidenza maggiore, quello che possiamo fare per evitare che questo accada è di andare a utilizzare al posto del margine funzionale, il margine geometrico. Quest'ultimo ci restituisce una misura invariante allo scaling dei parametri.
+Denotiamo il margine geometrico attraverso la formula \[\gamma^{(i)} = y^{(i)} \left(\left(\displaystyle \frac{w}{||w||}\right)^T x^{(i)} + \frac{b}{||w||}\right)\]
+ottenuto dividendo il margine funzionale per $||w||$.
+Il margine funzionale viene comunque utilizzato come funzione di test per verificare se un determinato punto è stato classificato correttamente.\\
+
+Margine geometrico rispetto all’$i$-esima osservazione: $\gamma^{(i)} = y^{(i)} \left(\left(\displaystyle \frac{w}{||w||}\right))^T x^{(i)} + \frac{b}{||w||} \right)$. \\
+Margine geometrico rispetto all’intero insieme di esempi: $\displaystyle \gamma =  \min_{i = 1, \dots, m} \gamma^{(i)}$.\\
+
+Idea per scegliere l’iperpiano separatore: scegliere quello che massimizza il margine da entrambe le classi del training set. Ciò significa massimizzare la distanza tra i punti più vicini di ogni classe (il minimo dei margini geometrici tra tutti gli esempi). Il classificatore separerà quindi gli esempi di training positivi dai negativi con un gap.
+\subsection{SVM}
+Ha come scopo quello di massimizzare il minimo margine geometrico. L’SVM cerca l’iperpiano che è il più distante possibile dai membri di ogni classe.
+
+\subsection{Metodi di mapping}
+Se non si riesce a separare gli esempi positivi dai negativi in uno spazio a dimensioni minori usando un iperpiano, è possibile mappare tutto in uno spazio dimensionale a dimensioni maggiori nel quale si riesce a separarli.
+
+\subsection{Kernel}
+Siano $X$ lo spazio delle istanze e $F$ lo spazio delle feature.
+Una funzione $k : X \times X \to \mathbb{R}$ è un kernel valido se esiste una \textit{feature map} $\phi : X \to F \mbox{ tale che }$ \[k(x, z) = \langle\phi(x), \phi(z)\rangle, \forall x, z \in X\]
+Ha come argomento una coppia di punti nello spazio originale e ha la caratteristica di poter essere rappresentata nello spazio di arrivo (spazio delle feature) un prodotto interno. Il prodotto interno in uno spazio euclideo è il prodotto scalare tra due vettori (ovvero di due featue che sono il risultato del mapping). Nello specifico, un kernel valido opera il prodotto interno tra due feature che sono il risultato del mapping nello spazio delle feature di due istanze dello spazio originale.\\
+
+Il kernel può essere pensato come una similarità tra oggetti.\\
+
+Un kernel definisce un prodotto interno \textit{(dot product)} tra vettori. Uno spazio vettoriale che ha un prodotto interno, ha una norma della forma: $||x|| = \sqrt{\langle x, x \rangle}$. Se si ha una norma, si ha una distanza $d(x,y) = ||x-y||$. Quindi il kernel misura la similarità tra due oggetti come l‘inverso della loro distanza.\\
+
+Dato un kernel $k$ e un insieme $S = \{x_1, \dots, x_n\}$, si può definire la \textit{kernel matrix} corrispondente: \[G_{i,j} = \langle \Phi(x_i), \Phi(x_j) \rangle = k(x_i, x_j)\]
+
+Molti algoritmi interagiscono con i dati tramite prodotti interni.
+Quindi se si sostituisce $x \cdot z$ con $k(x, z)$, essi agiranno implicitamente come se i dati appartenessero a uno spazio $\Phi$ a dimensioni maggiori. 
+
+\subsection{Strategia di kernel o kernellizzazione}
+Dal momento che è possibile costruire una funzione $k(x,z)$, tale che \[k(x,z) = \langle \Phi(x), \Phi(z)\rangle_H \mbox{ con }\Phi : X \to H\] allora durante l’addestramento ogni volta che si deve computare $\langle \Phi(x), \Phi(z) \rangle_H$ basterà valutare $k(x,z)$; infatti non c’è bisogno di applicare effettivamente la funzione $\Phi$. In questo modo, si dice che la trasformazione esiste solo implicitamente.\\
+
+Un metodo è \textit{kernellizzato} se ogni vettore delle feature $\psi(x)$ appare solo dentro un prodotto interno con un altro vettore delle feature $\psi(z)$. Ciò si applica sia ai problemi di ottimizzazione che alla funzione di predizione.
+
+\textit{ESERCIZIO 1 SUL FOGLIO}

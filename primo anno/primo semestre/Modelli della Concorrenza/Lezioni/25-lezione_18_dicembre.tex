@@ -1,0 +1,144 @@
+\section{Algoritmi per LTL}
+Automi finiti che riconoscono parole infinite su un alfabeto finito $\Sigma$, detti\textit{ automi di Büchi}, questi vengono rappresentati come $B = (Q, q_0, \delta, F)$, dove:
+\begin{itemize}
+    \item $Q$: insieme finito di stati (\textit{locations})
+    \item $q_0 \in Q$: stato iniziale
+    \item $\delta \subseteq Q \times \Sigma \times Q$: relazione di transizione, indica le possibili transizioni di questo automa. Composto da stato di partenza, etichetta e lo stato di arrivo. 
+    \item $F \subseteq Q$: insieme degli stati accettanti
+\end{itemize}
+
+Una parola infinita $w = a_0 a_1 \dots$ è accettata da $B$ se la sequenza corrispondente di stati $q_0q_1\dots$ passa infinite volte per almeno uno stato in $F$.\\
+
+Si cerca da $q_0$ una transizione uscente etichettata con il simbolo $a_0$, se non esiste ci si ferma e si dice che la parola non è accettata. In caso contrario invece, si passa al nuovo stato e si controlla se esiste un arco uscente etichettato con il secondo simbolo della parola e così via.\\
+
+Il problema $L(B) = \emptyset$ è decidibile.
+\subsection{Esempio}
+\begin{enumerate}
+    \item Osserviamo il seguente automa finito:
+        \begin{center}
+            \begin{tikzpicture}[shorten >=1pt,node distance=2cm,on grid,auto] 
+               \node[state,accepting] (q_0) [] {$q_0$}; 
+               \node[state] (q_1) [right=of q_0] {$q_1$}; 
+                \path[->] 
+                (q_0) edge [bend left] node  {$a$} (q_1)
+                      edge [loop left] node {$b$} ()
+                (q_1) edge [bend left] node  {$b$} (q_0)
+                      edge [loop right] node {$a$} ();
+            \end{tikzpicture}
+        \end{center}
+        
+        Siano poi alcune parole infinite, e diciamo se sono accettate o meno dall'automa raffigurato:
+        \begin{itemize}
+            \item $w_1 = bbbbbbbbb\dots$, questa parola è accettata, rimane in $q_0$ che è accettante. Appartiene quindi al linguaggio dell'automa
+            \item $w_2 = bbaaabbbb\dots$, anche questa parola è accettata, infatti dopo 6 mosse rimane sempre in $q_0$.
+            \item $w_3 = babababab\dots$, anche questa parola è accettata, si rimane infinite volte nel ciclo $q_o \to q_1$, per tanto passa infinite volte in $q_0$ essendo di conseguenza accettata.
+            \item $w_4 = baabbbaaa\dots$, dato che resta un numero finito di volte in $q_1$, e solamente un numero finito di volte in $q_0$, questa parola non è accettata e non fa parte del linguaggio dell'automa. 
+        \end{itemize}
+    \item Osserviamo un secondo automa finito:
+        \begin{center}
+            \begin{tikzpicture}[shorten >=1pt,node distance=2cm,on grid,auto] 
+               \node[state] (q_0) [] {$q_0$}; 
+               \node[state,accepting] (q_1) [right=of q_0] {$q_1$}; 
+                \path[->] 
+                (q_0) edge [bend left] node  {$\{p\}$} (q_1)
+                      edge [loop left] node {$\emptyset$} ()
+                (q_1) edge [bend left] node  {$\emptyset$} (q_0)
+                      edge [loop right] node {$\{p\}$} ();
+            \end{tikzpicture}
+        \end{center}
+        
+    Sottoinsiemi di proposizioni atomiche: $\emptyset$ e $\{p\}$
+    \begin{itemize}
+        \item $w_1 = \emptyset\{p\}\{p\}\emptyset\{p\}\emptyset\emptyset \dots$, questa non viene accettata
+        \item $w_2 = \emptyset\{p\}\emptyset\{p\}\emptyset \dots$, questa invece viene accettata
+    \end{itemize}
+    Sia GF$\{p\}$ la formula LTL corrispondente all'automa, allora per la formula GF$\{p\}$ diciamo che $p$ è vera in numero infinito di stati in un certo cammino
+\end{enumerate}
+\subsection{Algoritmo per LTL - Problema}
+
+Il problema sta nel verificare se $\alpha$ è vera in $(M, q_0)$.
+\begin{enumerate}
+    \item Si costruisce l’automa $B_{\neg \alpha}$, ovvero l’automa che riconosce tutte le parole in cui $\alpha$ non è verificata.
+    \item Si trasforma il modello di Kripke $M$ in un automa etichettato da insiemi di proposizioni atomiche.
+    \item Si calcola il prodotto sincrono dei due automi $PS$.\\
+   \textit{Prodotto sincrono}: automa dato dall’esecuzione in parallelo due automi in modo che procedano con le stesse azioni (etichette). I suoi stati pertanto sono formati dal prodotto cartesiano degli stati dei due automi componenti.\\
+   Nel caso in cui, nella coppia di stati correnti, uno degli automi non ha la transizione uscente con l’etichetta considerata, il prodotto sincrono non può avanzare quindi non c’è una transazione nel prodotto sincrono corrispondente a quell’azione.\\
+   
+   Le parole riconosciute dal prodotto sincrono sono tutte e sole le parole riconosciute da entrambi i due automi.
+   \item Se $L(PS) = \emptyset$, allora $M, q_0 \models \alpha$, non c’è nessun cammino nel quale non è verificata la formula $\alpha$.
+\end{enumerate}
+
+\subsubsection{Estensione per formule in LTL}
+Siano $M = (Q, T, I)$ un modello di Kripke e $\alpha$ una formula.
+Si definisce \textit{estensione} di $\alpha$ l’insieme degli stati in cui $\alpha$ è valida, ovvero $[[\alpha]] = \{q \in Q \; | \; M, q \models \alpha\}$.
+Si hanno poi alcuni \textit{casi particolari};
+\begin{itemize}
+    \item $[[T]] = Q$
+    \item $[[F]]=\emptyset$
+    \item $[[p]] = $ insieme degli stati in cui è vera $p$, con $p \in AP$
+\end{itemize}
+
+\subsubsection{Estensione per formule in CTL}
+Sia $M = (Q, T, I)$ un modello di Kripke.
+\begin{itemize}
+    \item Si considera la formula $\alpha \equiv AF\beta$ a cui si associa una funzione $f_{\alpha}: 2^Q \to 2^Q$ tale che 
+    \[\forall H \subseteq Q \, ,f_{\alpha}(H) = [[\beta]] \cup \{q \in Q \; | \; \forall (q, q') \in T, \; q' \in H\}\]
+    Osservazione: $f_{\alpha}(\emptyset) = [[\beta]]$. Inoltre possiamo dimostrare che $[[\alpha]]$ è il minimo punto fisso di $f_\alpha$.
+  \item Si considera la formula $\alpha \equiv EG\beta$ a cui si associa una funzione $g_{\alpha}: 2^Q \to 2^Q$ tale che 
+  \[\forall H \subseteq Q \, ,g_{\alpha}(H) = [[\beta]] \cap \{q \in Q \; | \; \forall (q, q') \in T, \; q' \in H\}\]
+  Osservazione: $g_{\alpha}(Q) = [[\beta]]$. Inoltre $[[\alpha]]$ è il massimo punto fisso di $g_\alpha$.
+\end{itemize}
+
+\subsection{Calcolo $\mu$}
+È un linguaggio logico che permette di definire formule ricorsive. \\
+Si supponga di avere un solo operatore temporale: $X$. È possibile esprimere la proprietà $EF \alpha$?
+\[EF \alpha \equiv \alpha \lor EX\alpha \lor EXEX \alpha \lor \dots\]
+
+Si tratta di una formula infinita ma con una struttura ben definita.
+Si raccoglie $EX$ e otteniamo in seguito 
+\begin{equation*}
+    \begin{split}
+        EF \alpha   &\equiv \alpha \lor EX(\alpha \lor EX \alpha \lor EXEX \alpha \lor \dots)\\
+                    & \equiv \alpha \lor EX(EF \alpha)
+    \end{split}
+\end{equation*}
+Quest’espressione ha un carattere ricorsivo e verrà scritta in forma compatta come $\mu Y.(\alpha \lor EXY)$\\
+
+Si può fare un ragionamento analogo per $AG \alpha$:
+\[AG \alpha \equiv \alpha \land AX\alpha \land AXAX \alpha \land \dots\]
+Si tratta di una formula infinita ma con una struttura ben definita. Anche qui si raccoglie $AX$ ottenendo poi:
+\begin{equation*}
+    \begin{split}
+        AG \alpha   & \equiv \alpha \land AX(\alpha \land AX \alpha \land AXAX \alpha \land \dots) \\
+                    & \equiv \alpha \land AX(AG \alpha)
+    \end{split}
+\end{equation*}
+Quest’espressione ha un carattere ricorsivo e verrà scritta in forma compatta come $\nu Y.(\alpha \lor AXY)$
+
+Il senso di questo operazione, è quello di poter generalizzare l'idea di definire formule di un linguaggio logico come nelle forme compatte viste sopra, fino ad avere un linguaggio completo che consideriamo come una nuova logica. 
+\subsubsection{Sintassi del calcolo $\mu$}
+Sia $AP = \{p_1, p_2, \dots, q, r, \dots\}$ l’insieme delle proposizioni atomiche. E siano $\alpha$ e $\beta$ due formule.
+\begin{enumerate}
+    \item $\alpha \lor \beta$ e $\neg \alpha$ sono formule.
+    \item $EX \alpha, AX \alpha$ sono formule.
+    \item $\mu Y.f(Y)$ è una formula, dove $f$ è una formula nella quale compare $Y$ (con restrizioni sulle negazioni).
+    \item $\nu Y. f(Y)$ è una formula, dove $f$ è una formula nella quale compare $Y$ (con restrizioni sulle negazioni).
+\end{enumerate}
+
+La semantica del calcolo $\mu$ è definita su modelli di Kripke attraverso operatori di punto fisso.\\
+
+CTL$^* \subset \mu$-calculus (tutte le proprietà esprimibili in CTL$^*$ sono esprimibili anche in calcolo $\mu$). Il calcolo $\mu$ ha la massima potenza espressiva, un’alta complessità e una potenziale oscurità delle formule.
+
+\subsubsection{Complessità e aspetti algoritmici}
+Siano $M$ un modello di Kripke (e $|M|$ la sua dimensione, ovvero il numero di stati) e $f$ una formula (e $|f|$ la sua dimensione).\\
+Complessità temporale di CTL: $\mathcal{O}(|M| \times |f|)$\\
+Complessità temporale di LTL: $\mathcal{O}(|M| \times 2^{|f|})$\\
+Le stime di complessità vanno interpretate perché CTL, anche sembra meno complesso, spesso comporta formule di dimensioni maggiori.\\
+
+Strategie algoritmiche: rappresentazioni simboliche (OBDD), partial order reduction (unfolding) e traduzione in SAT.
+
+
+\subsection{Fairness}
+Un’esecuzione è \textit{unfair} (iniqua, ingiusta) se un evento rimane sempre abilitato da un istante in poi, ma non scatta mai.\\
+\textbf{Problema}: limitare la valutazione di una formula alle esecuzioni fair.\\
+Un’esecuzione è fortemente fair se $GT(t$ abilitata$) \implies GT(t$ scatta$)$, ovvero se una certa transizione è abilitata infinite volte deve scattare infinite volte.

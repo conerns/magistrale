@@ -1,0 +1,91 @@
+\section{Lezione del 5 novembre - Zandron}
+Esistono linguaggi non ricorsivi, cioè esistono problemi non decidibili.\\
+Le macchine di Turing possono essere enumerate, ovvero possono essere associate a numeri naturali. \\
+I problemi invece non possono essere enumerati, questo perché sono in quantità maggiori rispetto ai numeri naturali. Questo è il risultato del fatto che ci sono più problemi rispetto alle macchine di Turing.\\
+Ci sono problemi ragionevoli, che possono essere chiaramente descritti, per i quali sappiamo che non esiste un algoritmo in grado di risolverli. Non possono essere risolvibile in modo automatizzato \\
+Un problema indecidibile è diverso da un problema intrattabile (che significa risolvibile ma in un tempo troppo elevato).
+
+\subsection{Halting Problem}
+Si vuole sapere per una certa coppia $M;x$ se giungerà a terminare oppure se andrà in loop infinito. Mi interessa quindi un algoritmo che è sempre in grado se termina o meno la computazione su un certo calore in input, questo indifferentemente dal numero di passi che devono essere effettuati. \\
+\begin{teorema}{Teorema}{}
+\par
+Linguaggio $H$ non ricorsivo, con $H = \{$tutte le stringhe ($M;x$) tali per cui la macchina $M$ avente in input $x$, questa $\neq \perp$, ovvero la macchina $M$ va a terminare$\}$. Scrivendolo formalmente abbiamo $H = {M;x | M(x) \neq \perp}$. Il risultato che otteniamo ci dice che $H$ non è ricorsivo, ovvero il $Halting Problem$ non è decidibile.
+\end{teorema}
+Per il teorema enunciato si ha una \textbf{Dimostrazione per assurdo}\\
+Immaginiamo per assurdo che $H$ è ricorsivo. Questo significa che è possibile costruire una macchina $M_H$ tale che $M_H(M;x) =$ YES, se $M(x) \neq \perp$(termina la computazione) e $M_H(M;x) =$ NO, se $M(x) = \perp$(non termina la computazione).\\
+È allora possibile costruire un’altra macchina $D$ tale che, ricevuta in input una macchina $M$ si comporti in maniera opposta rispetto a una macchina $M_H$ con input $M;M$ (dare un programma in input ad un altro programma, in questo caso la nostra macchina di Turing $M$):
+\begin{itemize}
+    \item se $M_H(M;M) \neq \perp$, $M_H(M; M)$ risponde YES e $D(M)$ va in loop
+    \item se $M_H(M;M) = \perp$, $M_H(M; M)$ risponde NO e $D(M)$ risponde YES 
+\end{itemize}
+Se la macchina passata in input a $D$ fosse $D$ stessa, allora $D(D)$ o va in loop infinito o risponde YES.
+\begin{itemize}
+    \item Affinché $D$ risponda YES, $M_H(D;D)$ deve rispondere NO, ma per definizione se $M_H$ risponde NO, allora $D(D)$ non termina la computazione.
+    \item Affinché $D$ vada in loop infinito, $M_H(D; D)$ deve rispondere YES, ma per definizione de $M_H$ risponde YES, allora $D(D)$ termina la computazione. 
+\end{itemize}
+Non è possibile allora costruire la macchina $D$ perché se gli do come input se stessa, mi ritrovo in una situazione assurda. Non è possibile costruire nemmeno $M_H$ e quindi $H$ non è ricorsivo. 
+
+\begin{teorema}{Teorema}{}
+\par
+$H$ è ricorsivamente enumerabile. Ovvero che il problema non è decidibile e il problema dell'arresto è parzialmente definibile.
+\end{teorema}
+Bisogna creare una macchina di Turing che riconosce tutte le stringhe del linguaggio $H$. Ovvero che la macchina termina in $YES$ e quindi la stringa appartiene al linguaggio. \\
+\textbf{Dimostrazione}
+Occorre una macchina $M'_H$ che prenda in input ($M;x$) e determina se $M$ termina sull’input $x$. 
+\begin{itemize}
+    \item se $M(x)$ termina, $M'_H(M;x)$ deve rispondere YES
+    \item se $M(x)$ non termina, $M'_H(M;x)$ deve rispondere NO o entrare in un loop infinito.
+\end{itemize}
+La macchina $M'_H$ è costruibile basandosi sul funzionamento della macchina di Turing universale $U$ e rispondere nel seguente modo:
+\begin{itemize}
+    \item se $M(x)$ risponde YES, $U(M;x)$ risponde YES e $M'_H(M;x)$ risponde YES ($U(M;x)$ ha terminato la computazione quindi $M'_H(M;x)$ è YES perché è finita la computazione )
+    \item se $M(x)$ risponde NO, $U(M;x)$ risponde NO e $M'_H(M;x)$ risponde YES ($U(M;x)$ ha terminato la computazione quindi $M'_H(M;x)$ è YES, anche se la computazione è finita in stato N è pur sempre finita)
+    \item se $M(x)$ va in halt, $U(M;x)$ va in halt e $M'_H(M;x)$ risponde YES ($U(M;x)$ ha terminato la computazione quindi $M'_H(M;x)$ è YES, anche se la computazione è finita in stato di arresto è pur sempre finita)
+    \item se $M(x)$ entra in un loop infinito, $U(M;x)$ entra in un loop infinito e $M'_H(M;x)$ entra in un loop infinito. ($U(M;x)$ non ha terminato la computazione quindi $M'_H(M;x)$ anche lei entra in loop, la stringa non appartiene al linguaggio) 
+\end{itemize}
+Quindi il problema dell’Halting è parzialmente decidibile e il suo linguaggio è ricorsivamente enumerabile.\\
+\subsection{Linguaggi Ricorsivamente Enumerabili}
+I linguaggi non ricorsivamente enumerabili sono linguaggi i cui problemi associati sono tali per cui esiste almeno un’istanza per la quale non esiste alcuna macchina di Turing che dia risposta.
+
+\begin{teorema}{Teorema}{}
+\par
+$\exists \ $ linguaggio RE (ricorsivamente enumerabile)
+\end{teorema}
+La dimostrazione l'avevamo definita nella lezione scorsa  [\ref{dimostrazione_ricorsivamente_enumerabile}]\\ 
+Quello che possiamo ricavare:
+\begin{enumerate}
+    \item se $L_H$ non è ricorsivo ma è ricorsivamente enumerabile.
+    \item di conseguenza  $\overline{L_H}$ non è ricorsivamente enumerabile. (per il teorema dei linguaggi ricorsivi)
+\end{enumerate}
+Se io considero $\overline{L_H} = \{M;x\  | \ M(x) = \perp \}$, questo non lo posso riconoscere nemmeno parzialmente con nessuna macchina di Turing, perché se fossi in grado di farlo avremmo che $L_H$ è ricorsivo. 
+
+Vogliamo classificare i problemi sulla base dei tempi di esecuzione. Problemi di decisione decidibili possono lavorare in tempi:
+\begin{itemize}
+    \item polinomiali(P) (rispetto alla dimensione dell'input).
+    \item dimostrabilmente esponenziali
+\end{itemize}
+Possiamo formalizzare il numero di passi di una TM in modo formale attraverso $t_M(x)$, questo corrisponde al tempo di calcolo di una macchina $M$ su input specifico $x$ per dare risposta.\\
+Parliamo ora della funzione di complessità temporale, questa ci si presenta nella forma $T_M(n) = \max\{t_M(x) \; : \; |x|=n\}$. 
+Per considerare il caso peggiore, si calcola il massimo tra tutti i tempi di calcolo della macchina $M$ su input $x$ tali che la dimensione dell’istanza $x$ sia uguale a $n$.\\
+
+La \textbf{classe polinomiale (P)} è la classe di linguaggi $L$ decisi da una macchina di Turing deterministica (una macchina in cui c’è una funzione di transizione, ad ogni coppia stato-simbolo la macchina può fare una e una sola cosa), in un tempo limitato superiormente da una certa funzione polinomiale in $n$.\\ $P = \{L$ deciso da una DTM in tempo $\mathcal{O}(p(n))\}$
+Possiamo definire in un ulteriore modo la classe $P$, utilizzando la notazione $time(n)$.\\
+La \textbf{classe di problemi $time(f(n))$} è la classe dei linguaggi che sono decisi da una macchina di Turing entro un tempo $f(n)$. (Es. $time(n)$: classe di tutti i linguaggi decisi in tempo lineare.). Come faccio a dire che $P$ è la classe di linguaggi decisi in tempo polinomiale ora? Semplicemente esprimo:\\
+$$P = \displaystyle \bigcup_{j \geq 0} time(n^j), \textnormal{corrispondente alla unione di tutte le classi di complessità} n^j$$
+Avendo definito la classe P significa che abbiamo un algoritmo/TM che risolve il problema in modo efficiente. \\
+Analogamente posso definire anche lo spazio richiesto dalla soluzione di un certo problema, e lo si fa nel seguente modo:
+$$s_{_M}(x)  \textnormal{spazio di calcolo di una macchina } M \textnormal{ su input } x$$
+Lo spazio di calcolo è il numero di celle visitate dal nastro della macchina $M$ con input $x$ durante la computazione. Durante la computazione sappiamo certamente che lo spazio può variare, ma noi consideriamo solo le celle visitate.  
+
+Funzione di complessità spaziale: $S_{_M}(n) = \max\{s_M(x) \; : \; |x|=n\}$. Per considerare il caso peggiore, si calcola il massimo tra tutti gli spazi di calcolo della macchina $M$ su input $x$ tali che la dimensione dell’istanza $x$ sia uguale a $n$.
+\subsubsection{Rapporto spazio-tempo}
+Tra lo spazio utilizzato e il tempo, per una macchina di Turing, c'è un rapporto:
+\begin{itemize}
+    \item $S_M(n) \leq T_M(n) + n$ $+ \, n$: per il caso in cui l’input non sia preso in considerazione. Se il tempo è limitato allora lo spazio è limitato.
+    \item Se $M(x)$ è in loop su “poche” celle, allora $S_M(n)$ è limitato ma $T_M(n)$ no.  Quindi non è vero che se lo spazio è limitato anche il tempo è limitato.
+    \item Se esiste una macchina $M$ che lavora in spazio finito e in tempo infinito, allora esiste un’altra macchina $M'$ che fa la stessa cosa in tempo limitato. 
+    $$T_{M'}(n) \leq |K|\cdot |S_M(n)| \cdot |\Sigma|^{S_M(n)}$$
+    Il tempo di calcolo è minore o uguale al numero di configurazioni possibili della macchina.
+    Se si supera questo numero infatti, vuol dire che la macchina a un certo punto si trova in una configurazione in cui era già stata prima e questo significa che rifarà la stessa porzione di passi in loop.
+    Se lo spazio è limitato, allora il problema è risolvibile anche in tempo limitato (magari su un’altra macchina).
+\end{itemize}

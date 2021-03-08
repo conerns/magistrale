@@ -1,0 +1,93 @@
+\section{Lezione del 23 novembre}
+Esiste un algoritmo polinomiale per costruire un ciclo Euleriano da un grafo Euleriano.\\
+Un algoritmo 2-approssimante per il TSP metrico è noto come algoritmo di Christofides.
+
+\subsection{Algoritmo di Christofides}
+Dato un grafo $G(V,E)$ non orientato, completo, con costi $c$ semimetrica, l’algoritmo trova un ciclo hamiltoniano di costo al più doppio rispetto al ciclo di costo minimo.
+\begin{enumerate}
+    \item Si trova il minimo albero ricoprente $T$ di $G$.\\
+    L’algoritmo greedy (*algoritmo di PRIN*) garantisce l’ottimo: basta scegliere gli archi in ordine di costo crescente ma saltando quelli che chiudono i cicli.
+    \item Si raddoppia ogni arco di $T$ ottenendo un grafo euleriano.
+    \item Si costruisce un ciclo euleriano $\mathcal{E}$ di questo grafo (in tempo polinomiale).
+    \item Si sceglie un nodo iniziale $u \in \mathcal{E}$ e si visira $\mathcal{E}$ a partire da $u$.
+    \item Si costruisce una permutazione $\pi$ dei nodi $V$, sequenziando i nodi nell’ordine della loro prima apparizione in $\mathcal{E}$ nella visita.
+    \item Si restituisce il ciclo hamiltoniano $H$ associato a $\pi$. 
+\end{enumerate}
+$H$ è ottenuto da $\mathcal{E}$, sostituendo cammini con archi: $c(H) \leq c(\mathcal{E})$ per disuguaglianza triangolare.
+Evidenziamo una differenziazione della notazione, chiameremo $H^*$ un ciclo hamiltoniano ottimo (con costo minimo), con $H$ invece si indica la soluzione che approssima quella di minimo costo.
+
+Il costo, per costruire un ciclo di Eulero $\mathcal{E}$, è in relazione con il costo dell'albero di copertura minimo $c(T)$, sono nella relazione $c(\mathcal{E}) = 2 \cdot c(T)$. Questo perché $E$ è il ciclo di Eulero del grafo ottenuto duplicando gli archi di $T$ e $E$ attraversa una sola volta tutti e soli gli archi di tale grafo. Questo perché stiamo generando un multi grafo. \\
+Si ha che $c(\mathcal{E}) = 2 \cdot c(T)$ perché $\mathcal{E}$ è il ciclo di Eulero del grafo ($G_T$) ottenuto duplicando gli archi di $T$ ed $E$ attraversa una sola volta tutti e soli gli archi di tale grafo($G_T$).  Da questo quindi deriva che \[c(\mathcal{E}) = c(E(G_{\pi})) = 2 \cdot c(T)\]
+Quello che ci manca ora per poterci collegare ad $H^*$, date tutte le nozioni apprese fin ora, è esprimere la relazione tra il cammino di costo minimo $c(T)$ e il camino hamiltoniano $H^*$. La relazione che sussiste è data da \[c(T) \leq c(H^*)\]	
+
+Un ciclo hamiltoninao ottimale è costituito da un albero di copertura $T' \ +$ un arco $e$ che chiude l'albero ad un ciclo, per cui  $c(H^*) \geq c(T')$ perché $c(H^*) = c(T') + c(e)$.
+$T'$ non è detto che sia l'albero di copertura minima per cui $c(T) \leq c(T')$ dove $T$ invece è l'albero di copertura minimo. Unendo le due relaziono otteniamo che: $c(H^*) \geq c(T') \geq c(T)$.
+Possiamo ottenere la seguente rappresentazione 
+\[c(T) \leq c(T') \leq c(H^*)\]
+\[\Downarrow\]
+\[c(T) \leq c(H^*)\]
+Da quanto espresso deriva che 
+\begin{itemize}
+    \item $c(H) \leq c(\mathcal{E}) \leq 2 \cdot c(H^*)$
+    \item $c(\mathcal{E}) = 2 \cdot c(T)$
+    \item $2 \cdot c(T) \leq 2 \cdot c(H^*)$
+\end{itemize}
+Quello che possiamo ottenere come risultato finale:
+
+\begin{teorema}{Teorema}{}
+Sia $H^*$ il ciclo hamiltoniano di costo minimo e sia $T$ l’albero ricoprente di $G$ di costo minimo, allora $c(H^*) \geq c(T)$.
+\end{teorema}
+\textbf{Dimostrazione}\\
+Sia $T'$ il cammino semplice ottenuto da $H^*$ rimuovendo un arco allora $T'$ è un albero: $c(H^*) \geq c(T')$.
+$T'$ contiene tutti i nodi di $G$, quindi è un albero ricoprente.
+Se $T'$ è un albero ricoprente e $T$ l’albero ricoprente a costo minimo, allora $c(T') \geq c(T)$.
+Quindi $c(H^*) \geq c(T') \implies c(H^*) \geq c(T)$
+
+\begin{teorema}{Teorema}{}
+Sia $H^*$ il ciclo hamiltoniano di costo minimo e sia $H$ il ciclo ritornato dall’algoritmo di Christofides, allora $c(H) \leq 2 \cdot c(H^*)$.
+\end{teorema}
+\textbf{Dimostrazione}\\
+Sia $\mathcal{E}$ il grafo ottenuto dall’albero ricoprente a costo minimo $T$ raddoppiando gli archi, allora $c(\mathcal{E}) = 2 \cdot c(T)$.
+Sia $H$ il ciclo ottenuto dal ciclo euleriano $\mathcal{E}$, eventualmente saltando i nodi, allora $c(H) \leq c(\mathcal{E})$.\\
+Dato il teorema per cui $c(T) \leq c(H^*)$, allora $c(H) \leq 2 \cdot c(T) \leq 2 \cdot c(H^*)$.
+
+\subsection{Cammino hamiltoniano (Hamiltonian path, HP) di decisione}
+HP prende in input un grafo $G=(V,E)$ e riporterà output, dato che è un problema di decisione, se esiste un cammino che visita ogni nodo di $V$ esattamente una volta.\\
+Quello che sappiamo è che il problema HP è un NP-completo.
+
+\subsubsection{TSP di decisione}
+Ricordiamo che prende in input un grafo $G=(V,E)$ completo e pesato e un costo $k$, e essendo anche lui un problema di decisione, l'algoritmo ci dovrà restituire se esiste un cammino da $u$ a $u$ che visita ogni nodo di $V$ esattamente una volta ed è di costo $\leq k$.
+
+Quello che avevamo detto in precedenza, è che HP $\leq_p$ TSP.\\
+La riduzione polinomiale $f$ prende $G = (V,E)$ in input e produce $f(G) = G'$, dove $G’= (V, E’, w)$, con $E'$ completo su $V$ dove: $w(e)= 1 \iff e \in E$; $w(e)= 2$, altrimenti. \\
+Il cammino hamiltoniano in $G$ ha $n$ vertici.
+
+\begin{teorema}{Teorema}{}
+    TSP non ha un’approssimazione costante a meno che P = NP.
+\end{teorema}
+\textbf{Dimostrazione}\\
+Sia $G=(V,E)$ un grafo di cui si vuole calcolare un ciclo hamiltoniano. Si costruisce $G' = (V, E', w)$ dove: 
+\begin{itemize}
+    \item $w(e) = 1 \iff e=(u,v) \in E$
+    \item $w(e) = \displaystyle \frac{|V|}{1- \displaystyle \frac{1}{\varepsilon}}$	altrimenti (cioè pesa di più)
+\end{itemize}
+Si assuma di avere un algoritmo $A$ che è $\epsilon$-approssimato. Si hanno due diverse casistiche:
+\begin{itemize}
+    \item Caso 1: $A$ restituisce un ciclo di costo $|V|$, quindi esiste un ciclo hamiltoniano determinato in tempo polinomiale. 
+    \item Caso 2: $A$ restituisce un ciclo con almeno un arco di costo $\epsilon \cdot |V| + 1$, allora $A(x)> \epsilon \cdot |V|$.
+\end{itemize}
+
+Questo perché $A(x)$ è maggiore del costo $|V|-1 + \epsilon \cdot |V| + 1$.
+Ma $\epsilon \cdot opt(x) > A(x)$, per definizione di $\epsilon$-approssimazione, e quindi si ha che $opt(x) > \displaystyle \frac{A(x)}{\epsilon} > |V|$. Quindi non esiste un ciclo hamiltoniano, ovvero non c’è modo di avere un ciclo di costo $|V|$.
+
+\subsection{Problema Closest String}
+In questo caso l'input input è una collezione di $k$ stringhe $s_1, \dots, s_k$ di lunghezza $l$ e un intero $d$. ($k$ e $d$ parametri) riportando in output una stringa $s$ tale che $d_H(s, s_j) \leq d, \forall$ stringa $s_1, \dots, s_k$.
+
+\textbf{Hamming distance}: $d_H(s, s') = $ simboli diversi tra $s$ e $s'$.
+
+CS è NP-hard.
+
+\begin{teorema}{Teorema}{}
+    Closest String è risolvibile in tempo $\mathcal{O}(d+1)^d |G|$.
+\end{teorema}
+Se $d$ è piccolo, allora il tempo $\mathcal{O}(d+1)^d$ è accettabile anche con input molto grandi.

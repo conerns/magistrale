@@ -1,0 +1,77 @@
+\section{Lezione del 2 novembre - Zandron}
+Un linguaggio finito è sicuramente ricorsivo. (si sta facendo riferimento a \ref{decidibile})
+
+Legenda nomencalatura utilizzata nei file:
+\begin{itemize}
+    \item $\displaystyle \Sigma$: alfabeto, insieme finito di simboli.
+    \item $\displaystyle \Sigma^*$: insieme di tutte le stringhe che si possono costruire a partire dai simboli dell’alfabeto (compresa la stringa vuota).
+    \item $\displaystyle \Sigma^+$: $\Sigma^* \setminus \{\epsilon\}$
+    \item $\displaystyle \Sigma^*$ e $\Sigma^+$ sono casi banali di linguaggi ricorsivi.
+\end{itemize}
+
+\textbf{Teorema}: Preso un linguaggio $L \subseteq \Sigma^*$, possiamo dire che se $L$ è ricorsivo $\implies L$ è anche ricorsivamente enumerabile (RE).\\
+\textbf{Dimostrazione}[\label{dimostrazione_ricorsivamente_enumerabile}*]: Se $L$ è ricorsivo allora esiste una macchina di Turing $M$ tale che se si esegue una computazione dico se $x \in L$, pertanto la macchina termina in YES, in alternativa  $x \notin L$ e la macchina termina in NO.  È possibile allora costruire una macchina $M'$ tale che: quando $M$ va in YES, $M'$ va in YES; quando $M$ va in NO, $M'$ va in loop.
+$M'$ si ottiene modificando leggermente $M$ per far si che la macchina non restituisca mai NO, cambiando la funzione di transazione, finendo in un ciclo infinito. 
+
+
+Abbiamo un altro Teorema, che enuncia che preso un linguaggio $L \subset \Sigma^*$, $L$ è ricorsivo $\iff L$ è ricorsivamente enumerabile $\land \;  \overline{L}$(il complementare di L) è ricorsivamente enumerabile. Il complementare è costruito dalle stringhe che non fanno parte di $L$. La dimostrazione del teorema ci dice per accettare $\overline{L}$, serve una macchina che accetta tutte le stringhe che non sono in $L$ e va in loop quando riceve una stringa di $L$.
+Siano poi \begin{itemize}
+    \item $M$: la macchina che decide $L$.
+    \item $M'$: la macchina che accetta $L$. 
+\end{itemize}
+Vogliamo convincerci che esiste una macchina $M''$ che si comporta nel seguente modo:
+\begin{itemize}
+    \item Risponde $YES$ se $x$ appartine a $\overline{L}$, quindi $x \notin L$
+    \item Va in loop se $x \notin  \overline{L}$, quindi $x \in L$
+\end{itemize}
+Posso costruire questa macchina nel seguente modo: quando $M$ va in $YES$ faccio andare $M''$ in loop; quando $M$ va in NO, eseguo una modifica alla funzione di transizione per la mia $M''$ e va uno stato di $YES$.
+
+{ \medskip}
+A partire da una macchina $M_1$ che accetta $L$ e da una macchina $M_2$ che accetta $\overline{L}$, è possibile costruire una macchina $M_3$ che decida $L$.
+Per farlo, si costruisce una macchina $M_3$ che: va in YES, se $M_1$ va in YES; va in NO, se $M_2$ va in YES. \\
+Infatti $M_1$ e $M_2$ non possono mai essere entrambe in YES per una stessa stringa, e non andranno mai in NO, perché si troveranno in loop. \\
+$M_3$ non andrà mai in loop infinito perché $\forall$ input $x$, $x \in L \lor x \notin L$, quindi una delle due macchina dà sempre risposta YES. \\
+$M_3$ deve simulare due macchine. Per farlo può usare $k$ nastri, in particolare con $k=4$: su due nastri ci sono le due macchine simulate e sugli altri due i due input. Successivamente si deve procedere simulando alternativamente un passo per ogni macchina, finché una delle due non arriva in YES (memorizzando ad ogni passo la configurazione corrente per ogni macchina).\\
+
+\subsection{Problemi di decisione}
+I linguaggi sono utili quando vogliamo parlare formalmente di intrattabilità, e ci sono serviti per poter parlare dei problemi di decisione. Un problema di decisione è un problema che ha due sole possibili risposte (YES e NO). Dato un problema di decisione è possibile associarlo a un linguaggio, per il quale ci si chiede se una stringa gli appartenga o meno. Questo ci sarà utile per poter classificare i problemi.
+\subsubsection{Hamiltonian Cycle Problem (anche nella versione Hamiltonian Path Problem)}
+Dato un grafo $G=(V,E)$, non completo e non pesato, ci si chiede se esiste un modo per partire da un nodo e tornarci toccando tutti i vertici del grafo una e una sola volta. A differenza del TSP, in questo caso non si ha un grafo completo.  
+Il problema è risolvibile (basta provare tutti i cammini), quindi il linguaggio associato al problema è ricorsivo. 
+
+{\medskip}
+
+È sempre possibile passare da un problema generale di ottimo al problema di decisione associato e tipicamente lo si fa aggiungendo un ulteriore parametro e ponendo una domanda rispetto a quel parametro. Prendiamo ad esempio in condierazione il problema del TSP:
+\begin{itemize}
+    \item TSP di ottimo si chiede qual è il giro con peso minimo
+    \item TSP di decisione (D-TSP) si chiede esiste un giro con peso $\leq$ B
+\end{itemize}
+Questo ci porta intuitivamente a dire che se si riesce a dimostrare che la versione di decisione ha risposta ma non in tempi accettabili, tanto meno saranno accettabili i tempi di risposta della versione di ottimo. 
+
+{\medskip}
+
+Sia $\Pi$ un problema di decisione. È possibile effettuare un passaggio $\Pi \to L(\Pi, cod)$ ad un linguaggio che dipende da $\Pi$ e da uno schema di codifica $cod$, ovvero una funzione $cod: I_{\Pi} \to \Sigma^*$ che prende in ingresso un’istanza del problema e dà in uscita una stringa del linguaggio.\\
+Sia $x \in I_{\Pi}$ un’istanza del problema, $x$ può avere risposta YES (e dovrà essere codificata in modo tale che $cod(x) \in L$)  o NO (e dovrà essere codificata in modo tale che $cod(x) \notin L$). \\
+Una codifica è una traduzione di un’istanza in una stringa di un linguaggio. Risolvere un problema di decisione significa riconoscere quali stringhe fanno parte del corrispondente linguaggio e quali no.
+
+\medskip
+
+Ritornando a parlare del HCP, si consideri quindi l’\textbf{Halmitonian Cycle Problem}.\\
+Il $L_{HC} = \{$stringhe $y \in \Sigma^*$ che corrispondo a un’istanza con risposta YES$\}$ 
+Essendo un problema risolvibile, esiste una macchina di Turing in grado di decidere il linguaggio Ciclo Hamiltoniano (HC). Un modo per tradurre il grafo nelle stringhe di un linguaggio è quello di rappresentare la matrice di adiacenza del grafo tramite una stringa. \\ La prima cosa che possiamo dire è che HC è risolvibile $\iff L_{HC}$ è ricorsivo (decidibile).\\
+HC è risolvibile, quindi $L_{HC}$ è ricorsivo, ma quello che noi vogliamo ora chiederci è quanto tempo ci vuole a decidere se una stringa appartiene o no al linguaggio associato a HC.\\
+Per capire se una stringa fa parte o meno del linguaggio quanto tempo ci vuole? Per capirlo si guarda il numero di passi (che sarò finito) nel caso peggiore. Può essere deciso se è efficiente o meno in base alla risposa data. 
+\subsection{Universal Turing Machine (UTM)}
+I calcolatori moderni sono realizzazioni delle macchine di Turing universali.
+É una macchina di Turing universale la macchina di Turing $U$ che non fa un compito specifico rispetto a quanto definito nella funzione di transizione, ma prende in input un’altra macchina $M$, un separatore $;$, e una stringa $x$ di input per la macchina $M$, restituendo in output il risultato della computazione della macchina $M$ sull’input $x$.
+$$U(M;x) \to M(x)$$
+Si chiama universale perché calcola quello che calcola qualunque altra macchina di Turing. 
+
+Un calcolatore standard definisce stati e simboli come numeri naturali ($S, \Sigma \in \mathbb{N}$).
+Se si ha in input $(M; x)$, si fa in modo che la quantità di stati di $M$ definisca gli stati di $U$ (se $M$ ha $n$ stati, gli stati in $U$ saranno $1, \dots, n$) e i simboli, gli stati finali e i movimenti della testina siano definiti sommando $|S_M|$ a interi partendo da $1$. 
+$U(M;x)$ ha due nastri: 
+\begin{itemize}
+    \item sul primo, c’è la descrizione di $M$, un separatore $;$ e tutta la descrizione dell’input $x$.
+    \item sul secondo, c’è la configurazione attuale di $M;x$. 
+\end{itemize}
+Nel caso in cui $M$ arrivi in uno stato finale, $U$ entra nello stesso stato e dà la stessa risposta di $M$.

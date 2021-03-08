@@ -1,0 +1,75 @@
+\section{Introduzione al Pattern Matching su stringhe}
+%non centra un cazzo con le lezioni frontali
+Il \textbf{pattern matching} si occupa di ricercare un all'interno di un testo $T$ le occorrenze di un pattern $P$. Si hanno: 
+\begin{itemize} 
+    \item pattern matching esatto: trovare le occorrenze esatte di $P$ in $T$
+    \item pattern matching approssimato : trovare le occorrenze approssimate di $P$ in $T$
+\end{itemize}
+\subsection{Definizioni}
+Definiamo stringa come una sequenza di simboli appartenenti ad un dato alfabeto $\Sigma$, scritta come: \\
+$X= x_1,\ldots,x_n,\quad \forall x_i\in \Sigma, \forall i = 1, \dots, n$ ovviamente non è necessario che la stringa contenga tutti i simboli dell'alfabeto.\\ 
+Diamo alcune definizioni utili: 
+\begin{itemize} 
+    \item $|X|$ indica la lunghezza della stringa 
+    \item $\varepsilon$ indica la stringa vuota, di lunghezza 0
+    \item $X[i]$ indica il carattere all'indice $i$ di $X$ (partendo da 1 e non da 0) 
+    \item $X[i,j]$ indica la sottostringa che parte dall'indice $i$ e arriva all'indice $j$ (estremi inclusi).  \\
+    Inoltre se si hanno $i\neq j$ e $j\neq |X|$ si ha una \textbf{sottostringa propria}.\\ 
+    (Esempio: per $X=bbaccbbaac$ ho la sottostringa $X[4,8]=ccbba$) 
+    \item $X[1,j]$ indico un \textbf{prefisso} di $X$ di lunghezza $j$ (estremo incluso). 
+    Si parla di \textbf{prefisso proprio} se $j \neq |X|$, se $j=0$ allora si ha \textbf{prefisso nullo} e si indica con $\varepsilon$.\\
+    \item $X[i,|X|]$ indica un \textbf{suffisso} della stringa $X$ di lunghezza $|X|-i+1$. 
+    Si ha inoltre che se ho $X[|X|,|X|+1]$ allora ho il \textbf{suffisso nullo}, ovvero $\varepsilon$.\\ 
+\end{itemize}
+\subsection{Pattern Matching Esatto (PME)}
+Preso in input un testo $T$ di lunghezza $n$ e un patter $P$ di lunghezza $m$, definiti all'interno dell'alfabeto $\Sigma$, l'algoritmo di restituisce tutte le occorrenze esatte di $P$ in $T$.\\ 
+$P$ occorre esattamente in posizione i di $T$,se la sottostringa $T[i, i+|P|-1]$  coincide con  $P$. Quindi in output ho tutte le posizione $i$ nel testo tali per cui $T[i,i+m-1]$ è esattamente uguale a $P$.
+
+\subsubsection{Algoritmo banale per PME esatto}
+Una finestra $W$ lunga $m = |P|$ scorre lungo $T$ da sinistra a destra a partire dalla posizione $i = 1$. Nella generica posizione $i$ di $W$ ognuno dei simboli di $P$ viene confrontato con il corrispondente simbolo di $T$ all'interno di $W$ procedendo da sinistra verso destra. Se ogni simbolo di $P$ è uguale al suo corrispondente in $W$, allora viene prodotta in output l'occorrenza $i$ di $P$ in $T$. In caso contrario la finestra $W$ viene spostata alla posizione $i+1$ e il confronto riparte. Tale algoritmo ha una complessità $\mathcal{O}(|T| \cdot |P|)$.
+
+
+\subsection{Pattern Matching Approssimato (PMA1)}
+Preso in input un testo $T$ di lunghezza $n$ e un pattern $P$ di lunghezza $m$, definiti su alfabeto $\Sigma$, e una soglia di errore $k$, riporta come output tutte le occorrenza approssimate di $P$ in $T$. 
+Bisogna fare riferimento alla \textbf{Distanza di edit}
+\subsubsection{Distanza di edit}
+Date due stringhe $X_1$ e $X_2$ si definisce distanza di edit il minimo numero di operazioni di sostituzione, cancellazione e inserimento di un simbolo che trasformano $X_1$ in $X_2$ (o viceversa). La distanza di edit tra due stringhe è simmetrica.
+\subsubsection{Occorrenza approssimata}
+Date due stringhe $T$ e $P$, definite sull'alfabeto $\Sigma$, e una soglia $k$, si dirà che:
+\begin{itemize}
+    \item $P$ ha un’occorrenza approssimata in $T$ in posizione $i$ se esiste (almeno) una sottostringa $T[i-L+1,i]$ che finisce in posizione $i$, e ha distanza di edit al più $k$ con $P$. 
+    \item $L$ è un certo valore non prevedibile in quanto sto ammettendo che il match sia su una stringa di lunghezza diversa da quella del pattern
+    \item l'output diventa l'insieme di tutte le posizioni $i$ di $T$in cui finisce almeno una sottostringa che ha con $P$ una distanza di edit al più $k$.
+\end{itemize}
+Definiamo \textbf{bordo} della stringa $X$, $B(X)$, che è il più lungo prefisso proprio che occorre come suffisso di $X$.
+Il bordo è per definizione un prefisso proprio e non può coincidere con l’intera $X$ \\ 
+Definiamo concatenazione tra una stringa $X$ e un simbolo $\sigma$ come: $X\sigma$
+
+\subsection{Ricerca esatta con Automa a Stati Finiti}
+Siamo nell'ambito del pattern matching esatto.\\
+L'algoritmo utilizzato funziona nel seguente modo :
+\begin{itemize}
+    \item Abbiamo una fase di preprocessamento in tempo $\mathcal{O}(m|\Sigma|)$, per calcolare la funzione di transizione $\delta$.
+    \item Usa la funzione di transizione per scandire  il testo in un tempo lineare nella sua lunghezza $\mathcal{O}(n)$ per cercare tutte le occorrenze esatte del pattern $P$. 
+\end{itemize}
+
+\subsubsection{Funzione di transizione}
+Definiamo $\delta$ definita sul pattern $P$ come: $\delta:\{0,1,\ldots, m\}\times \Sigma\to\{0,1,\,\ldots, m\}$  \\
+Quindi ad ogni coppia di valori che possiamo formare tra un simbolo e un intero tra 0 e $m$, corrisponde un intero tra 0 e $m$. Nel dettaglio si hanno due casi:
+\begin{enumerate}
+    \item $\delta(j,\sigma) = j + 1 \iff j < m \land P[j + 1]= \sigma$, dove $\sigma$ è l'input della funzione.
+    \item $\delta(j,\sigma) = k \iff P[j + 1]\neq \sigma \lor j = m,\mbox{ con } k = |B(P[1, j] \sigma)|$. 
+    on $k$ che è la lunghezza del bordo tra il prefisso corrente a cui viene concatenato il carattere $\sigma$. Si ha che $k\leq j$ per definizione (dato che sto calcolando il bordo su una stringa di lunghezza $j+1$).  
+\end{enumerate}
+La transizione dallo stato $j$ allo stato $\delta(j,\sigma)$ avviene attraverso il simbolo $\sigma$. 
+
+%%%%HA FATTO MOLTI ESEMPI, CI STANNO
+
+Facciamo due osservazioni:
+\begin{enumerate}
+    \item dallo stato 0, si arriva allo stato 0 per qualsiasi simbolo $\sigma\neq P[1]$ e quindi si arriva allo stato 1 attraverso $\sigma =P[1]$ 
+    \item dallo stato $m$ si arriva sempre ad uno stato $k\leq m$ e da uno stato $m$ si può arrivare di nuovo ad uno stato $m$
+\end{enumerate}
+
+
+%%%%HA FATTO MOLTI altri ESEMPI, CI STANNO

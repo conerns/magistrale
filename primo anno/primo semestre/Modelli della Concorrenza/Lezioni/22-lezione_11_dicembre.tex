@@ -1,0 +1,44 @@
+\section{Lezione del 11 dicembre}
+\begin{itemize}
+    \item $FGF \alpha \equiv GF \alpha$	prima o poi sarà sempre vero che prima o poi sarà vera $\alpha$ coincide a è sempre vero che prima o poi sarà vera $\alpha$
+    \item $GFG \alpha \equiv FG \alpha$	
+\end{itemize}
+\subsection{Insiemi minimali di operatori}
+\begin{itemize}
+    \item $T  \bigcup \alpha$ (true until $\alpha$) $\equiv F \alpha$, occorre che a un certo punto del cammino è vera $\alpha$ e in tutti gli stati precedenti sia vera $T$. MA $T$ è sempre soddisfatta, quindi sostanzialmente si richiede solamente che sia $\alpha$ sia vera. Questo viene mostrato con l'equivalenza. 
+    \item $\neg F \neg \alpha$ (non è vero che prima o poi diventa vera $\neg \alpha$) $\equiv G \alpha$, questa equivalenza ci dice che $G$ può essere derivato da $F$ definendolo come la negazione di $F$.
+\end{itemize}
+Si può dimostrare che l’insieme $\{X, U\}$ forma un insieme minimale di operatori, dal quale si possono derivare tutti gli altri: $F, G, W, R$.
+
+\subsection{Negazioni in LTL}
+Quello che ci chiediamo è: cosa significa che non è vero che $F \alpha$? Da non confrontare con la formula  $\neg F \alpha$ \\
+Infatti la frase la possiamo riformulare nei termini; \textit{Non è vero che $F \alpha$ equivale a non è vero che in ogni cammino prima o poi $\alpha$ diventa vera e significa che c’è almeno un cammino in cui $\alpha$ è sempre falsa.}\\
+Mentre  $\neg F \alpha$  equivale dire che in ogni cammino non è vero che prima o poi $\alpha$ diventa vera, cioè $G \neg \alpha$, in ogni cammino $\alpha$ è sempre falsa. Attenzione $\neg F \alpha$ non è la negazione logica di $F \alpha$.
+
+\subsection{Limiti espressivi di LTL}
+LTL non è in grado di esprimere proprietà del tipo “esiste un cammino in cui $\alpha$”.\\
+"È possibile" equivale a “Esiste un cammino”.
+
+\subsection{Alberi di computazione}
+Sono alberi (grafi aciclici) orientati.
+Gli alberi di computazione vengono ricavati da un modello di Kripke partendo da uno stato iniziale che viene utilizzato come radice. Tutti gli archi usciti dallo stato iniziale vengono posti come nodi dell’albero al primo livello e così via.\\
+\textit{Computazione}: cammino nell’albero a partire dalla radice.
+
+\subsubsection{Sintassi - Computation Tree Logic}
+Proposizioni atomiche: $AP = \{p_1, p_2, \dots, q, r, \dots\}$
+Abbiamo delle Formule ben formate,$FBF_{CTL}$, le elenchiamo di seguito: 
+\[\forall p \in AP, p \in FBF_{CTL}  \mbox{ e } \forall \alpha, \beta \in FBF_{CTL}\]
+\begin{itemize}
+    \item $\neg \alpha$, $\alpha \lor \beta \in FBF_{CTL}$
+    \item $A X \alpha, E X \alpha \in FBF_{CTL}$	per ogni cammino/esiste un cammino nel quale, nel prossimo stato vale $\alpha$
+    \item $A F \alpha, E F \alpha \in FBF_{CTL}$	
+    \item $AG \alpha, E G \alpha \in FBF_{CTL}$
+    \item $A(\alpha U \beta) \in FBF_{CTL}, E(\alpha U \beta) \in FBF_{CTL}$
+\end{itemize}
+
+$A$ (all): quantificatore universale (per ogni cammino)\\
+$E$ (exist): quantificatore esistenziale (esiste un cammino tale che)\\
+
+Ogni volta che si usa un operatore temporale bisogna abbinargli un quantificatore. Per esempio: $AFG \alpha$ non è una formula ben formata.\\
+
+A livello sintattico, ci sono formule di LTL che non sono formule di CTL e viceversa. Dal punto di vista semantico, data una formula in CTL è possibile che esista un formula di LTL equivalente.

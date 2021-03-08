@@ -1,0 +1,68 @@
+\documentclass[a4paper]{article} 
+\usepackage[longend,ruled,linesnumbered]{algorithm2e}
+\input{head}
+\usepackage{graphicx}
+% \usepackage[table,xcdraw]{xcolor}
+\usepackage{multirow}
+\tcbuselibrary{theorems}
+
+\newtcbtheorem[]{teorema}{}%
+{colback=gray!15,colframe=gray!70}{th}
+
+\begin{document}
+
+%-------------------------------
+%	TITLE SECTION
+%-------------------------------
+
+\fancyhead[C]{}
+\hrule \medskip % Upper rule
+\begin{minipage}{0.295\textwidth} 
+\raggedright
+\footnotesize
+Andrei Gabriel Taraboi \hfill\\   
+\hfill\\
+\end{minipage}
+\begin{minipage}{0.4\textwidth} 
+\centering 
+\large 
+Machine Learning\\ 
+\normalsize 
+\end{minipage}
+\begin{minipage}{0.295\textwidth} 
+\raggedleft
+\hfill\\
+\end{minipage}
+\medskip\hrule 
+\bigskip
+
+%-------------------------------
+%	CONTENTS
+%-------------------------------
+\tableofcontents
+
+\newpage
+\part{Teoria}
+%%%%%%%%%%%%%%%%%%%%Lezioni
+\input{Lezioni/lez_1_e_2}
+\input{Lezioni/lezione_3}
+\input{Lezioni/lezione_4}
+\input{Lezioni/lezione_5}
+\input{Lezioni/lezione_6}
+\input{Lezioni/lezione_7}
+\input{Lezioni/lezione_8}
+\input{Lezioni/lezione_9}
+\input{Lezioni/lezione__10}
+\input{Lezioni/lezione__11}
+%%%%%%%%%%%%%%%%%%%%End of Lezioni
+\setcounter{section}{0}
+\newpage
+\part{Esercitazione}
+% %%%%%%%%%%%%%%%%%%%%Esercitazioni
+\input{Esercitazioni/lezione1}
+\input{Esercitazioni/esercitazione_2}
+\input{Esercitazioni/esercitazione_3}
+\input{Esercitazioni/bayes_concept}
+\input{Esercitazioni/Kernel-SVM-KMeans}
+%%%%%%%%%%%%%%%%%%%%End of Esercitazioni
+\end{document}

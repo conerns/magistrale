@@ -1,0 +1,61 @@
+\section{LF-function}
+La LF-function è la funzione che data una posizione $i$ sulla BWT $B$, restituisce la posizione $j$ nell’ordinamento lessicografico del suffisso $B[i] T[S[i],n]$, cioè $j = LF(i) = p+r$.
+
+\textbf{\textit{Osservazioni importanti}}
+\begin{itemize}
+    \item $B[i]$ precede $T[S[i],n] \implies B[i]$ è il simbolo di $T$ in posizione $S[i]-1$
+    \item $B[i]$ precede $T[S[i],n] \implies B[i] T[S[i],n]$ è il suffisso di indice $S[i]-1$
+    \item $j$ è la posizione di $B[i]T[S[i],n]$ nell’ordinamento lessicografico $\implies S[j] = S[i]-1$
+\end{itemize}
+
+\subsection{Calcolo della LF-function tramite FM-index}
+
+Questione: usare le funzioni di FM-index per esprimere la somma $p + r$ in funzione della posizione $i$ sulla BWT $B$. Ricordando che $p = $ numero di simboli inferiori a $B[i] = C(B[i])$ e $r = $ numero di simboli uguali a $B[i]$ in $B[1,i] = Occ(i+ 1, B[i])$\\
+Il numero di simboli uguali a $B[i]$ in $B[1,i]$ è uguale al numero di simboli uguali a $B[i]$ in $B[1, i-1]$ più $1$.
+\[j = C(B[i]) + Occ(i, B[i]) + 1\]
+
+\subsection{Calcolo tramite FM-index della backward extension}
+Ci si riferisce al calcolo tramite FM-index della backward extension di un $Q$-intervallo con un simbolo $\sigma$. Nel calcolo della backward extension per calcolare il $\sigma Q$-intervallo (fase 4.), i $k$ suffissi $B[i_p]T[S[i_p], n]$ condividono il prefisso comune $\sigma Q$ e hanno posizioni $j_p = LF(i_p)$, con $1 \leq p \leq k$.
+L’intervallo continuo di posizioni $[j_1, j_k+1]$ èil $\sigma Q$-intervallo.\\
+
+Si riprendono le formule della scorsa lezione. \\
+
+Dato un $Q$-intervallo $[b,e)$ e un simbolo $\sigma$, il $\sigma Q$-intervallo $[b',e')$ è calcolato come: $b' = LF(i_1)$ e $e' = LF(i_k) +1$, dove $i_1$ è la più piccola posizione in $[b,e)$ tale che $B[i_1] = \sigma$ e $i_k$ è la più grande posizione in $[b,e)$ tale che $B[i_k] = \sigma$.\\
+\begin{equation*}
+    \begin{split}
+        b' & = LF(i_1) = C(B[i_1]) + Occ(i_1, B[i_1]) +1 \\
+        & = C(\sigma) + Occ(i_1, \sigma) +1 \\ 
+        & = C(\sigma) + Occ(b, \sigma) +1
+    \end{split}
+\end{equation*}
+
+\begin{equation*}
+    \begin{split}
+        e'& = LF(i_k) +1 = C(B[i_k]) + Occ(i_k, B[i_k]) +1 +1 \\ 
+        & = C(\sigma) + Occ(i_k, \sigma) +1 +1 \\ 
+        & = C(\sigma) + Occ(i_k +1, \sigma) +1 \\
+        & = C(\sigma) + Occ(e, \sigma) +1
+    \end{split}
+\end{equation*}
+$Occ(i_1, \sigma)$ è uguale a $Occ(b, \sigma)$ in quanto nelle posizioni da $b$ a $i_1-1$ non esistono simboli uguali a $\sigma$.
+$Occ(i_k, \sigma) +1$ è il numero di simboli uguali a $\sigma$ in $B[1, i_k]$, quindi è uguale a $Occ(i_k+1, \sigma)$.
+A sua volta, $Occ(i_k+1, \sigma) = Occ(e, \sigma)$, in quanto nelle posizioni da $i_k+1$ a $e-1$ non esistono simboli uguali a $\sigma$.
+
+$e' \leq b' \implies $ il $\sigma Q$-intervallo non esiste
+
+\begin{algorithm}[H]
+    \SetAlgoLined
+    $[b,e) \leftarrow [1, n+1)$\;
+    $i \leftarrow |P|$\;
+    \While{$[b,e)$ is not null $\land i > 0$}{
+        $\sigma \leftarrow P[i]$\;
+        $b \leftarrow C(\sigma) + Occ(b, \sigma) + 1$\;
+        $e \leftarrow C(\sigma) + Occ(e, \sigma) + 1$\;
+        $i \leftarrow i-1$\;
+    }
+    \If{$[b,e)$ is not null}{
+        output $S[b,e)$
+    }
+    \caption{Procedura Search\_Pattern(C, Occ, P, S)}
+\end{algorithm}
+Complessità: $\mathcal{O}(m)$.

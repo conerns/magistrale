@@ -1,0 +1,102 @@
+\section{Frammentazione e replica}
+Tipi di architetture dei database:
+\begin{itemize}
+    \item shared-everything: non c’è una distribuzione, il software, il db, il dbms e il disco sono in un unico nodo.
+    \item shared-disk: diversi componenti software agiscono sulla stessa SAN (Storage Area Network). Si tratta di un’architettura dati di puro storage con un numero elevatissimo di dischi (in raid) ridondati. 
+    \item shared-nothing: il database ha il suo proprio disco. Gode della proprietà di scalabilità orizzontale o scale out, a patto di gestire la complessità,
+che consiste nel poter continuare ad aggiungere nuovi nodi DB-disk indefinitamente.
+\end{itemize}
+
+Vediamo quindi le proprietà generali di un DDBMS (facendo esplicito riferimento alle architetture \textit{shared-nothing} per la loro scalabilità):
+\begin{itemize}
+  \item \textbf{località}, secondo il \textit{principio di località}, che garantisce un aumento di performances (nonché di sicurezza) tenendo i dati si trovano vicino alle applicazioni che li utilizzano più frequentemente. Questo può ridurre i tempi di latenza, anche per motivi di sicurezza degli accessi.
+  
+  La partizione dei dati corrisponde spesso ad una partizione naturale delle applicazioni e degli utenti: i dati risiedono vicino a dove vengono usati più spesso, ma sono globalmente raggiungibili.
+  \item \textbf{modularità}, permettendo di scalare orizzontalmente e permettendo modifiche a dati ed applicazioni a basso costo
+  \item \textbf{flessibilità}, distribuzione incrementale e progressiva dei dati: la configurazione si adatta alle esigenze delle applicazioni.
+   si ha una maggior fragilità a causa delle unità che aumentano di numero ma si ha \textbf{ridondanza} e quindi maggiore resistenza ai guasti di dati e applicazioni ridondate (\textit{fail soft}).
+  \item \textbf{resistenza ai guasti}
+  \item \textbf{prestazioni ed efficienza}
+    Distribuendo un DB su nodi diversi, ogni nodo gestisce un DB di dimensioni più ridotte, più semplice da gestire e ottimizzare nelle applicazioni locali.
+    Ogni nodo può infatti essere ottimizzato indipendentemente dagli altri. Il carico totale (transazioni /sec) viene quindi distribuito sui nodi. Questo consente anche un parallelismo tra transazioni locali che fanno parte di una stessa transazione distribuita.
+    Gli svantaggi sono la necessità di un coordinamento tra i nodi e alla presenza di un traffico di rete.
+
+\end{itemize}
+
+\subsection{Funzionalità specifiche dei DDBMS rispetto ai DBMS centralizzati}
+
+Architettura shared-nothing: ogni server mantiene la capacità di gestire applicazioni in modo indipendente, mentre le interazioni con altri server e applicazioni remote rappresentano un carico supplementare sul sistema.
+
+Il traffico di rete in questa configurazione:
+\begin{itemize}
+    \item Per le interrogazioni: queries provenienti dalle applicazioni e risultati provenienti dal server.
+    \item Per le transazioni: richieste transazionali dalle applicazioni e dati di controllo per il coordinamento.
+\end{itemize}
+
+Per quanto riguarda l’ottimizzazione, l’elemento critico è la rete. C’è l’esigenza di distribuire i dati in modo che la maggior parte delle transazioni sia locale, o eviti trasmissione di dati tra nodi. 
+
+I DDBMS, rispetto ai DBMS hanno delle funzionalità specifiche:
+\begin{itemize}
+    \item \textbf{trasmissione} di query, transizioni, frammenti di db e dati di controllo tra i nodi 
+    \item \textbf{frammentazione, replicazione e trasparenza} (secondo vari livelli), fattori legati alla natura distribuita dei dati 
+    \item un \textbf{query processor} e un \textbf{query plan} per la previsione di una strategia globale accanto a strategie per le query locali. Si gestisce il passaggio tra schema logico globale e quelli locali. Chi esegue la query lo fa senza pensare alla frammentazione dei dati 
+    \item \textbf{controllo di concorrenza} tramite algoritmi distribuiti, fondamentale per gli accessi \textit{in scrittura} 
+    \item \textbf{strategie di recovery} e \textbf{gestione dei guasti}, sia in merito alla rete che all'hardware stesso 
+\end{itemize}
+
+Si definisce \textbf{frammentazione} come la possibilità di allocare porzioni (\textit{chunk}) diverse del db su nodi diversi.\\ Si definisce \textbf{replicazione} come la possibilità di allocare stesse porzioni del db su nodi diversi.\\ Si definisce \textbf{trasparenza} come la possibilità per l'applicazione di accedere ai dati senza sapere dove sono allocati (serve qualcosa che instradi le query).
+
+Eistono due tipi di frammentazione
+\begin{enumerate}
+    \item \textbf{orizzontale} che prevede di prendere una tabella e frammentare in base alle righe: le prime $n$ da una parte, le $m$ successive dall'altra e via dicendo.
+    \item \textbf{verticale} che consente di ridurre la dimensionalità della tabelle in base alle colonne. In ogni nuova tabella la prima colonna deve essere uguale alla prima colonna della tabella completa, questo per garantire che si possa ricomporre la tabella (e lo schema) originale e garantire la trasparenza (nella prima colonna c'è la chiave primaria).
+\end{enumerate}
+
+Ci sono delle regole di correttezza che la frammentazione deve rispettare:
+\begin{itemize}
+    \item Completezza: ogni record della relazione R di partenza deve poter essere ritrovato in almeno uno dei frammenti. 
+    \item Ricostruibilità: la relazione R di partenza deve poter essere ricostruita senza perdita di informazione a partire dai frammenti. 
+    \item Disgiunzione: ogni record della Relazione R deve essere rappresentato in uno solo dei frammenti, o in alternativa. 
+    \item Replicazione
+\end{itemize}
+
+Quindi possiamo meglio definire le due frammentazione da $R$ in varie $R_i$:
+\begin{itemize}
+    \item Frammentazione orizzontale, partizione di R in n relazioni $\{R_1, R_2, \dots, R_n\}$ tali che:
+    \begin{itemize}
+        \item Schema($R_i$) = Schema($R$) poer tutti gli i;
+        \item Ogni $R_i$ contiene un sottoinsieme dei record di $R$
+        \item Normalmente definita da un’operazione di selezione: $R_i = \sigma_{Ci}(R)$
+        \item Garantisce la completezza, infatti $R_1\cup R_2\cup\ldots R_n=R$
+        \item l'unione garantisce la ricostruibilità
+    \end{itemize}
+    \item Frammentazione verticale, partizione di R in n relazioni $\{R_1, R_2, \dots, R_n\}$ tali che::
+    \begin{itemize}
+        \item $schema(R) = L =(A_1,\ldots,A _m)$ e $schema(R_i) = L_i = (A_{i1},\ldots,A_{ik})$ 
+        \item garantisce la completezza, infatti $L_1\cup L_2\cup\ldots L_n=L$, dove i vari $L_i$ sono i frammenti verticali ed $L$ è la tabella originale
+        \item si garantisce la ricostruibilità in quanto $L_i\cap L_j \supseteq chiave\,\,\,primaria(R),\,\forall i\neq j$ (ovvero ogni frammento deve contenere la chiave primaria)
+  \end{itemize}
+\end{itemize}
+
+\subsection{Replicazione}
+
+La replicazione migliora le prestazioni, consentendo la coesistenza di applicazioni con requisiti operazionali diversi sugli stessi dati e aumentando la località dei dati utilizzati da ogni applicazione. D’altra parte, introduce complicazioni architetturali (come la gestione di transazioni e updates di copie multiple, che devono essere tutte aggiornate) e richiede un nuovo passo di progettazione, per capire quali frammenti replicare, quante copie mantenere, dove allocare le copie,le politiche di gestione delle copie.
+
+Schemi di allocazione dei frammenti.\\
+Ogni frammento è generalmente allocato su un nodo diverso (e su file diversi). Quindi, lo schema globale esiste solo in modo virtuale, ma non è materializzato su un unico nodo. Lo schema di allocazione descrive il mapping: Frammento $\to$ nodo.
+
+\subsection{Trasparenza nei DBMS}
+Definiamo \textbf{trasparenza} la possibilità per l'applicazione di accedere ai dati senza sapere dove sono allocati. Si tratta di separare la semantica di alto livello dalle modalità di frammentazione e allocazione.\\
+Attua una separazione dei concetti (logica applicativa – logica dei dati), ma necessita di uno strato software che gestisca la traduzione dallo schema unico ai sottoschemi. Ciò aumenta la complessità del sistema e determina una perdita di performance. Tuttavia, se il mapping è nativamente supportato dal DDBMS i problemi si riducono (non si eliminano).\\
+Esistono due tipi di trasparenza 
+\begin{enumerate}
+    \item logica: indipendenza dell’applicazione da modifiche dello schema logico. Un’applicazione che utilizza un frammento dello schema non subisce modifiche quando altri frammenti vengono modificati.
+    \item fisica: indipendenza dell’applicazione da modifiche dello schema fisico.
+\end{enumerate}
+
+\subsubsection{Livelli di trasparenza nei DBMS}
+\begin{itemize} 
+    \item \textbf{trasparenza di frammentazione}, che permette di ignorare l'esistenza dei frammenti ed è lo scenario migliore per la programmazione applicativa con un'applicazione scritta in SQL standard. Il sistema si occupa di convertire query globali in locali e relazioni in sotto-relazioni. La scomposizione delle query per ogni sotto-relazione è detta \textbf{query rewriting} 
+    \item \textbf{trasparenza di replicazione/allocazione}, dove l'applicazione è consapevole dei frammenti ma non dei nodi in cui si trovano. In questo caso la query è già spezzata in quanto si sa di avere a che fare con un sistema frammentato 
+    \item \textbf{trasparenza di linguaggio}, dove l'applicazione specifica sia i frammenti che i nodi, nodi che possono offrire interfacce che non sono SQL standard. Tuttavia l'applicazione sarà scritta in SQL standard a prescindere dai linguaggi locali dei nodi. Le query vengono quindi tradotte dal ottimizzatore di query. \textit{Questo è il livello di trasparenza più basso} 
+\end{itemize}

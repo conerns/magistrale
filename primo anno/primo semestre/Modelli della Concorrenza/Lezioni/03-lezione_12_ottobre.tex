@@ -1,0 +1,51 @@
+\section{Lezione del 12 ottobre}
+\subsection{Logica di Hoare}
+
+\begin{itemize}
+    \item \textbf{Istruzioni di scelta}: L'istruzione di     scelta fa parte delle regole di derivazione viste     nella lezione precedente. 
+
+    L'istruzione si presenta nella forma: $\{p\} \textbf{if} \ B \ \textbf{then} \ C \ \textbf{else} \ D \ \textbf{endif} \{q\}$.
+    
+    
+    Cerchiamo premesse che permettono di derivare questa istruzione. Nella situazione attuale la condizione che possiamo eseguire può essere o \textit{C} o \textit{D}. Valutiamo separatamente le due possibilità:
+    \begin{itemize}
+        \item Nel caso in cui la condizione del \textbf{if} fosse vera: $\{p \land B\}$ C $\{q\}$ 
+            \item All'inizio dell'esecuzione è falsa la condizione \textit{B}, in questo caso: $\{p \land \neg B\}$ D $\{q\}$ 
+        \end{itemize}
+        Entrambe queste due triple sono delle premesse dalle quali possiamo dedurre la tripla risultante, ricaviamo quindi la formula generale della regola di derivazione
+            $\displaystyle \frac{
+                    \{p \land B \} C \{q\} \ \{p \land \neg B\} D \{q\}
+                }
+                {
+                    \{p\} \textbf{if} \ B \ \textbf{then} \ C \ \textbf{else} \ D \ \textbf{endif} \{q\}
+                }$
+                
+    \item \textbf{Istruzioni interattive} si presentano nella forma $\textbf{while} \ B \ \textbf{do} \ c \ \textbf{endwhile}$ che chiameremo $W$ successivamente
+    abbiamo quindi la seguente tripla.
+    $\{p \} W \{q\}$  Se eseguo il comando W a partire dallo stato in cui vale p, alla fine deve valere q.
+    
+    \begin{itemize}
+        \item correttezza parziale, supponiamo a priori che l'esecuzione termini, senza dimostrarlo. Lo supponiamo solamente. La tripla ci darà solamente una soluzione parziale.
+        \item si deve dimostrare che l'esecuzione termini. Si procede quindi prima dimostrando la correttezza parziale aggiungendo poi la dimostrazione per l'esecuzione finita.
+    \end{itemize}
+    Noi studieremo sempre triple che nella post condizione troviamo $\{p\}W\{q \land \neg B\}$, questo perché in ordine per terminare il programma la condizione $B$ deve risultare falsa.\\
+    Ipotizziamo che all'inizio la condizione \textbf{B} sia vera, avendo quindi la precondizione $\{i \land B\}$, in questo caso ci troviamo ad eseguire la condizione C, suppongo di poter derivare, tramite C eseguito una sola volta, nuovamente $i$, mi ritrovo la seguente tripla: $\{i \land B\}C\{i\}$.
+    Questo significa che, se vale la tripla elencata sopra, la nostra $i$, che resta medesima ad inizio e alla fine dell'esecuzione della condizione C, è una \textbf{\textit{invariante di ciclo}} per C.\\
+    Qualora valga dopo la singola esecuzione di $C$ allora avrei ancora $\{i\land B\}$ e dovrei eseguire nuovamente $C$ e dopo varrà ancora $i$ sicuramente e bisogna ristudiare $B$ per capire come procedere, in quanto $i$ resterà vera per qualsiasi numero di iterazioni di $C$. Si ha che $i$ resterà vera, teoricamente, anche una volta usciti dal ciclo. \\
+    Qualora non valga $B$ si ha che: $\{i\land \neg B\}W\{i\land \neg B\}$. Questo ci porta a poter dire che  $\displaystyle \frac{\{i \land B\}C\{i\}}{\{i\}W\{i\land \neg B\}}$, che corrisponde alla nostra regola di iterazione. 
+\end{itemize}
+
+
+\subsection{Notazioni}
+Una notazione da tenere a mente è $\vdash$ (derivabile) (\textbf{$\vdash \ \{p\}C\{q\}$}), intendiamo dire che quella tripla è stata derivata applicando le regole di derivazione. (sintassi, perché è una notazione puramente formale)
+
+Una seconda notazione è $\models$ (vera) (\textbf{$\models \ \{p\}C\{q\}$}). Possiamo leggerlo nella forma \textit{La tripla è vera se ogni volta che si esegue C in uno stato della memoria che soddisfa p si raggiunge uno stato della memoria in cui è vera q}. (semantico)
+
+ 
+
+\subsection{Esercizi}
+
+
+
+--------
+

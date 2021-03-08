@@ -1,0 +1,32 @@
+\section{Lezione del 21 ottobre}
+Ricordiamo quanto detto sulla precondizione più debole indicata come $wp(C, q)$. Abbiamo poi la proprietà fondamentale della condizione più debole. Si ha che $\vDash\{p\}\mbox{ C }\{q\}$ (quindi la tripla è vera) sse: $p\implies wp(C,q)$. Siccome l'estensione di $wp(C, q)$ è formata da tutti gli stati a partire dai quali l'esecuzione di $C$ porta a uno stato finale in cui vale $q$.
+
+L'\textbf{esistenza} della precondizione più debole è garantita. È garantita inoltre l'\textbf{unicità} della precondizione più debole (a meno di equivalenza logiche).
+Si possono trovare dei casi estremi \begin{itemize}
+    \item $wp(x:=5, x<0) \equiv false$, non può formare una tripla valida
+    \item $wp(x:=5, x \geq 0) \equiv true$, 
+\end{itemize} 
+
+\subsection{Regola di derivazione}
+Sia $W = while \ B \ do \ C \ endwhile $, osserviamo quanto seguo:\\
+Se $\neg B$ nello stato iniziale dell'interazione, allora il corpo non viene eseguito, quindi l'esecuzione di $W$ equivale all'operazione skip. Prima di eseguire il comando serve che prima di eseguire il comando $q$ sia già valida ($\neg B \land q$). Il secondo caso corrisponde al caso in cui è vera la condizione $B$, allora il corpo di $W$ viene esguito almeno una volta, in questo caso $W$ equivale a $C;W$. ($B \land wp(C;W, q)$). Alla formula applico la regola della sequenza della $wp$, portandomi ad ottenere: $B \land wp(C, wp(W, q))$. Questo ci permette di raggiungere in definitiva alla formula :
+$$ wp(W,q) = (\neg B \land q) \lor  (B \land wp(C, wp(W, q)))$$
+Notiamo che la regola che ci aiuta a trovare la nostra $wp$ è ricorsiva, pertanto non ha un caso base e non possiamo tradurla in un algoritmo effettivo.
+
+\subsection{Estensioni semolici del linguaggio}
+
+Innanzitutto potremmo estendere il linguaggio usato, aggiungendo: 
+\begin{itemize} 
+    \item $\mbox{do \textit{C} while \textit{B} endwhile}$ che nella realtà corrisponde a: $\mbox{\textit{C}; while \textit{B} do \textnormal{C} endwhile}$ 
+    \item $\mbox{repeat \textit{C} until \textit{B} endrepeat}$ che nella realtà corrisponde a: $\mbox{\textit{C}; while not \textit{B} do \textit{C} endwhile}$ 
+    \item  $\mbox{for(\textit{D; B; F}) \textit{C} endfor} $   forse $C;\mbox{while \textit{B} do \textit{F}  endwhile}$ 
+    \item \textbf{procedure, metodi e funzioni}
+    \item \textbf{array}, anche se solo in lettura se vogliamo applicare la logica di Hoare come l'abbiamo vista 
+\end{itemize}
+
+Le triple di Hoare sono state viste come specifiche della correttezza di un programma ma possono essere interpretate anche come *contratti* tra chi scrive un programma e un potenziale utente dello stesso.
+Si può infatti supporre che un utente affidi la progettazione di un programma avendo in mente un certo risultato. 
+L’utente specifica quindi una postcondizione e chiede allo sviluppatore di garantire che al termine dell’esecuzione venga rispettata. \\
+Chi sviluppa il programma può impegnarsi a rispettare il contratto a patto che chi usa il programma garantisca che prima dell’esecuzione del comando sia vera una certa precondizione.\\
+\textbf{Invarianti costruttivi}: $\{p\}  A; W; C  \{q\}$, $\{p\}  A  \{inv\}  W  \{inv \land \neg B\}  C  \{q\}$ \\
+\textbf{Completezza relativa}: la regola di conseguenza usa le proprietà dei numeri, ma l’aritmetica è incompleta (teoremi di Gödel).

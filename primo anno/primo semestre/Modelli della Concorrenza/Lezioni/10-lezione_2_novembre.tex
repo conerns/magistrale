@@ -1,0 +1,115 @@
+\section{Lezione del 2 novembre} 
+Esercizio, creare la LTS di $x = ((a \cdot P_1' +  \overline{b}\cdot P_1'')|((a \cdot P_1' +  \overline{b}\cdot P_1''))_{\backslash\{a\}}$
+\begin{center}
+    \begin{tikzpicture}[shorten >=1pt,node distance=7cm,on grid,auto]
+      \node[state] (q_0) {$((a \cdot P_1' +  \overline{b}\cdot P_1'')|((a \cdot P_1' +  \overline{b}\cdot P_1''))_{\backslash\{a\}}$}; 
+      \node[state] (q_1) [below=of q_0] {{$(P_1'')|((a \cdot P_1' +  \overline{b}\cdot P_1''))_{\backslash\{a\}}$}}; 
+      \node[state] (q_2) [below left =of q_0] {$(P_1' | P_2')_{\backslash\{a\}}$};  
+      \node[state] (q_3) [right = of q_0] {$( (a \cdot P_1' +  \overline{b}\cdot P_1'') | P_2')_{\backslash\{a\}}$};  
+      \node[state] (q_4) [below right = of q_0] {$(P_1'' | P_2'')_{\backslash\{a\}}$};
+      \path[->] 
+      (q_0) edge  node {$\overline{b}$} (q_1)
+      (q_0) edge  node {$\tau$} (q_2)
+      (q_0) edge  node {$b$} (q_3)
+      (q_0) edge  node {$\tau \textnormal{di b}$} (q_4)
+      (q_1) edge  node {$b$} (q_4)
+      (q_3) edge  node {$\overline{b}$} (q_4);
+    \end{tikzpicture}
+\end{center}
+
+Altri esempi: 
+$P_1=a\cdot b\cdot Nil+a\cdot c\cdot Nil$ e $P_2=a\cdot(b\cdot Nil+c\cdot Nil)$.
+Per il caso $P_1$
+\begin{center}
+    \begin{tikzpicture}[shorten >=1pt,node distance=2.5cm,on grid,auto]
+        \node[state] (q_0) {$P_1$}; 
+        \node[state] (q_1) [below right=of q_0] {$c\cdot Nil$};  
+        \node[state] (q_3) [below left=of q_0]
+        {$b\cdot Nil$}; 
+        \node[state] (q_2) [below right =of q_3] {$Nil$};
+        \path[->]
+        (q_0) edge  node {$a$} (q_1)
+        (q_1) edge  node {$c$} (q_2)
+        (q_3) edge  node [below left]{$b$} (q_2)
+        (q_0) edge  node [above left]{$a$} (q_3);
+    \end{tikzpicture}
+\end{center}
+Avendo come trace $Trace(P_1) = \{\epsilon,a ,ab, ac\}$ \\
+Per il caso $P_2$
+\begin{center}
+    \begin{tikzpicture}[shorten >=1pt,node distance=2.4cm,on grid,auto]
+        \node[state] (q_0) {$P_2$}; 
+        \node[state] (q_1) [below=of q_0] {$b\cdot Nil+c\cdot Nil$};  
+        \node[state] (q_2) [below=of q_1] {$Nil$}; 
+        \path[->]
+        (q_0) edge  node {$a$} (q_1)
+        (q_1) edge [bend right = 25] node[below left] {$b$} (q_2)
+        (q_1) edge [bend left = 25] node {$c$} (q_2);
+    \end{tikzpicture}
+\end{center}
+E notiamo che le tracce di $P_2$ siano le stesse, quindi $P_1 \stackrel{T}{\sim} P_2$. \\
+Ma se ad esempio prendo:
+  $Q_1=(P_1|\overline{a}\cdot \overline{c}\cdot Nil )_{\backslash\{a,b,c\}}$
+  $Q_2=(P_2|\overline{a}\cdot \overline{c}\cdot Nil )_{\backslash\{a,b,c\}}$
+  Ho:
+\begin{center}
+    \begin{tikzpicture}[shorten >=1pt,node distance=4cm,on grid,auto] 
+        \node[state] (q_0) {$Q_1$};  
+        \node[state] (q_1) [below right=of q_0] {$(b\cdot Nil+\overline{c} \cdot Nil)_{\backslash\{a,b,c\}}$};
+        \node[state] (q_3) [below left=of q_0] {$(c\cdot Nil+\overline{c} \cdot Nil)_{\backslash\{a,b,c\}}$}; 
+        \node[state] (q_2) [below =of q_3] {$Nil|Nil$};
+        \node[state] (q_4) [below =of q_1] {$deadlock$};
+        \path[->]
+        (q_0) edge  node {$\tau$} (q_1)
+        (q_0) edge  node [above left] {$\tau$} (q_3)
+        (q_3) edge  node {$\tau$} (q_2)
+        (q_1) edge  node {$\tau$} (q_4);
+    \end{tikzpicture}
+\end{center}
+\begin{center}
+    \begin{tikzpicture}[shorten >=1pt,node distance=4cm,on grid,auto]
+        \node[state] (q_0) {$Q_2$}; 
+        \node[state] (q_1) [below=of q_0] {$(b\cdot Nil+c\cdot Nil|c\cdot Nil
+        )_{\backslash\{a,b,c\}}$}; 
+        
+        \node[state] (q_2) [below=of q_1] {$Nil|Nil$}; 
+        \path[->]
+        (q_0) edge  node {$\tau$} (q_1)
+        (q_1) edge  node {$\tau$} (q_2);
+    \end{tikzpicture}
+\end{center}
+Quindi il primo va in deadlock e il secondo no, quindi vedremo non sono
+equivalenti per la bisimulazione.
+  
+%%questo esempino non lo metto, non serve secondo me, era >> quello prima
+
+\subsection{Bisimulazione}
+Data una relazione binaria $R\subseteq Proc_{CCS}\times Proc_{CCS}$, questa è una relazione di bisimulazione (forte) sse: $\forall \ p,q\in Proc_{CCS} \ t.c: \ p \ R \ q \mbox{ vale quanto segue }$: 
+\begin{itemize} 
+    \item $\forall \alpha\in Act=A\cup \overline{A} \cup \{\tau\}$ se ho $p\stackrel{\alpha}{\rightarrow}p'$ allora deve esistere un $ q'\in  Proc_{CCS} \mbox{ t.c }q\stackrel{\alpha}{\rightarrow}q'\mbox{ e si ha }p'\ R\ q'$ 
+    \item  $\forall \alpha\in Act=A\cup \overline{A}\cup \{\tau\}$ se ho $q\stackrel{\alpha}{\rightarrow}q'$ allora deve esistere un $ p' \in  Proc_{CCS}\mbox{ t.c }p\stackrel{\alpha}{\rightarrow}p'\mbox{ e si ha }p'\ R\ q'$ 
+\end{itemize} 
+Due processi $p$ e $q$ sono fortemente bisimili: $p\stackrel{Bis}{\sim} q$ sse $\exists \ R\subseteq Proc_{CCS}\times Proc_{CCS}$, relazione di bisimulazione forte tale che $p \ R\ q$.\\ 
+
+Possiamo dire che in generale : $\stackrel{Bis}{\sim}=\cup\{R\subseteq Proc_{CCS}\times Proc_{CCS} | \ R \mbox{ è una relazione di bisimulazione forte}\}$
+
+\subsubsection{Teorema bisimulazione forte}
+Se prendo $\stackrel{Bis}{\sim}\subseteq Proc_{CCS}\times Proc_{CCS}$ si dimostra che questa è una relazione riflessiva, simmetrica e transitiva. Quindi è una relazione di equivalenza.\\ 
+
+Posso scrivere quindi che: 
+$p\stackrel{Bis}{\sim} q 
+    \begin{cases}
+         \iff \forall\alpha\in Act \\
+         \land \textnormal{devono valere entrambe}\begin{cases}
+             \textnormal{se } p\stackrel{\alpha}{\rightarrow}p' \mbox{ allora } \exists q':
+             q\stackrel{\alpha}{\rightarrow}q'\land p'\stackrel{Bis}{\sim}q' \\
+             \textnormal{se } q\stackrel{\alpha}{\rightarrow}q' \mbox{ allora } \exists p': p\stackrel{\alpha}{\rightarrow}p'\land p'\stackrel{Bis}{\sim}q'
+         \end{cases}
+    \end{cases}
+$
+
+Se due processi sono fortemente bisimili allora sono sicuramente equivalenti rispetto alle tracce. Il viceversa non vale, esistono infatti processi equivalenti rispetto alle tracce che non sono bisimili.  Per vedere che due processi sono bisimili devo quindi, per ogni esecuzione, ottenere due processi ancora bisimili.
+
+%%%% fa esempi, se vuoi posso fare le immagini che mi viene facile poi fare il pdf, però non mi sembravano molto necessari questi
+
+Ricavando le tracce di due processi possiamo in alcuni casi osservare una traccia $\tau$, quello che devo fare è poter quindi di astrarre dalle interazioni interne ($\tau$), introducendo l'\textbf{equivalenza debole}, volendo astrarre rispetto alle azioni $\tau$, introducendo la \textbf{bisimulazione debole}.

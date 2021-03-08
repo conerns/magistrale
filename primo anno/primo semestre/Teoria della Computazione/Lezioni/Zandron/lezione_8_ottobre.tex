@@ -1,0 +1,58 @@
+\section{Lezione del 8 ottobre - Zandron}
+
+%% complessità computazionale 
+%% libri di approfondimento Gaarey-Johnson, Papadimitrium, Sipser
+
+Ci sono problemi che possiamo dimostrare che non esistano algoritmi che risolvono il problema in maniera efficiente. 
+
+Possiamo classificare i problemi in diverse categorie
+\begin{itemize}
+    \item Facili : so risolvere e riesco risolvere usando un algoritmo che lavora in tempo polinomiale
+    \item Difficili (Intrattabili) : sono in grado di risolvere i problemi ma non conosco alcun algoritmo che possa ottenere un tempo polinomiale
+    \item Difficilissimi : problemi per i quali, oltre non conoscere un algoritmo efficiente, ma posso anche dimostrare che un algoritmo del genere non esista. Questo significa che avrò per ogni soluzione dell'algoritmi tempi non efficienti, ma l'algoritmo che lo risolva esista.
+    \item Impossibili : problemi, che a prescindere dal tempo che viene impiegato per la loro risoluzione, non vi è un algoritmo che riesca sempre a risolvere il problema. Significa che almeno una volta, per l'input utilizzato, il mio algoritmo non riesca a generare una soluzione.
+\end{itemize}
+
+Per risolvere i problemi si utilizzano le macchine di Turing (MdT). Il tipo di problemi vengono identificati usando la notazione: P, NP(difficili), NP-completo.
+
+I problemi certe volte si presentano, o vengono risolti, in forma di Grafo: G = (V, E), possono essere sia ordinati che non ordinati.
+
+Dico che due vertici sono connessi se esiste un cammino che collega i due vertici presi in considerazione. Se per ogni copia di vertici esiste un cammino che collega i vertici, allora il grafo si dice connesso. Inoltre si utilizzano anche i grafi completi e grafi pesati.
+
+Linguaggi formali: Per costruire un linguaggio formale possiamo utilizzare 
+\begin{itemize}
+    \item V che corrisponde all'alfabeto, che è solamente un insieme finito di simboli che ci aiutano a comporre delle parole, o meglio detto stringhe
+    \item Stringhe, solitamente viene utilizzata la notazione: $\epsilon$ la stringa vuota, $V^*$ insieme infinito di tutte le possibili stringhe che posso costruire con l'alfabeto in questione.
+    \item $V^+$ corrisponde all'insieme di tutte le possibili stringhe esclusa la strina vuota, indico V*-$\epsilon$
+    \item Il linguaggio è un sotto insieme del insieme $V^*$, L $\subseteq V^*$. Questo sotto insieme può essere sia finito che infinito.
+\end{itemize}
+
+La nozione di problema:
+Un problema computazione è una questione alla quale vogliamo dare una risposta, per specificare il problema dobbiamo definire quali parametri prevede il nostro problema (come è fatto l'input e che valori posso usare come input) e elencare le proprietà che deve soddisfare la soluzione.
+
+Quando parlo di Istanza si parla di specificare alcuni valori specifici dell'input accettato dal programma.
+
+%------------------------------------------------
+
+\subsection{Primo esercizio : Arco minimo}
+Ho G = (V,E) pesato sugli archi e voglio trovare qual è l'arco di peso minimo. 
+Proprietà della soluzione: qual è l'arco con peso minimo.
+
+\subsection{Secondo esercizio : Raggiungibilità}
+Ho G = (V,E) non pesato e $V_s$, $V_d \in V$ due vertici  del grafo. Voglio sapere se il vertice d è raggiungibile dal vertice s.
+
+
+\subsection{Terzo esercizio : Traveling Salesman Problem}
+Ho G = (V,E) completo e pesato sui lati $V_s$ e $V_d \in V$ del grafo. Qual è il cammino, che tocca tutti i vertici una e una sola volta, di peso minimo?
+\bigskip
+\begin{align*}
+    \hfill
+\end{align*}
+
+Un algoritmo A affinché considerato un buon algoritmo(efficiente) deve:
+\begin{itemize}
+    \item risolvere $\Pi$ (il nostro problema) $\forall$ istanza.
+    \item A è efficiente se la complessità corrisponde a un tempo polinomiale $\mathcal O(p(n))$. In caso contrario il tempo corrisponde a una complessità esponenziale $\mathcal O(2^n)$. 
+\end{itemize}
+
+Un problema intrattabile è un problema per il quale non esiste un algoritmo con complessità polinomiale in grado di risolverlo. È errato pensare che il problema intrattabile non abbia soluzione. Il problema intrattabile può avere o meno una soluzione. 

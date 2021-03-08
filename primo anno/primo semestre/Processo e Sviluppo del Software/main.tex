@@ -1,0 +1,72 @@
+\documentclass[a4paper]{article} 
+\usepackage[longend,ruled,linesnumbered]{algorithm2e}
+\input{head}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{minted}
+\usemintedstyle{vs}
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=Java,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+
+\begin{document}
+
+%-------------------------------
+%	TITLE SECTION
+%-------------------------------
+
+\fancyhead[C]{}
+\hrule \medskip % Upper rule
+\begin{minipage}{0.295\textwidth} 
+\raggedright
+\footnotesize
+Andrei Gabriel Taraboi \hfill\\   
+\hfill\\
+\end{minipage}
+\begin{minipage}{0.4\textwidth} 
+\centering 
+\large 
+Processo e Sviluppo del Software\\ 
+\normalsize 
+\end{minipage}
+\begin{minipage}{0.295\textwidth} 
+\raggedleft
+\hfill\\
+\end{minipage}
+\medskip\hrule 
+\bigskip
+
+%-------------------------------
+%	CONTENTS
+%-------------------------------
+\tableofcontents
+\newpage 
+
+\input{Lezioni/01-risk_analysis}
+\input{Lezioni/02-CMMI}
+\input{Lezioni/03-REngi}
+\input{Lezioni/04-DomainUnderstanding}
+\input{Lezioni/05-evalutation}
+\input{Lezioni/06-Requirements_doc}
+\input{Lezioni/07-req_Evol}
+\input{Lezioni/08-MVC}
+\input{Lezioni/09-ORM}
+\input{Lezioni/10-enterprise_app}
+\end{document}

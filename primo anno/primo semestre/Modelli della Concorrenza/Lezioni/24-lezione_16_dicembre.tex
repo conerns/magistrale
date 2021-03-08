@@ -1,0 +1,103 @@
+\section{Lezione del 16 dicembre}
+Partiamo parlando di insiemi parzialmente ordinati e Funzione monotòne. Siano $(A, \leq)$ e $(B, \leq)$ due insiemi parzialmente ordinati.\\ 
+Una funzione $f : A \to B$ si dice \textit{monotòna} se, \[\forall x, y \in A \mbox{ vale }x \leq y \implies f(x) \leq f(y)\]
+Una funzione è monotòna se preserva la relazione d’ordine.
+
+\subsection{Punti fissi}
+Si considera una funzione $f : X \to X$. Un elemento $x \in X$ è un punto fisso di $f$ se $f(x) = x$.
+Ci sono i seguenti esempi:
+\begin{itemize}
+    \item $f: \mathbb{R} \to  \mathbb{R}, \ f(x) = x^2$, l'insieme dei punti fissi sono i punti $\{0,1\}$\\
+    La funzione non è monotona, infatti se prendessimo $x= -5$ e $y=-4$, essendo $-5 \leq -4$, non implica che $f(x) \leq f(y)$. Infatti $25 \nleq 16$
+    \item $g: \mathbb{R}^+ \to  \mathbb{R}, \ g(x) = log(x)$, l'insieme dei punti fissi sono i punti $\emptyset$\\
+    Questa è monotona
+    \item $h: \mathbb{R} \to  \mathbb{R}, \ h(x) = x$, l'insieme dei punti fissi sono i punti $\mathbb{R}$\\
+    
+\end{itemize}
+
+Se $(A, \leq)$ è un insieme parzialmente ordinato e $f:A \to A$ è una funzione monotòna, ci si può chiedere se esistono un minimo e un massimo punto fisso.\\
+
+\subsubsection{Esempio}
+Consideriamo $A=2^\mathbb{N}$ e $S \subseteq \mathbb{N}$
+Consideriamo le varie funzioni:
+\begin{enumerate}
+    \item $f(S) = S \cup \{2,7\}$. Tutti i sottoinsiemi che contengono $2$ e $7$ sono punti fissi. La funzione $f(S)$ è monotona, inoltre $\{2,7\}$ rappresenta il punto fisso minimo, mentre $\mathbb{N}$ risulta essere il punto fisso massimo.
+    \item $f(S) = S \cap \{2,7,8\}$, in questo esempio la funzione $f(S)$ è monotona, $\{2,7,8\}$ rappresenta il punto fisso massimo, mentre $\emptyset$ risulta essere il punto fisso minimo.
+    \item Il terzo esempio diferisce:
+    
+    {\centering
+        \begin{tikzpicture}[node distance=2.3cm,>=stealth',bend angle=30,auto]
+        \tikzstyle{place}=[circle,thick,draw=blue!75,fill=blue!20,minimum size=6mm]
+        \tikzstyle{transition}=[rectangle,thick,draw=blue!75,minimum size=4mm]
+        
+            \node [place] (uno)   [] {$1$};
+            \node [place] (tre)   [below right of=uno] {$3$}
+                edge [pre] (uno);
+            \node [place] (due)   [below left of=uno] {$2$}
+                edge [pre] (uno);
+            
+                
+            \node [place] (due-4)   [below left of=due] {$4$}
+                edge [pre] (due);
+            \node [place] (due-5)   [right = 1.95cm of due-4] {$5$}
+                edge [pre] (due); 
+                
+             \node [place] (due-9)   [below right of=due-5] {$9$}
+                edge [pre] (due-5);
+             \node [place] (due-8)   [below left of=due-5] {$8$}
+                edge [pre] (due-5);
+            \node [place] (tre-7)   [below right of= tre] {$7$}
+                edge [pre] (tre);
+            \node [place] (tre-6)   [right= .5cm of due-5] {$6$}
+                edge [pre] (tre);
+            \node [place] (tre-10)   [below right of = tre-6] {$10$}
+                edge [pre] (tre-6);
+            \node [place] (tre-11)   [below right of = tre-7] {$11$}
+                edge [pre] (tre-7);
+            \end{tikzpicture}
+    \par}
+    Da questo derivano $A = \{1,2 \dots, 11\}$, e ($\mathbb{P}(A), \subseteq$), ovvero insieme delle parti di $A$ ordinata sul contenimento $\subseteq$\\
+    La funzione è definita $f:\mathbb{P}(A) \to \mathbb{P}(A)$, dove $f(S) = S \cup \{x \in A | x \mbox{ è il figlio di un } y\in S\}$. Guardiamo alcuni valori di S:
+    \begin{itemize}
+        \item $f(\{2,6\}) = \{2,6,4,5,10\} \qquad f(\{2,6\}) \neq \{2,6\}$
+        \item $f(\{2,6,4,5,10\}) = \{2,6,4,5,10,8,9\} = M $ 
+        \item $f(M) = M$ 
+        \item $f(\emptyset) = \emptyset$ 
+    \end{itemize}
+    Il massimo punto fisso è $A$, se non ci fosse $\emptyset$ non ci sarebbe un punto fisso minimo (perché questo non sarebbe unico), ma ci sarebbero i punti fissi minimali rappresentati dalle foglie dell'albero.
+\end{enumerate}
+
+\subsection{Teorema di Knaster-Tarski}
+Siano $(L, \leq)$ un reticolo completo e $f:L \to L$ una funzione monotòna. Allora $f$ ha un minimo e un massimo punto fisso.
+\subsubsection{Dimostrazione per un caso particolare}
+$L=2^A$, per un insieme $A$ e sia $f : 2^A \to 2^A$, capire se tale funzione è monotona. \\
+Il primo passo consiste nel costruire l’insieme $Z = \{T \subseteq A \; | \; f(T) \subseteq T\}$, dove gli elementi di $Z$ vengono chiamati \textit{punti pre-fissi}. \\ 
+
+L’insieme $Z$ non può essere vuoto, perché tra i sottoinsiemi di $A$ c’è l’insieme $A$ e l’immagine di $A$ dev’essere un sottoinsieme di $A$ e necessariamente sarà contenuta in $A$.\\
+
+Si supponga che $f$ abbia qualche punto fisso, allora per questi punti fissi $p$ vale che $f(p)=p$, quindi se $f$ ha dei punti fissi, $Z$ li contiene tutti.
+Si ponga $m = \bigcap Z$.
+\[\forall S \in Z \,, m \subseteq S \mbox{ quindi }f(m) \subseteq f(S) \subseteq S\]
+Allora sappiamo che $f(m) \subseteq \bigcap Z = m$ che ci porta a concludere che $m \in Z$. Per tanto osserviamo che $m = \min Z$, quindi:
+\[f(m) \subseteq m\]
+La funzione $f$ è inoltre monotòna, e questo quindi ci porta a concludere che $f(f(m)) \subseteq f(m)$. Ma allora $f(m) \in Z$, e quindi $m \subseteq f(m)$. E come analizzato prima, anche ora possiamo dire che $m$ è il minimo punto fisso di $f$.
+
+\subsection{Funzione continua}
+Sia $f : 2^A \to 2^A$ una funzione monotòna. Prese una catena di sottoinsiemi di $A$, ovvero elementi di $2^A$, tale che 
+\[X_1 \subseteq X_2 \subseteq \dots \subseteq X_i \subseteq \dots\]  
+e la catena delle loro immagini \[f(X_1) \subseteq f(X_2) \subseteq \dots \subseteq f(X_i) \subseteq \dots\] 
+Si costruisce (sapendo che $2^A$ è un reticolo completo) l’unione di tutti gli $X_i$ che è un sottoinsieme di $A$.\\
+La funzione $f$ si dice \textit{continua} se $f(\bigcup X_i) = \bigcup f(X_i)$.
+
+Normalmente ciò non vale per tutte le funzioni monotòne, ma appunto solo per quelle continue.
+
+\subsection{Teorema di Kleene}
+Se $f$ è continua, allora il minimo punto fisso si $f$ si può ottenere calcolando \[f(\O), f(f(\O)), f(f(f(\O))), \dots\] 
+e il massimo punto fisso di $f$ si può ottener calcolando \[f(A), f(f(A)), f(f(f(A))), \dots\] (fermandosi quando si arriva a un risultato uguale al precedente).
+\subsubsection{Esempi}
+Consideriamo $A=2^\mathbb{N}$ e $S \subseteq \mathbb{N}$
+Consideriamo le varie funzioni applicate alla funzione di Kleene:
+\begin{enumerate}
+    \item $f(S) = S \cup \{2,7\}$. Quello che facciamo $f(\emptyset) = \emptyset \cup \{2,7\}$, ma non è il risultato che ci serve, applichiamo ancora la $f(f(\emptyset)) = f(\{2,7\}) = \{2,7\}$, questo infatti rappresenta il punto fisso minimo, mentre $f(\mathbb{N})$ restituisce subito $\mathbb{N}$ e questo risulta essere il punto fisso massimo. 
+    \item $f(S) = S \cap \{2,7,8\}$, in questo esempio la funzione $f(\emptyset) = \emptyset$ al primo passaggio e risulta essere il punto fisso minimo. Mentre per il punto massimo troviamo $f(\mathbb{N}) = \mathbb{N} \cap \{2,7,8\}$, quindi $f(f(\mathbb{N})) = f(\mathbb{N} \cap \{2,7,8\}) = \{2,7,8\}$
+\end{enumerate}

@@ -1,0 +1,58 @@
+\section{Lezione del 20 novembre}
+Le reti di Petri sono state introdotte da Carl Adam Petri nel 1962 con l’obiettivo di descrivere il flusso di informazione tra le componenti di un sistema complesso.
+
+Nei sistemi distribuiti lo stato globale non è osservabile; quindi la simulazione sequenziale non deterministica (semantica a interleaving) dei sistemi distribuiti è una forzatura, non rappresenta le caratteristiche reali del comportamento. La soluzione di Petri consiste nell’utilizzo delle reti di Petri per i sistemi elementari. In questi se devo specificare il \textbf{produttore-consumatore}, vado a specificare il mio sistema a livello di: Quali sono gli stati locali del sistema e quali sono gli eventi, in questo caso dell'ambiente.
+
+Una transizione, nel modello dei Sistemi di Transizioni Etichettati, prende uno stato globale e lo trasforma in un altro stato globale. Nelle reti di Petri, invece, la transizione è locale che dipende da alcune precondizioni e produce postcondizioni.
+
+Lo \textbf{stato} viene definito da una collezione di stati locali, ovvero condizioni vere. Gli stati locali sono rappresentati da cerchi e rappresentano condizioni booleane (vere se presentano un pallino, false altrimenti).\\
+
+Abbiamo inoltre gli eventi, ovvero le nostre transizione locali, rappresentata con quadrati. Gli stati locali determinano quali eventi sono \textbf{abilitati}, ovvero possono occorrere. \\
+Due eventi occorrono in modo \textbf{concorrente} se vengono abilitati contemporaneamente.
+\subsection{Le reti elementari}
+Una rete $N = (B,E,F)$ è una rete, questa possiamo rappresentarla attraverso un grafo bipartito, tale che:
+\begin{itemize}
+    \item $B$: insieme finito di condizioni (stati locali, proprietà booleane) rappresentate da cerchi (\textbigcircle).
+    \item $E$: insieme finito di eventi (trasformazioni locali di stato, transizioni locali) rappresentati da quadrati ($\square$).
+    \item $B \cap E = \varnothing$ e $B \cup E \neq \varnothing$ ($B$ e $E$ sono insiemi disgiunti e non vuoti)
+    \item $F \subseteq (B \times E) \cup (E \times B)$: relazione di flusso, rappresentata da una freccia, tale che:\\
+        $dom(F) \cup ran(F) = B \cup E$, ovvero non ci sono elementi isolati.
+        Una condizione isolata non cambia mai di valore e quindi non è osservabile (in quanto la si osserverebbe solo nel momento in cui dovesse cambiar valore), pertanto non la si modella perché non ha influenza sul sistema. 
+        Un evento isolato non ha influenza su alcuna condizione, non ha pertanto né precondizioni né postcondizioni, e non è rilevabile, pertanto non lo si modella. 
+\end{itemize}
+
+Sia $x \in B \cup E = X$, possiamo identificare :
+\begin{enumerate}
+    \item \textbullet $ x = \{y \in X \; | \; (y,x) \in F\}$ come pre-elementi di $x$ (precondizioni o pre-eventi)
+    \item $x$\textbullet$= \{y \in X \; | \; (x,y) \in F\}$	come post-elementi di $x$ (postcondizioni o post-eventi)
+\end{enumerate}
+
+Il concetto di pre e post lo posso estendere alle sotto-condizioni/eventi. E le possiamo ottenere l'insieme delle precondzioni \textbullet$A$eseguendo eseguendo l'unione di tutti i \textbullet$X$, discorso analogo per le post condizioni. Condizioni ed eventi sono nozioni duali. 
+
+Sia $A \subseteq B \cup E$, allora \textbullet$A = \displaystyle \bigcup_{x \in A} $\textbullet$x$ e $A $\textbullet$ = \displaystyle \bigcup_{x \in A} x$\textbullet\\
+
+La rete $N = (B, E, F)$ descrive la struttura del sistema, ovvero le relazioni tra le condizioni e gli eventi. 
+Il comportamento è definito attraverso le nozioni di caso e di regola di scatto o di transizione.\\
+
+Un caso,configurazione oppure stato globale è un insieme di condizioni $c \subset B$ che rappresentano l’insieme di condizioni vere di una certa configurazione del sistema, ovvero un insieme di stati locali che collettivamente individuano lo stato globale del sistema. \
+Abbiamo quindi una condizione falsa \textbigcircle  e una condizione vera $\Large \astrosun$\\
+
+Ho una rete e un sottoinsieme di condizioni, che in una certa condizione presumo siano vere. Devo quindi sapere dire quando un evento, data una certa condizione, può occorrere (essere abilitato), per farlo utilizzo una\textbf{ regola di scatto} o \textbf{regola di transizione} \\
+
+Sia $N = (B, E, F)$ una rete elementare e $c \subset B$.
+L’evento $e \in E$ è abilitato (può occorrere) in $c$, denotato con $c[e >$ $\iff $\textbullet$ e \subseteq c \; \land \; \{e $\textbullet$\} \cap c = \varnothing$ (quindi se le precondizioni sono vere e le postcondizioni sono false).\\
+Se $c$ in $c[e >$ non rappresenta solo le precondizioni dell’evento $e$, ma tutte le condizioni vere in quel momento; quindi le precondizioni di $e$ sono un sottoinsieme di $c$.\\ 
+Se $c[e >$, allora, quando $e$ occorre in $c$, genera un nuovo caso $c'$. Ricordando che $c$ rappresentava un insieme, otteniamo che $c'$, in seguito a $c[e > c'$, sarà così composto: $c' = (c \setminus \{$\textbullet$ e\}) \cup \{e $\textbullet$\}$. In poche parole tolgo dall'insieme le pre condizioni e unisco le postcondizioni.\\
+Due eventi non interferiscono uno con l’altro (sono indipendenti) se hanno pre e post condizioni disgiunte.
+
+\subsection{Principio di estensionalità}
+Principio di estensionalità (il cambiamento di stato è locale): un evento è completamento caratterizzato dai cambiamenti che produce negli stati locali e che sono indipendenti dalla particolare configurazione in cui l’evento occorre.
+
+Sia $N = (B,E,F)$ \textbf{una rete elementare}:
+\begin{itemize}
+    \item $N$ è semplice $\iff \forall x,y \in B \cup E, \;  $\textbullet$ x = $\textbullet$ y \; \land \; x $\textbullet$ = y $\textbullet$ \implies x = y$\\
+        Essendo che le due condizioni $x$ e $y$ cambiano valore di verità in maniera sincronizzata, (altrimenti l’evento per cui sono precondizioni o postcondizioni non si potrà mai verificare), non ha senso separarle in due variabili distinte.
+    \item $N$ è pura $\iff \forall e \in E, \; $\textbullet$ e \cap e $\textbullet$ = \varnothing$
+        Nel caso in cui \textbullet$ e \cap e $\textbullet$ \neq \varnothing$ (rete non pura), $e$ non occorre mai quindi non viene modellato. 
+\end{itemize}
+  Nelle reti 1-safe (non elementari), il caso \textbullet$ e \cap e $\textbullet$ \neq \varnothing$ viene visto come un modo più sintetico per rappresentare un’ulteriore condizione che si frammezza tra \textbullet$ e$ e $e $\textbullet.

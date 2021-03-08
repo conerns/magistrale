@@ -1,0 +1,119 @@
+\section{Lezione del 7 ottobre}
+%------------------------------------------------
+Come facciamo a determinare se l'output di un determinato programma è corretto?
+\newline 
+\begin{algorithm}[H]
+    \SetAlgoLined
+    int x = v[0]; \textit{x è il massimo in $v[0, \dots, 0]$} \\
+    int h = 1; \textit{ora x è il massimo in $v[0, \dots, h-1]$}\\
+    
+    \While{h $<$ n}{ \textit{x è il massimo in $v[0, \dots, h-1]$ questo lo suppongo} \\
+        \lIf{x $<$ v[h]}
+        {
+            x = v[h] \textit{x è il massimo in $v[0, \dots, h]$}
+        } 
+        h = h + 1; \textit{x è il massimo in $v[0, \dots, h-1], h \leq n$}
+    }
+    \textit{x è il massimo in $v[0, \dots, h-1], h = n$} \\
+    \Return x;
+    \caption{int f(int n, const int v[])}
+\end{algorithm}
+
+L'algoritmo restituisce il valore massimo presente all'interno del vettore v. Suppongo che n sia un numero positivo $n > 0$, e che un elemento generico del vettore sia un intero $v[i] \in \mathbb{Z}$ per i $\in \{0, \dots, n-1\}$. 
+\hfill \newline \newline 
+Dal momento che la proprietà \textit{x è il massimo in $v[0, \dots, h-1]$} è vera all’inizio dell’iterazione, ovvero nella riga 4 del codice, alla fine del codice nella riga 8, e prima dell’iterazione stessa presente alla riga 2, per induzione si può concludere che qualunque sia il numero di iterazioni che vengono svolte, la proprietà \textit{x è il massimo in $v[0, \dots, h-1]$} è invariante.
+\newline\newline
+Precondizione :  $\forall i \in  \{0, \dots, n-1\}, v[i] \in \mathbb{Z}$ e supponiamo inoltre che $n > 0$. \newline
+Postcondizione : $\forall i \in  \{0, \dots, n-1\}, \ v[i] \leq x$ \newline
+\hspace*{2.5cm} $\exists i \in \{0, \dots, n - 1\}, v[i] = x$ \newline
+Le post condizioni indicate, insieme, ci conducono a dire che $x = max(v[0, \dots, n-1)$
+
+La precondizione esprime ciò che vale all'inizio o più esattamente ciò che supponiamo valga a inizio esecuzione, la postcondizione è ciò che vale alla fine dell'esecuzione.
+\newline 
+
+Possiamo definire lo stato della memoria (s) come una funzione che va dall'insieme delle variabili del programma (V) un valore. $s : V \to \mathbb{Z}$
+
+Data una formula $\phi$ e uno stato $s$, possiamo verificare se la formula è vera/valida/verificata in $s$. Una particolare formula che gode della proprietà di essere invariante, se è vera all’inizio di un’iterazione, allora è vera anche alla fine dell’iterazione.
+
+Quando si esegue una istruzione, in genere, essa cambia lo stato della memoria. Scrivendo un programma risulta considerabile come un trasformatore di stato, perché le istruzioni che esegue generano un cambio dello stato della memoria. Un programma che non termina non ha stato uno stato finale, e quanto detto prima non è più valido in questo caso specifico.
+
+Possiamo esprimere la nostra specifica di correttezza di un programma attraverso una tripla: $\alpha,P, \beta $. Dove $\alpha,\beta $ sono le nostre formule della logica proposizionale e $P$ è un programma(o fragmento di codice). Inoltre $\alpha$ è la nostra formula di precondizione e $\beta$ è la nostra formula di postcondizione.
+
+\subsection{Logica di Hoare}
+Le formule nella logica di Hoare sono triple che si presentano nella seguente forma: $\alpha,P, \beta$.
+
+Abbiamo un linguaggio e un elemento fondamentale all'interno di questo linguaggio è il\textit{comando} C.
+\textit{C::} $x := E$, con: 
+\begin{itemize}
+    \item x identificatore della variabile 
+    \item := simbolo per l'assegnamento 
+    \item E simbolo non terminale della grammatica che sta per \textit{espressione}
+\end{itemize}
+Quando abbiamo delle espressioni semplici possiamo combinarle in diversi modi:
+\begin{itemize}
+    \item in sequenza, aggiungendo un \textit{;} tra i due comandi: C ; C
+    \item istruzione di scelta, if B then C else C endif
+    \begin{itemize}
+        \item B è un'espressione booleana, un simbolo non terminale della grammatica che dobbiamo poi in seguito definire.
+    \end{itemize}
+    \item istruzione iterativa, while B do C endwhile
+    \item SKIP, un'istruzione fittizia semplicemente avanza il program counter ma non fa nulla
+\end{itemize}
+
+B:= true $|$ false $|$ not B $|$ B AND B $|$ B OR B $|$ E $<$ E $|$ E $>$ E $|$ E $=$ E
+\begin{itemize}
+    \item true e false sono costanti booleani (non sono delle formule logiche ma elementi del linguaggio)
+    \item E espressioni aritmetiche costruite con nomi di variabili ed eventualmente costanti numeriche
+\end{itemize}
+
+\subsubsection{Esempio di programma}
+\begin{algorithm}[H]
+    \SetAlgoLined
+    x := a; y := b; \\
+    \While{x $!=$ y}{ 
+        \lIf{x $<$ y}{ y := y - x}
+        \Else{ x: = x - y;}
+    }
+    \caption{Programma D}
+\end{algorithm}
+
+Questo programma soddisfa la tripla $\{a> 0 \land b > 0\}$ D $\{x = MCD(a,b)\}$?
+
+Come va letta la tripla nella logica di Hoare? Se si esegue il programma D a partire da uno stato della memoria in cui i valori di a sono maggiori di 0 e b è maggiore di zero allora alla fine dell'esecuzione il valore di x  sarà il massimo comune divisore tra a e b.
+
+\subsubsection{Dimostrazione}
+Una dimostrazione in una logica data è una sequenza di assiomi o formule derivate di quella
+logica. \begin{itemize}
+    \item assiomi, sono formule supposte vere a priori.
+    \item formule derivate,  formule che derivano da altre formule precedenti applicando una regola di derivazione o di inferenza.
+\end{itemize}
+Una regola di derivazione ha la forma:
+$$\displaystyle \frac{\alpha_1, \alpha_2, \dots \alpha_k}{\alpha}$$ 
+\begin{itemize}
+    \item $\alpha_1, \alpha_2, \dots \alpha_k$  premesse, formule che sono già state derivate o assiomi
+    \item $\alpha$ conclusione, nuova formula
+\end{itemize}
+In questo caso ognuna delle $\alpha_i$, inclusa $\alpha$ la nostra conclusione,  è una formula tripla della logica di Hoare.
+Quindi una dimostrazione si ottiene applicando ripetutamente le regole di derivazione fino ad
+arrivare alla conclusione.
+
+\subsubsection{Regole di derivazione}
+\begin{enumerate}
+    \item \textit{skip}, dal momento che non fa nulla, non cambia lo stato della memoria e quindi non occorrono premesse. Possiamo derivare quindi una tripla dove la pre e la post condizione coincidono
+    $\displaystyle \frac{}{\{p\}skip\{p\}}$
+    \item regola di conseguenza o implicazione, ci sono due premesse. 
+    \begin{itemize}
+        \item Una non è una tripla di Hoare ma è una implicazione nella logica preposizionale.
+        $p \to p'$
+        \item La seconda è una tripla di Hoare nella forma $\{p'\}C\{q\}$. 
+    \end{itemize} 
+    Ritrovandoci quindi a dover scrivere: $\displaystyle \frac{p \to p' ,\ \{p'\}C\{q\}}{\{p\} C \{q\}}$, questa regola ha una forma speculare: \\ $\displaystyle \frac{\{p\}C\{q'\} ,\ q' \to q }{\{p\} C \{q\}}$
+    \item struttura di sequenza dei programmi: abbiamo due premesse $\displaystyle \frac{\{p\}C_1\{q\} \quad \{q\}C_2\{r\}}{\{p\}C_1,C_2\{r\}}$
+    \item regola di assegnamento: Questa regola ha uno status particolare essendo l'unica regola che non ha premesse. 
+    $\displaystyle \frac{}{\{p[E/x]\}x := E\{p\}}$ 
+    \begin{itemize}
+        \item \textit{p} è la formula che generalmente contiene gli identificatori delle variabili del programma
+        \item \textit{$\{p[E/x]\}$} è formula nella quale l’espressione sostituisce tutte le occorrenze della variabile $x$.
+        \item \textit{$[E/x]$} indica invece una sostituzione
+    \end{itemize}
+\end{enumerate}

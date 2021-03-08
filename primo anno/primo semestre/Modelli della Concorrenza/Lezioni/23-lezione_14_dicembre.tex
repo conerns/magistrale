@@ -1,0 +1,107 @@
+\section{Confronto tra LTL e CTL}
+Molte proprietà interessanti si possono esprimere sia in LTL  sia in CTL:
+    \begin{itemize}
+    \item Invarianti: nella prima parte abbiamo $AG \neg p$ esprimibile come $G \neg p$
+    \item Reattività: in questo caso abbiamo  da una parte $AG(p \to AFq)$ e dall'altra $G(p \to Fq)$
+
+\end{itemize}
+Abbiamo poi la Reset property, si esprime nella come \textbf{AG EF}$p$,e sta a indicare che da ogni stato raggiungibile in ogni cammino è sempre possibile raggiungere uno stato nel quale vale $p$. Questa proprietà non la si può esprimere in LTL.\\
+
+Abbiamo la formula $FGp$, in CTL, indica che in ogni cammino prima o poi si raggiungerà uno stato a partire dal quale $p$ rimane sempre vera. Questa proprietà non la si può esprimere in LTL.
+
+{\centering
+\begin{tikzpicture}[node distance=2.3cm,>=stealth',bend angle=30,auto]
+  \tikzstyle{place}=[circle,thick,draw=blue!75,fill=blue!20,minimum size=6mm]
+  \tikzstyle{transition}=[rectangle,thick,draw=blue!75,minimum size=4mm]
+
+    \node [place] (uno)   [label=below:$\{p\}$] {$s_0$}
+        edge [loop above] (uno); %P1
+    
+    \node [place] (due)   [right of=uno,label=below:$\{ \ \}$] {$s_1$}
+        edge[pre] (uno); 
+    \node [place] (tre)   [right of=due,label=below:$\{p\}$] {$s_2$}
+        edge [pre] (due)
+        edge [loop above] (tre); %P1
+\end{tikzpicture}
+\par}
+
+Considerato il modello di Kripke sopra, analizziamo la validità di $FG_p$. Andiamo a considerare i cammini massimali
+\begin{itemize}
+    \item $(s_0)^w$, in questo caso $FG_p$ è verificata
+     \item $(s_0 \ s_1) s_2^w$, in questo caso $FG_p$ è verificata
+\end{itemize}
+Quindi si verifica sempre. Nonostante questo non possiamo trasformala in LTL. Questo perché una possibile traduzione sarebbe AFAG$p$, ma come possiamo notare la \textbf{A} non rispetto la validità della formula. Si trae che:
+\[M,s_0 \vDash FGp \quad M,s_0 \nvDash AFAGp\]
+
+Confrontiamo però la formula AFEGp, questo perché comunque io avanzi nell'albero, da qualsiasi punto esiste un cammino in cui $p$ è vera. \textbf{MA} sia:
+
+{\centering
+\begin{tikzpicture}[node distance=2.3cm,>=stealth',bend angle=30,auto]
+  \tikzstyle{place}=[circle,thick,draw=blue!75,fill=blue!20,minimum size=6mm]
+  \tikzstyle{transition}=[rectangle,thick,draw=blue!75,minimum size=4mm]
+
+    \node [place] (uno)   [label=below:$\{ \ \}$] {$s_1$};
+    \node [place] (tre)   [right of=uno,label=below:$\{p\}$] {$s_2$}
+        edge [pre, bend left] (uno)
+        edge [post, bend right] (uno)
+        edge [loop above] (tre); %P1
+\end{tikzpicture}
+\par}
+Ci ritroviamo comunque a dire che
+\[M,s_1 \nvDash FGp \quad M,s_1 \vDash AFEGp\]
+
+Perché abbiamo un cammino che non rende mai vera $Gp$, è vera però AFAGp. Infatti prima o poi ci sarà un cammino in cui vale \textit{p}.
+\subsection{CTL$^*$}
+Esiste una logica CTL*, questa estende sia LTL sia CTL, mantenendo i due quantificatori sui cammini, ma eliminando il vincolo di CTL.\\
+\textbf{Esempio}: AFG$p \lor$ AFEG $q$ espressa EFG$q$\\
+
+In linea di massima, estendere la capacità espressiva di una logica si paga con un maggior costo computazionale degli algoritmi di model-checking per le formule di quella logica.
+
+\subsection{Equivalenza di modelli rispetto a una logica}
+Due modelli di Kripke, $M_1$ e $M_2$, con stati iniziali $q_0$ e $s_0$ si dicono \textit{equivalenti} rispetto a una logica \textbf{L} se, per ogni formula $\alpha \in FBF_L$: \[M_1, q_o \vDash \alpha \iff M_2, s_0 \vDash \alpha\]
+
+\subsection{Insiemi parzialmente ordinati}
+Relazione d’ordine parziale su $A$: $\leq$ $\subseteq$ $A \times A$
+\begin{enumerate}
+    \item \textbf{riflessiva}: $x \leq x$, $\forall x \in A$
+    \item \textbf{antisimmetrica}: $(x \leq y \land y \leq x) \implies x = y$, $\forall x, y \in A$
+    \item \textbf{transitiva}: $(x \leq y \land y \leq z) \implies x \leq z$, $\forall x,y,z \in A$
+\end{enumerate}
+
+Sia $(A, \leq)$ un insieme parzialmente ordinato e $B \subseteq A$. Allora diciamo che $x \in A$ è un \textbf{maggiorante} di $B$ se $y \leq x$, $\forall y \in B$. Mentre $x \in A$ è un \textbf{minorante} di $B$ se $x \leq y$, $\forall y \in B$.\\
+
+Si indica con $B^*$ l’insieme dei maggioranti di $B$ e con $B_*$ l’insieme dei minoranti di $B$.\\
+$B$ si dice:
+\begin{enumerate}
+    \item limitato \textbf{superiormente} se $B^* \neq \emptyset$. 
+    \item limitato \textbf{inferiormente} se $B_* \neq \emptyset$.
+\end{enumerate}
+
+Per quanto riguarda \textbf{$x \in B$}, questo:
+\begin{itemize}
+    \item è il \textbf{minimo} di $B$ se $x \leq y$, $\forall y \in B$.
+    \item è il \textbf{massimo} di $B$ se $y \leq x$, $\forall y \in B$.
+    \item è \textbf{minimale} in $B$ se $y \leq x \implies y = x$.
+    \item è \textbf{massimale} in $B$ se $x \leq y \implies y = x$.
+\end{itemize}
+ 
+Se $x$ è il minimo di $B^*$, si dice che $x$ è l’estremo superiore (join) di $B$ e si scrive $x = \sup B$ o $x = \bigvee B$. Se $x$ è il massimo di $B_*$, si dice che $x$ è l’estremo inferiore (meet) di $B$ e si scrive $x = \inf B$ o $x = \bigwedge B$. In particolare, se $B = \{x,y\}$, si scrive $x \bigvee y$ per indicare $\bigvee B$ se esiste e $x \bigwedge y$ per $\bigwedge B$ se esiste.\\
+
+Si consideri la logica proposizionale.\\
+
+La nozione di implicazione ha due aspetti: operazione che date due formule costruisce una nuova formula e relazione binaria tra formule.\\
+L’implicazione è riflessiva perché qualunque formula $\alpha$ implica se stessa ed è transitiva perché se una formula $\alpha$ implica $\beta$ e la formula $\beta$ implica $\gamma$ allora anche $\alpha$ implicherà $\gamma$.\\
+
+Per quanto riguarda l’antisimmetria, date due formule diverse $\alpha$ e $\beta$ è possibile che $\alpha$ implichi $\beta$ e viceversa. (Esempio: $\alpha \lor \beta \implies \beta \lor \alpha$ e viceversa)\\
+
+Quindi l’implicazione non è una relazione di ordine parziale sull’insieme di tutte le formule bene formate. Si tratta di una relazione di *preordine*, in quanto è riflessiva e transitiva.\\
+
+È possibile trasformare qualunque relazione di preordine in una relazione di ordine parziale su un insieme derivato.
+Definita una relazione di equivalenza tra formule, si possono costruire le classi di equivalenza, ovvero insiemi di formule tali che in ogni insieme ci sono formule due a due equivalenti.\\
+
+Con $[FBF_{LP}]_{\equiv}$ si indica l’insieme di tutte le classi di equivalenza, sul quale si può definire una relazione $\implies$ definita nel seguente modo: una certa classe di equivalenza implica un’altra classe di equivalenza se una qualunque delle formule della prima classe implica una qualunque delle formule della seconda classe.\\
+$([FBF_{LP}]_{\equiv}, \implies)$ è una relazione di ordine parziale.
+
+\subsection{Reticolo}
+Un \textit{reticolo} è un insieme parzialmente ordinato $(L, \leq)$, tale che $\forall x, y \in L$, esistono $x \bigvee y$ (join) e $x \bigwedge y$ (meet).
+Un reticolo si dice completo se $\bigvee B$ e $\bigwedge B$ esistono $\forall B \subseteq L$.

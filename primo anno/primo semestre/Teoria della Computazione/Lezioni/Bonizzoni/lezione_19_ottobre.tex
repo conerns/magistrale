@@ -1,0 +1,32 @@
+\section{Lezione del 19 - Bonizzoni}
+Alcuni fatti:
+\begin{itemize}
+    \item Se un problema NP-completo è in P (cioè ha un algoritmo polinomiale che lo risolve), allora $P = NP$.
+    Per dimostrarlo, per definzione di NP-difficile, sappiamo che per $\forall \ A \in NP,\,\,A \leq_p \Pi$. Ovvero $\Pi$ è una procedura che risolve A, dopo che ho trasformato l'input $x$ di $A$ in input $f(x)$ per $\Pi$, con $f(x)$ calcolabile in tempo polinomiale.\\ Assumendo quindi che $\Pi\in P$ allora anche ogni $A\in P$, e quindi $NP=P$.
+    \item La riduzione polinomiale è transitiva. Significa che se $A\leq_p B$ e $B\leq_p C$ allora: $A\leq_p C$. Questa transitività deve necessariamente essere dimostrata. \\ \\
+    Infatti $A\leq_p B$ implica l'esistenza di $f$ tale che $x\in L_A$ sse $f(x) \in L_B$. Ugualmente $B\leq_p C$ implica l'esistenza di $g$ tale che $x\in L_B$ sse $g(x) \in L_C$.\\
+    L'obiettivo è quello di dimostrare che $\exists \ f'$ tale che $x\in L_A$ sse $f'(x)\in  L_C$. Per formare $f'$ dobbiamo partire da $f$ e $g$ assumendo che $f'() = g \cdot f()$. L'idea di base corrispondere a prendere $x \in L_A$ con $f(x) \in L_B$, se questo è vero possiamo applicare la nostra funzione $g(x)$ potendo quindi eseguire $g(f(x))$. Questo ci permette di dire che $g(f(x))$ appartiene alle istanze di $C$, dimostrando così la transitività. \\
+    In altre parole ho che $x \in L_A$ e che $f(x)\in L_B$ (quindi $f(x)$ è un input per $B$) ma quindi $g(f(x))\in L_C$ (quindi $g(f(x))$ è un input per $C$). \\
+    Poiché $f$ è calcolabile in tempo polinomiale $|x|$ e anche $g$ è calcolabile in tempo polinomiale in $|f(x)|$, deduco che $f'=g\circ f$ è calcolabile in tempo polinomiale $|x|$. Questo ci consentirà di dimostrare quali problemi entrino nei NP-Completi. \\
+    
+    Quindi per dimostrare che un problema $\Pi'$ è \textbf{NP-difficile}, devo ridurre $\Pi'$ ad un problema qualsiasi \textbf{NP-difficile} (in base alla somiglianza del problema), sapendo che $\forall A\in NP$ $A$ si riduce ad un problema \textbf{NP-difficile}, come $SAT$.\\ In modo equivalente per dire che è un problema è \textbf{NP-complete} faccio quanto fatto per \textbf{NP-difficile} ma devo aggiungere che esso sia in $NP$, dovendo quindi aggiungere il certificato per dimostrare che la verifica si possa fare in tempo polinomiale.
+\end{itemize}
+
+\subsection{Set Cover}
+Dato un universo $U$ di $n$ elementi sia $S=\{S_1,\ldots,S_M\}$ una collezione di sottoinsiemi di $U$. Sia anche data una funzione di costo $c:S\to\mathbb{Q}^+$. Il problema \textbf{set-cover} consiste nel trovare una collezione $C$ di sottoinsiemi di $S$ di costo minimo che copra tutti gli elementi di $U$. Se il costo è uniforme, il problema set cover chiede di trovare una sottocollezione che copra tutti gli elementi di $U$ e che abbia minima dimensione.\\
+
+\textit{set-cover}, nella versione decisionale e nella versione con peso uniforme, è \textbf{NP-complete}. Quindi il problema ci chiede se esiste una collezione $C$ di sottoinsiemi di $S$ la cui unione sia $U$ con cardinalità minore uguale di $j$.
+\subsubsection{Dimostrare che SC è in NP}
+Data una sottocollezione $C$ posso facilmente dimostrare che $|C|\leq k$ in tempo polinomiale e che l'unione degli insieme di $C$ include tutti gli elementi di $U$, in tempo polinomiale su $|U|$. 
+Posso aggiungere anche un certificato, nella forma di una collezione che copre tutto $U$ (e quindi la verifica è in tempo polinomiale nell'input e nel certificato). Quindi \textbf{set-cover} è in \textbf{NP}.\\ 
+
+Per dimostrare che \textbf{set-cover} è \textbf{NP-difficile} dimostro che: $\mbox{vertex-cover} \leq_p \mbox{set-cover}$ ovvero uso un problema che so già essere \textbf{NP-difficile}, appunto \textit{vertex-cover}.\\ 
+
+Devo quindi trasformare un'istanza di \textit{vertex-cover} $C=\langle G=(V,E), j\rangle$ in un'istanza $C'$ di \textit{set-cover}, in tempo polinomiale, tale che $C$ è soddisfacibile sse $C'$ è soddisfacibile (se risponde YES su input $C$ e $C'$).\\ 
+Eseguo l'assegnamento  $U = E$. Per quanto riguarda la collezione $S$ procedo nel seguente modo. Etichetto i vertici in $V$ da $1$ a $n$. Sia $S_i$ l'insieme degli archi incidenti al vertice $i$-simo.Sia poi $k=j$ per concludere la costruzione polinomiale dell'istanza di \textit{set-cover}.\\ Ciascun arco è un elemento di $U$ e ciascun vertice è un insieme di $S$.\\
+
+Vediamo anche la dimostrazione formale che \textit{vertex-cover} risponde yes, per $j$, sse istanza di \textit{set-cover} risponde yes per $k=j$.\\ Innanzitutto se \textit{vertex-cover} risponde yes per $j$ allora trovo una collezione di \textit{set-cover} buona di cardinalità $j$. 
+
+supponiamo che $G$ ha una copertura C di al più $j$ vertici. Per costruzione, $C$ corrisponde ad una collezione $C'$ di sottoinsiemi di $U$. Poiché assumo $k=j$ allora $|C'|\leq k$. Inoltre $C'$ copre tutti gli elementi di $U$ poiché $C$ copre tutti gli archi di $G$. Per mostrare questo prendo ogni elemento di $U$ che è un arco in $G$. Poiché $C$ è una copertura,
+almeno un estremo dell'arco è in $C$ e quindi l'arco è in un insieme di $C'$. Dimostriamo anche l'altro verso della dimostrazione, ovvero devo garantire l'esistenza della copertura. \\
+Suppongo di avere un set cover $C'$ di dimensione al più $k$ nella nostra istanza. Dato che ad ogni insieme di $C'$ ho associato un vertice in $G$,  sia C l’insieme di quei vertici, allora $|C|=|C'|\leq k=j$. Inoltre, $C$ è una copertura di $G$ poiché $C'$ è un set-cover, poiché, preso un arco $e$ ho che $e\in U$ e quindi $C'$ deve contenere almeno un insieme che include $e$ e tale insieme è quello che corrisponde ai nodi che sono estremi di $e$. Quindi $C$ deve contenere almeno un estremo di $e$. Quindi posso concludere dicendo che $C$ è copertura di $G$.

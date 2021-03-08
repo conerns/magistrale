@@ -1,0 +1,153 @@
+\section{Ricerca approssimata con algoritmo di Wu e Manber }
+Prima di procedere andiamo a riprendere il concetto di occorrenza approssimata:
+Dato un pattern $P$ e un testo $T$, definiti sull'alfabeto $\Sigma$, e una soglia di errore k, diciamo che:
+\begin{teorema}{Occorrenza approssimata}{}
+    P ha un'occorrenza approssimata in T, in posizione j se esiste una $T[j-L+1, j]$ che ha disatanza di edit con P al più pari a k. (occorrenza con al più k errori)
+\end{teorema}
+Questa tipologia di ricerca, in particolar modo con questo algoritmo, è basata su paradigma SHIFT-AND visto nella lezione precedente. Anche qui abbiaimo una suddivisione dei compiti in due fasi:
+\begin{itemize}
+    \item Preprocessing del pattern $P$ di lunghezza $m$ in tempo $\mathcal{O}(|\Sigma|+m)$, tramite il calcolo di una tabella $B$ di $|\Sigma|$ parole di $m$ bit.
+     Il preprocessing è identico a quella della ricerca esatta di BYG.
+     \item  Scansioni del testo $T$ di lunghezza $n$ in tempo $\mathcal{O}(nk)$ per cercare le occorrenze approssimate di $P$.
+\end{itemize}
+Dove $\Sigma$ è l’alfabeto di definizione del testo e del pattern. L’algoritmo WM è basato sul paradigma SHIFT-AND e opera su word di bit.\\
+
+\subsection{Scansione del testo}
+L’algoritmo effettua $k+1$ iterazioni di scansione del testo $T$ per $0 \leq h \leq k$, dove l’iterazione $h$ trova tutte le occorrenze del pattern $P$ con al più $h$ errori.
+\begin{itemize}
+    \item Tutte le occorrenze con al più $0$ errori sono trovate all’iterazione $h=0$ (occorrenze esatte).
+    \item Tutte le occorrenze con al più $1$ errori sono trovate all’iterazione $h=1$.
+\end{itemize}
+\[\vdots\]
+\begin{itemize}
+    \item Tutte le occorrenze con al più $k$ errori sono trovate all’iterazione $h=k$.
+\end{itemize}
+
+La generica iterazione $h$ calcola $n$ parole $D_j^h$ lunghe $m$ bit tali che $D_j^h[m] = 1 \iff P$ ha un’occorrenza che finisce in $j$ con al più $h $ errori.  \\
+L’iterazione $h=0$ calcola $n$ parole $D_j^0$ lunghe $m$ bit tali che $D_j^0[m] = 1 \iff P$ ha un’occorrenza che finisce in $j$ con al più $0$ errori. \\
+L’iterazione $h=k$ calcola $n$ parole $D_j^k$ lunghe $m$ bit tali che $D_j^k[m] = 1 \iff P$ ha un’occorrenza che finisce in $j$ con al più $k$ errori. \\
+Solo l’ultima iterazione $h=k$ produce in output tutte le posizioni $j$ su $T$ in cui finisce un’occorrenza di $P$ con al più $k$ errori.\\
+
+\subsubsection{Parola \texorpdfstring{$D^h_j$}{}}
+Si denoti con $P[1, i] = \mbox{suff}_h(T[1, j])$ il fatto che $P[1, i]$ occorre come suffisso di $T[1, j]$ con al più $h$ errori.
+
+Quando si parla di definizione di parola $D^h_j$, lo si deve considerando i valori di $j$ e $h$ nel seguente modo: $0 \leq j \leq n, 0\leq h \leq k$\\
+$D^h_j = d_1 d_2 \dots d_m$ tale che $d_i = D^h_j[i] = 1 \iff P[1, i ] = \mbox{suff}_h(T[1, j])$\\
+
+In particolare, per definizione la parola $D^h_0$ è tale che:
+\begin{itemize}
+    \item $D^h_0 [i] = 1$, $\forall i \leq h$ (per le prime $h$ posizioni da sinistra) 
+    \item $D^h_0[i] = 0$, $\forall i > h$ (per le ultime $m-h$ posizioni da destra)
+\end{itemize}
+
+Infatti si ha che: $\forall i \leq h$, $P[1, i] = \mbox{suff}_h(T[1,0])$ e $\forall i > h$, $P[1, i] \neq \mbox{suff}_h(T[1,0])$.\\
+
+La parola $D^0_0$ (per $ h=0$) è per definizione $D^0_0 = 00..00$.\\
+
+Inoltre $d_m = D^h_j[m] = 1 \iff P[1, m] = \mbox{suff}_h(T[1,j])$, ovvero se $P$ ha un’occorrenza che finisce in $j$ con al più $h$ errori (e quindi con al più $k$ errori).
+$D^h_j[m] = 1 \implies D^k_j[m] = 1$
+
+La parola $D^0_j = d_1 \dots d_m$ è tale che $d_j = D^0_j[i] = 1 \iff P[1,i] = \mbox{suff}(T[1,j])$.\\
+La parola $D^0_j$ coincide con la parola $D_j$ dell’algoritmo di ricerca esatta di Baeza-Yates e Gonnet.
+
+\subsubsection{Scansione del testo}
+Alla prima iterazione $h = 0$, $T$ viene scandito per $j$ da $ 1$ a $n$ per calcolare tutte le parole $D^0_j$, come nell’algoritmo di BYG.\\
+
+Alla generica iterazione $h > 0$, per ogni posizione $j$ del testo $T$ viene calcolata la parola $D^h_j$. All’ultima iterazione $h=k$ ogni volta che la parola calcolata $D^k_j$ ha il bit meno significativo uguale a $1$, viene prodotta in output la posizione $j$ in cui finisce un’occorrenza approssimata del pattern con al più $k$ errori.\\
+
+Si vuole calcolare la generica parola $D^h_j$ per un qualsiasi $j>0$ e un qualsiasi $h>0$.
+\begin{itemize}
+   \item $h>0 \land j>0 \land i >1$
+       In questa situazione abbiamo la possibilità di incontrare diverse casistiche:
+       \begin{enumerate}
+       \item In un primo caso ci ritroviamo a dire che:
+           \begin{equation*}
+               \begin{split}
+                   D^h_j[i] = 1 &\iff P[1, i] = \mbox{suff}_h(T[1, j]) \\
+                   & \Leftarrow P[1, i-1] = \mbox{suff}_h(T[1, j-1]) \land P[i] = T[j] \\
+                    &\iff D^h_{j-1}[i-1] = 1 \land P[i] = T[i] \\
+                    &\iff D^h_{j-1}[i-1] = 1 \land B_{T[j]}[i] = 1
+               \end{split}
+           \end{equation*}
+           Con $\Leftarrow$ andiamo ad intendere che tutte le condizioni in $\iff$ devono essere verificate finché $D^h_j[i] = 1 \iff P[1, i] = \mbox{suff}_h(T[1, j])$ risulti corretto. Sarebbe una doppia implicazione. Ci ritroviamo quindi con:
+           \[D^h_j[i] \Leftarrow D^h_{j-1}[i-1] \land B_{T[j]} [i]\]
+       \item In un secondo caso invece:
+            \begin{equation*}
+               \begin{split}
+               D^h_j[i] = 1 & \iff P[1, i] = \mbox{suff}_h(T[1, j]) \\
+               & \Leftarrow P[1, i-1] = \mbox{suff}_{h-1}(T[1, j-1]) \\
+               & \iff D^{h-1}_{j-1}[i-1] = 1
+               \end{split}
+            \end{equation*}
+            In questo caso $P[i]$ e $T[j]$ possono anche essere diversi perché si rimane comunque nella soglia massima di $k$ errori. Quindi \[D^h_j[i] \Leftarrow D^{h-1}_{j-1}[i-1]\]
+        \item Il terzo caso invece genera un errore:
+        \begin{equation*}
+            \begin{split}
+                D^h_j[i] = 1 &\iff P[1, i] = \mbox{suff}_h(T[1, j]) \\
+                & \Leftarrow P[1, i] = \mbox{suff}_{h-1}(T[1, j-1]) \\
+                & \iff D^{h-1}_{j-1}[i] = 1
+            \end{split}
+        \end{equation*}
+            Il suffisso è con $h-1$ perché $T[j]$ genera un errore.
+            Quindi \[D^h_j[i] \Leftarrow D^{h-1}_{j-1}[i]\]
+        \item Il quarto caso è solamente un duale del terzo caso :
+        \begin{equation*}
+            \begin{split}
+                D^h_j[i] = 1 &\iff P[1, i] = \mbox{suff}_h(T[1, j])\\
+                & \Leftarrow P[1, i-1] = \mbox{suff}_{h-1}(T[1, j]) \\
+                & \iff D^{h-1}_{j}[i-1] = 1
+            \end{split}
+        \end{equation*}
+             Quindi \[D^h_j[i] \Leftarrow D^{h-1}_{j}[i-1]\]
+        \end{enumerate}
+        Quindi per $i >1$, ci ritoviamo ad avere:
+        \begin{equation*}
+            \begin{split}
+                D^h_j[i] & \iff  (D^h_{j-1}[i-1] \land B_{T[j]}[i]) \lor D^{h-1}_{j-1}[i-1] \lor D^{h-1}_{j-1}[i] \lor D^{h-1}_{j}[i-1] \\
+                D^h_j[i] &=  (D^h_{j-1}[i-1] \land B_{T[j]}[i]) \lor D^{h-1}_{j-1}[i-1] \lor D^{h-1}_{j-1}[i] \lor D^{h-1}_{j}[i-1]
+            \end{split}
+        \end{equation*}
+    \item $h>0 \land j>0 \land i = 1$\\
+        Per $h>0 \land j>0$, $P[1,1]$ occorre sempre come suffisso del prefisso $T[1,j]$ (non nullo) con al più $h$ errori: $D^h_j[1]=1$, per $h>0 \land j>0$.\\
+        
+        Si sostituisce $i=1$ nella formula di calcolo di $D^h_j[i] \mbox{, con} i>1$: 
+        \[D^h_j[1] = (D^h_{j-1}[0] \land B_{T[j]}[1]) \lor D^{h-1}_{j-1}[0] \lor D^{h-1}_{j-1}[1] \lor D^{h-1}_{j}[0]\]
+        Si sostituisce al posto di tutti gli accessi ai bit in posizione $0$ un $1$: \[D^h_j[1] = (1 \land B_{T[j]}[1]) \lor 1 \lor D^{h-1}_{j-1}[1] \lor 1\]
+\end{itemize}
+Si effettua un RSHIFT1 sulle parole che nel caso $i=0$ andavano ad accedere ai bit in posizione $0$.\\
+Così facendo è possibile unificare i due casi e ottenere: per $i \geq 1$, 
+\begin{equation*}
+    \begin{split}
+        D^h_j[i] = & \left(\mbox{RSHIFT1}(D^h_{j-1})[i] \land B_{T[j]}[i]\right) \lor \\
+        & \mbox{RSHIFT1}(D^{h-1}_{j-1})[i] \lor\\ 
+        &  D^{h-1}_{j-1}[i]  \lor\\
+        & \mbox{RSHIFT1}(D^{h-1}_{j})[i]
+    \end{split}
+\end{equation*}
+Possiamo tranquilamente andare a rimuovere il calcolo sul bit a bit $[i]$ dato che sappiamo che sia il modo di agire, otteniamo:
+\begin{equation*}
+    \begin{split}
+        D^h_j = & \left(\mbox{RSHIFT1}(D^h_{j-1}) \land B_{T[j]}\right) \lor \\
+        & \mbox{RSHIFT1}(D^{h-1}_{j-1}) \lor\\ 
+        &  D^{h-1}_{j-1}  \lor\\
+        & \mbox{RSHIFT1}(D^{h-1}_{j})
+    \end{split}
+\end{equation*} 
+\subsubsection{Scansione del testo}
+\begin{enumerate}
+    \item Inizializzazione di una maschera $M = 00\dots01$ di $m$ bit tutti a $0$ tranne il meno significativo che è uguale a $1$.
+    \item Inizializzazione della parola $D^0_0 = 00\dots00$.
+    \item Calcolo di $D^0_j$ per $j$ da $1$ a $n$ (algoritmo BYG).
+    \item Per $h$ da $1$ a $k$: 
+    \begin{itemize}
+        \item Inizializzazione di $D^h_0$.
+        \item Per $j$ da $1$ a $n$, calcolo di $D^h_j$
+        \item Se $h=k$ e $(D^k_j \land M) \neq 0$, allora viene prodotta in output l’occorrenza $j$. 
+    \end{itemize}
+\end{enumerate}
+\subsubsection{Proprietà}
+\begin{itemize}
+    \item $D^h_j[i]=1 \implies D^{h'}_j[i] = 1$, con $h' > h$
+    \item $D^h_j[i] = 1 \implies D^{h+1}_j[i+1] = 1$, per $i<m$ e analogamente  $D^h_j[i] = 1 \implies D^{h+1}_j[i-1] = 1$, per $i>1$
+    \item $|B(P)| = i \iff D_j[m] = 1$ e $i$ è la più grande posizione $< m$ tale che $D_j[i]=1$.
+\end{itemize}

@@ -1,0 +1,104 @@
+\section{Lezione del 19 novembre}
+\subsection{FPT (Fixed Parameter Tractability)}
+
+Un algoritmo FPT con parametro $k$ fissato e input di dimensione $n$ è un algoritmo con complessità $\mathcal{O}(f(k) \times poly(n))$ in tempo, dove $f(k)$ non dipende da $n$ e non è polinomiale in $n$ (altrimenti il problema sarebbe in P, mentre l’algoritmo si applica a problemi NP-difficili: è un problema di ottimizzazione difficile). \\
+Sono solitamente rappresentati da funzioni esponenziali in $k$. Andiamo a considerare $2^k \cdot n$ per certi $k$ e $n$. Il tipo di complessità può portrare la funzione a non essere un semplice $k$, infatti in questo caso abbiamo $2^k$. Andiamo a osservare per quali valori di $k$ la funzione che ha come valore $2^k \cdot n$ sia meglio di $2^n$. Valutando NP-difficili si richiedono tempi esponenziali. I vantaggi rispetto a un tempo $2^n$ si hanno con $k$ non troppo grande.\\
+
+Un algoritmo FPT è ottenibile con diverse strategie, la più comune delle quali è *Bounded Search Tree*.
+
+\textbf{Algoritmo con bounded search tree per Vertex cover}
+Per costruire un algoritmo di costo $\mathcal{O}(2^k \cdot |V|)$ per risolvere Vertex Cover di decisione con copertura di dimensione $k$.
+
+L'idea principale che si utilizza in questo caso per coprire gli archi di un grafo $G=(V,E)$ si divide in alcuni step:
+\begin{enumerate}
+    \item si prende un arco a caso $(u,v)$ tale che un estremo dell’arco ($u$ o $v$) sia nella copertura del grafo.
+    \item si provano entrambi gli estremi e si effettua una ricorsione.\textbf{}
+\end{enumerate}
+Nel caso in cui il problema da risolvere fosse di natura decisionale, quindi un \textbf{Vertex Cover versione di decisione}, avendo come input un grafo $G=(V,E)$ e un intero $k \geq 0$ e si ha come obiettivo quello di stabilire se $G$ ha un vertex cover di dimensione al più $k$, questo rappresenta il nostro output. 
+Denominiamo il nostro algoritmo scritto il pseudo codice:
+\begin{lstlisting}
+    Procedura BoundedSearch(G,k)
+    //casi base
+    if G = insiemeVuoto then    //corrisponde all'aver considerato tutti gli archi
+    	return true
+    if k = 0 then               // ogni chiamata riduce k, il grafo non risulta vuoto
+    	return false            //esistono ancora archi ma siamo andati oltre k per la copertura
+    //ricorsione
+    prendi un arco (u,v) di G
+    if BoundedSearch(G-u, k-1) then 
+    	return true
+    if BoundedSearch(G-v, k-1) then
+    	return true
+    return false 
+    /**rappresentazione come albero binario, questo per via di come sono state impostate le chiamate ricorsive*/
+\end{lstlisting}
+Si nota facilmente che viene effettivamente costruito l'insieme copertura, ma viene riportata solamente il valore booleano in base al fatto se quella copertura esiste.\\
+Dall'algoritmo possiamo ricavare che si sta lavorando su un grafo $G$, dove se da queto ultimo viene rimosso  l’estremo $x$: \[G-x = (V-x, E - {\text{archi incidenti a } x})\]
+Costo complessivo: $2^k \cdot |V|$.
+
+La ricorsione corrisponde alla creazione di un albero limitato di ricerca. Si parte dalla radice $r$ (in cui si ha tutto $G$ e $k$ come parametro per la ricerca). In seguito si sceglie a caso l’arco $(u,v)$ e si creano due figli (uno per $u$ e uno per $v$ usati per la chiamata ricorsiva), decrementando $k$ di $1$ per scendere in profondità. Questo procedimento si ripete ricorsivamente per i due figli. \\
+
+Al passo ricorsivo generico, per ogni nodo da sviluppare si procede come segue: 
+\begin{itemize}
+    \item Se un nodo è etichettato dall’insieme $\{X\}$ di vertici, è perché si sta rappresentando il grafo $G-X$ e il parametro $k'$ è dato $k’ = k-|X|$. 
+    \item Si sceglie  l’arco $(z,w)$, questo è il passo che precede le due chiamate ricorsive, e si creano due figli per il nodo: $\{X\} \cup z$ e $\{X\} \cup w$, con il decremento di $k'$ che ora è $k'-1$.
+    \item Si ripete finché: 
+        \begin{itemize}
+            \item $G=\emptyset$, quindi sono finiti gli archi e si restituisce `true` perché è stata trovata la copertura. 
+            \item $k=0$ (e $G \neq \emptyset$), quindi sono rimasti archi non coperti e si è a profondità $k$, pertanto si restituisce `fail`.
+        \end{itemize}
+        Alla fine si avranno nodi `true` e nodi `fail`. 
+\end{itemize}
+Versione che ricostruisce l’insieme vertex cover (minimo) di dimensione $k\leq 2$.
+
+\begin{lstlisting}
+    Procedure Vertex-CoverFPT(G,k)
+    if G = insiemeVuoto 
+    	return insiemeVuoto
+    if k = 0
+    	return FAIL
+    Take (u,v), edge of G
+    C1 = {u} || Vertex-CoverFPT(G-u, k-1)
+    C2 = {v} || Vertex-CoverFPT(G-v, k-1)
+    return min{C1, C2}
+\end{lstlisting}
+
+Si consideri lo stesso algoritmo applicato a $G$ con $k=3$. Si scende di $3$ livelli e si ritorna il minimo insieme calcolato dai nodi che non restituiscono `fail`.
+
+Il tempo di calcolo è determinato dal numero di nodi dell'albero di ricorsione limitato (\textbf{bounded search tree}). Si ha che in totale abbiamo $\mathcal{O}(2^k)$ nodi alla profondità $k$ e che per ogni nodo si considera il costo di analisi del nodo. Il costo dell'analisi è pari a:
+\begin{itemize}
+    \item numero di archi $\mathcal{O}(|E|)$ se si analizzano tutti gli archi incidenti al nuovo estremo $u$ aggiungo al nodo
+    \item numero di vertici  $\mathcal{O}(|V|)$ se si considerano i vertici raggiungibili da $u$. 
+\end{itemize}
+Pertanto il costo in tempo, valutando quindi il caso peggiore, è $\mathcal{O}(2^k \cdot |V|)$
+\subsection{Problema del commesso viaggiatore (Traveling Salesman Problem, TSP)}
+
+Bisogna visitare una serie di clienti e tornare al punto di partenza senza tornare due volte dallo stesso cliente seguendo il percorso meno costoso. Molti altri problemi pratici hanno questa struttura. Abbiamo inoltre un costo per ogni possibile collegamento e il costo del percorso è la somma dei costi dei collegamenti percorsi.\\
+Quello che sappiamo è che TSP è un problema che rientra nell'insieme NP-completo.\\
+Altri problemi che presentano una simile impostazione sono elencati di seguito.
+\subsubsection{Ciclo di Eulero}
+Si tratta di un ciclo che visita tutti gli archi del grafo una sola volta. È quindi possibile tornare eventualmente nello stesso vertice.
+
+Possiamo discutere anche dei cicli euleriani in maniera più ampia. Questi ci dicono che dato un (multi)grafo non orientato, si definisce\textbf{ ciclo euleriano }un cammino chiuso che passa esattamente una volta per ogni arco. Dove un multigrafo è un grafo in cui esiste almeno una coppia di vertici collegata da più di un arco.
+\begin{teorema}{Teorema di Eulero}{}
+    Un (multi)grafo ammette un ciclo euleriano $\iff$ il grafo è connesso e ogni nodo ha grado pari (grafo euleriano).
+\end{teorema}
+
+Un nodo è di \textbf{grado pari} se il numero di archi entranti corrisponde al numero di archi uscenti.
+
+\subsection{Ciclo Hamiltoniano di peso minimo}
+Per modellarlo, si considera un grafo $G(V,E)$ completo, con costi sugli archi $c \in \mathbb{R}^E$. Un ciclo hamiltoniano è un ciclo semplice, non orientato, che passa per ogni nodo di $G$. Il costo del ciclo è pari alla somma dei costi dei suoi archi.\\
+Definiamo ciclo semplice come il ciclo in cui non viene ripetuto lo stesso vertice più volte.\\
+
+Il problema del commesso viaggiatore (TSP) consiste nel trovare un ciclo hamiltoniano di costo minimo. Se il grafo non è orientato, si parla di TSP simmetrico; se invece il grafo è orientato si parla di TSP asimmetrico.\\
+
+Il problema appartiene alla classe di problemi combinatori con funzione obiettivo lineare e alla classe dei problemi difficili (NP-hard).
+
+\subsubsection{TSP metrico}
+Dato un grafo $G(V,E)$ non orientato, completo con costi $c$ associati agli archi, se 
+\begin{itemize}
+    \item $c_{(u,v)} \geq 0$, $\forall$ arco $(u,v) \in E$	e	$c_{(u,v)} = 0 \iff u=v$
+    \item $c$ è tale che $\forall$ tripla di nodi distinti $(u,v,z)$ si ha che $c_{(u,v)} \leq c_{(u,z)} + c_{(z,v)}$ (disuguaglianza triangolare)
+\end{itemize}
+allora $c$ induce una semimetrica.
+

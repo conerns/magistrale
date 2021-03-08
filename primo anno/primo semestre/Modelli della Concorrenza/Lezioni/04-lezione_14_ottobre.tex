@@ -1,0 +1,10 @@
+\section{Lezione del 14 ottobre}
+Ricordiamo che stiamo dando per scontata la \textbf{terminazione} tramite la \textbf{correttezza parziale}.\\ Facciamo qualche osservazione: 
+\begin{itemize} 
+        \item nella precondizione della conclusione non si ha $B$, in quanto il corpo dell'iterazione può anche non essere mai eseguito.
+        \item data un'istruzione iterativa posso avere più di un invariante. Si ha inoltre che ogni formula iterativa ha l'\textbf{invariante banale} $i=\top$. Possiamo avere anche una formula in cui compaiono variabili che non sono modificate della funzione iterativa e quindi l'intera formula è un \textit{invariante di ciclo}. Studiamo quindi gli invarianti più utili.
+        \item nei casi pratici non consideriamo ovviamente iterazioni isolate ma iterazioni inserite in un programma. In questi casi quindi la scelta di un invariante adeguato dipende sia dall'iterazione che dall'intero contesto.
+\end{itemize}
+
+Supponiamo di avere un programma costituito di 3 parti, un primo comando \textbf{C}, una istruzione interattiva \textbf{W} e un terzo comando \textbf{D}. Supponiamo di voler dimostrare la tripla $\{p\}C;\, W;\, D \{q\}$, naturalmente questo programma si divide in pezzi tramite la regola della sequenza. Ci rirtorviamo nel caso seguente:
+$\{p\}C\{r\} W \{z\} D \{q\}$. Sapendo come usare la regola di derivazione per W, possiamo riscrivere: $\{inv\}W\{inv \land \neg B\}$. Possiamo notare che, facendo riferimento allo scomposizione a catena precedente, $\{r\}$ dovrà implicare la nostra invariante di ciclo. 

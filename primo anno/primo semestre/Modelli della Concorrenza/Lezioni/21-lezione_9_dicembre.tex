@@ -1,0 +1,59 @@
+\section{Lezione del 9 dicembre}
+Dato che noi vogliamo potere determinare la correttezza di una formula delle logiche temporali, dobbiamo andare a considerare tutti i cammini massimali. Per facilitare questo aspetto si possono dividere in famiglie i cammini. Possiamo rappresentare le famiglie con una notazione simile alle espressioni regolari, indichiamo con:
+\begin{itemize}
+    \item $^*$, indica che si hanno zero o più ripetizioni, ma in numero finito 
+    \item $^\omega$, che sta a indicare un numero infinito di ripetizioni 
+\end{itemize}
+Rispetto alla semantica avevamo detto di avere due fasi da eseguire: la definizione di un criterio per stabilire se una formula $\alpha$ è vera in un cammino massimale $\pi$ e dire che la formula è vera rispetto a uno stato $q$ se è vera in tutti i cammini massimali che partono da $q$.\\
+
+In poche parole, sia $\pi = q_0 q_1 \dots$ un cammino massimale e sia $\alpha$ una formula di LTL. $\pi \vDash \alpha$ significa che $\alpha$ è vera nel cammino $\pi$.\\
+
+Si definisce la relazione $\vDash$ per induzione sulla struttura delle formule.\\
+
+Si supponga che $\alpha$ e $\beta$ siano due formule ben formate e $p$ una proposizione atomica.
+\begin{itemize}
+    \item $\pi \vDash p \Leftrightarrow p \in I(q_0)$, indica che una proposizione $p$ è vera in un cammino sse $p$ è vera nello stato iniziale del cammino
+    \item $\pi \vDash \neg \alpha \Leftrightarrow \pi \nvDash \alpha$, $\neg \alpha$ è vera nel cammino $\pi$ sse $\alpha$ non è vera nel cammino $\pi$
+    \item $\pi \vDash \alpha \lor \beta \Leftrightarrow \pi \vDash \alpha \lor \pi \vDash \beta$, diremo invece che $\alpha$, oppure $\beta$, è vera in un cammino, sse una delle due è vera nel cammino $\pi$
+\end{itemize}
+\subsection{Esempi di formule complesse}
+\begin{itemize}
+    \item FG$\alpha$, che indica il fatto che $\alpha$ è invariante da un certo istante in poi
+    \item GF$\alpha$, con la sola inversione di F e G, otteniamo che $\alpha$ è vera in un numero infinito di stati. Quindi è sempre vero che prima o poi sarà sempre vera $\alpha$
+    \item G$\neg(cs_1 \land cs_2)$, dove \textbf{cs} indica \textit{critical section}, che corrisponde alla mutua esclusione. Quindi in nessun stato vale la congiunzione delle 2 proposizioni atomiche.
+\end{itemize}
+La notazione corrispondente a $req$ rappresenta che c'è una richiesta penedente, mentre con $ack$ denotiamo che è stato spedito un \textit{acknowledgment}
+\begin{itemize}
+    \item G$(req \implies XF\,ack)$, è sempre vero che se c'è una richiesta pendente, allora prima o poi verrà emesso l'ack a partire dall'istante successivo alla richiesta.
+    \item G$(req \implies (req \bigcup ack))$, è sempre vero che se c'è una richiesta, allora sarà valida la richiesta fino a quando verrà emesso l'ack.
+    \item G$(req \implies ((req \land \neg ack) \bigcup (ack \land \neg req) )$, è vero che se c'è una richiesta pendente allora si ha che la richiesta vale la richiesta pendente, e non il ack, fino a quando viene emesso l'ack ma diventa falsa req.
+\end{itemize}
+\subsection{Operatori temporali}
+Ipotesi: $\alpha \in FBF$
+    \begin{itemize}
+    
+    \item $\pi \vDash X \alpha \Leftrightarrow \pi^{(1)} \vDash \alpha$, tale formula indica che $\alpha$ dev’essere vera nel cammino che parte dal secondo stato di $\pi$
+    \item $\pi \vDash F \alpha \Leftrightarrow \exists i \in \mathbb{N} = \{0,1,2,\dots \} \; | \; \pi^{(i)} \vDash \alpha$, deve esistere un suffisso del cammino, che abbiamo indicato con $\pi^{(i)}$, in cui $\alpha$ sia vera
+    \item $\pi \vDash G \alpha \Leftrightarrow \forall i \in \mathbb{N} \; | \; \pi^{(i)} \vDash \alpha$, in questo caso viene indicato che $\alpha$ dev’essere vera in tutti i suffissi di $\pi$ (anche quello iniziale)
+    \item $\pi \vDash \alpha U \beta \Leftrightarrow $
+        \begin{itemize}
+            \item$\exists i \in \mathbb{N} \; | \; \pi^{(i)} \vDash \beta$, ovvero $\pi \vDash F \beta$
+            \item$\forall h, \; \, 0 \leq h \leq i, \; \, \pi^{(h)} \vDash \alpha$ 
+        \end{itemize}
+    S e $i=0$, la seconda clausola non è significativa e pertanto viene considerata vera la formula $\alpha U \beta \Leftrightarrow \pi^{(0)} \vDash \beta$.
+\end{itemize}
+\subsection{Operatori derivati}
+\begin{itemize}
+    \item \textbf{Until debole (weak until)}: $\alpha W \beta \equiv G \alpha \lor (\alpha U \beta)$, in tal caso abbiamo che $\beta$ può non diventare mai vera a patto che $\alpha$ rimanga sempre vera
+    \item \textbf{Release}: $\alpha R \beta \equiv \beta W (\alpha \land \beta)$, quindi se $\beta$ è sempre vero, oppure a un certo punto diventa  vera anche $\alpha$, e da questo punto in poi $\beta$ può anche diventare falsa.
+    \[\pi \vDash \alpha R \beta \Leftrightarrow \forall k \geq 0, \;(\pi^{(k)} \vDash \beta) \lor (\exists h < k \; | \; \pi^{(h)} \vDash \alpha) \]
+    Indica che o nel suffisso di ordine $k$ ($\pi^{(k)}$), $\beta$ è vera, oppure in tutti gli stati precedenti è vero $\alpha$
+\end{itemize}
+\subsection{Formule equivalenti}
+\[\alpha \equiv \beta \Leftrightarrow \forall \pi, \; (\pi \vDash \alpha \Leftrightarrow \pi \vDash \beta) \]
+Alcuni esempi:
+\begin{itemize}
+    \item $F \alpha \equiv \alpha \lor XF\alpha$	
+    \item $G \alpha \equiv \alpha \land XG\alpha$
+    \item $\alpha U \beta \equiv \beta \lor (\alpha \land X (\alpha U \beta))$	o è vera $\beta$ immediatamente o $\alpha$ è vera e dal prossimo stato varrà $\alpha U \beta$
+\end{itemize}

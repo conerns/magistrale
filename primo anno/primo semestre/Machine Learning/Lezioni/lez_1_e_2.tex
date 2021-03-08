@@ -1,0 +1,58 @@
+\section{Lezione 1 e 2}
+Un \textbf{sistema di apprendimento automatico} ricava da un \textit{dataset} una conoscenza non fornita a priori, descrivendo dati non forniti in precedenza. Si estrapolano informazioni facendo assunzioni sulle informazioni sistema già conosciute, creando una \textbf{classe delle ipotesi H}. Si cercano ipotesi coerenti per guidare il sistema di apprendimento automatico. Bisogna però mettere in conto anche eventuali errori, cercando di capire se esiste davvero un'ipotesi coerente e, in caso di assenza, si cerca di approssimare. In quest'ottica bisogna mediare tra \textbf{fit} e \textbf{complessità}. Ogni sistema dovrà cercare di mediare tra questi due aspetti, un \textit{fit} migliore comporta alta \textit{complessità}. Si ha sempre il rischio di \textbf{overfitting}, cercando una precisione dei dati che magari non esiste.\\
+    
+Abbiamo inoltre una \textbf{ipotesi da apprendere \textnormal{o} concetto target(o label}: tra tutte le ipotesi possibili, viene identificata, grazie ai dati di addestramento, quella giusta. Possiamo facilmente capire invece cosa intendiamo per \textbf{target dell’addestramento}, corrisponde alla risposta che ci si aspetta sull’istanza. Se l’ipotesi non mi fornisce come risposta il target di addestramento, allora la posso scartare. Altrimenti si definisce ipotesi accettabile o valida.
+
+Definiamo alcuni concetti base: 
+\begin{itemize} 
+    \item \textbf{task (\textit{T})}, il compito da apprendere. È più facile apprendere attraverso esempi che codificare conoscenza o definire alcuni compiti. Inoltre il comportamento della macchina in un ambiente può essere diverso da quello desiderato, a causa della mutabilità dell'ambiente ed è più semplice cambiare gli esempi che ridisegnare un sistema.
+    \item \textbf{performance (\textit{P})}, la misura della bontà dell'apprendimento.
+    \item \textbf{experience (\textit{E})}, l'esperienza sui cui basare l'apprendimento. Il tipo di esperienza scelto può variare molto il risultato e il successo dell'apprendimento. 
+\end{itemize}
+
+In merito alle parti software distinguiamo: il
+  \textbf{learner}, ovvero la parte di programma che impara dagli esempi in modo   automatico e il  \textbf{trainer}, il \textit{dataset} che fornisce esperienza al \textit{learner}
+
+L'ipotesi da apprendere viene chiamata \textbf{concetto target} (tra tutte le ipotesi possibili identifico quella giusta dai dati di addestramento).
+
+Si hanno inoltre diversi tipi di apprendimento: 
+    \begin{itemize}
+        \item \textbf{apprendimento supervisionato}, dove vengono forniti a priori esempi di comportamento e si suppone che il \textit{trainer} dia la risposta corretta per ogni input. L'esperienza è fornita da un insieme di coppie: \[S\equiv\{(x_1,y_1),(x_2,y_2),\ldots,(x_n,y_n)\}\] e, per ogni input ipotetico $x_i$ l'ipotetico trainer restituisce il corretto $y_i$ (target). Ci ritroviamo in questo caso se all'interno delle istanze, se c'è target.
+        \item Se riceviamo istanze di addestramento senza label/target ci ritroviamo nel tipo di \textbf{apprendimento non supervisionato}. In un 
+            \textbf{L'apprendimento non supervisionato} l’esperienza di apprendimento è rappresentata da esempi “non classificati”: non esiste un trainer che fornisce le risposte corrette agli input. Non c'è target e si ha \textit{libertà di classificazione}. Si cerca una \textit{regolarità} e una \textit{struttura} insita nei dati. In questo caso si ha:  \[S\equiv\{x_1,x_2,\ldots,x_n\}\]
+        \item \textbf{Apprendimento per rinforzo} Il learner interagisce con l’ambiente e riceve una ricompensa positiva o negativa . Si lavora con un \textit{addestramento continuo}, aggiornando le ipotesi con l'arrivo dei dati. Durante la fase di test bisogna conoscere le prestazioni e valutare la correttezza di quanto appreso. Il learner viene addestrato tramite \textit{rewards} e quindi apprende una strategia per massimizzare i \textit{rewards}, detta \textbf{strategia di comportamento} e per valutare la prestazione si cerca di massimizzare a lungo termine la ricompensa complessivamente ottenuta.
+    \end{itemize}
+    
+Si avrà, in realtà, a che fare con dati, di target e ipotesi, booleani e questo ambito è propriamente chiamato \textbf{concept learning}. In questo contesto si cerca di capire quale funzione booleana è adatta al mio addestramento. Traduciamo il dominio reale in valori booleani. 
+
+Introduciamo quindi il \textbf{bias induttivo} considerando:
+\begin{itemize}
+  \item un algoritmo di learning del concetto $L$
+  \item degli esempi di training $D_C=\{\langle x,c(x)\rangle\}$
+\end{itemize}
+Dove la funzione target associa ad ogni istanza un valore in $\{0,1\}$, appunto booleano. Una classe di ipotesi H è data da vincoli sugli attributi. Il training set D è costituito da esempi positivi e negativi della funzione target, dove $x$ è la nostra istanza, e $c(x)$ corrisponde al valore associato dalla funzione target a quell’istanza. Un’ipotesi appartiene alla classe di ipotesi se ogni istanza del training set è tale che il valore della funzione target sull’istanza coincide con il valore predetto dall’ipotesi.
+
+
+\subsection{Algoritmi di apprendimento}
+\subsubsection{Rote leaner}
+La macchina è programmata per mantenere una cronologia dei calcoli e confrontare il nuovo input con la sua cronologia degli input e degli output, recuperando l'output memorizzato se presente. Questo modello richiede che la macchina possa essere modellata come una funzione, producendo sempre lo stesso output per lo stesso input, e può essere formalmente descritto come segue: \\
+$ f({\displaystyle \ x_{1},x_{2}, \dots ,x_{n}})\to \ ({\displaystyle \ y_{1},y_{2},\dots ,y_{p}})\ \to store (({\displaystyle \ x_{1},x_{2},...,x_{n}}),({\displaystyle \ y_{1},y_{2},...,y_{p}})$
+Non si un inductive bias. 
+\subsubsection{Version space candidate elimination}
+Sia G l'insieme di ipotesi massimamente generali in H, e S l'insieme di ipotesi massimamente specifiche in H. Per ciascun esempio di trainging \textit{\textbf{d}}:
+\begin{itemize}
+    \item Se \textbf{\textit{d}} è positivo
+        \begin{itemize}
+            \item togli da G ipotesi inconsistenti con \textit{\textbf{d}}
+            \item UPDATE-S: per ciascuna ipotesi s in S che non è consistente con d, togli s da S e aggiungi a S tutte le minime generalizzazioni h di s tali che: h è consistente con d e alcuni membri di G sono più generici di h. Successivamente rimuovi da S ogni ipotesi che è più generale di un'altra ipotesi in S.
+        \end{itemize}
+    \item Se \textbf{\textit{d}} è negativo eseguo,\begin{itemize}
+        \item togli da S ipotesi inconsistenti con \textit{\textbf{d}}
+            \item UPDATE-G: per ciascuna ipotesi g in G che non è consistente con d, togli g da G e aggiungi a S tutte le minime specializzazioni h di g tali che: h è consistente con d e alcuni membri di S sono più generici di h. Successivamente rimuovi da G ogni ipotesi che è meno generale di un'altra ipotesi in G.
+        \end{itemize}
+\end{itemize}
+Questo include solamente il discorso di \textbf{Candidate Elimination}, per quanto riguarda invece \textbf{Version Space}, possiamo affermare che è costituito da serie di ipotesi tra quelle possibili nella classe d’ipotesi che hanno specificato un set di istanze (training set) e che sono consistenti su quegli esempi.\\ L’assunzione fondamentale, quando si fa riferimento al Candidate Elimination, è che qualunque ipotesi scelta per azzeccare gli esempi di addestramento, sia abbastanza buona anche nella fase di test, ovvero con gli esempi che non si sono ancora visti.
+\subsubsection{Find-S}
+Lo spazio delle ipotesi è descritto da congiunture (operazioni di AND) tra attribuiti. 
+Questo algoritmo permette di partire dall'ipotesi più specifica  e generalizzarla, trovando ad ogni passo un'ipotesi più specifica e consistente con il training set $D$. \\
+L'ipotesi in uscita sarà anche consistente con gli esempi negativi dando prova che il target è effettivamente in $H$. Con questo algoritmo non si può dimostrare di aver trovato l'unica ipotesi consistente con gli esempi e ignorando gli esempi negativi non posso capire se $D$ contiene dati inconsistenti. In altre parole il risultato dice che, se l’ipotesi segreta è una congiunzione e si è scelta quella più aderente alle istanze positive, allora le istanze al di fuori sono per forza negative.

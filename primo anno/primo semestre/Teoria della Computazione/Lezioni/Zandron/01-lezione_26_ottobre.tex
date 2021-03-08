@@ -1,0 +1,82 @@
+\section{Lezione 26 ottobre - Zandron}
+\textbf{Algoritmo}, in modo informale, diciamo che sia una sequenza di istruzioni elementari che permettono di portare alla risoluzione di un problema computazionale. \\
+Un algoritmo può essere di due tipi:
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+    \item \textbf{efficiente}: se lavora in tempo polinomiale rispetto alla dimensione dell'input del problema(lineare, quadrato, cubo).
+    \item \textbf{non efficiente}: se lavora in tempo esponenziale rispetto alla dimensione dell'input del problema. Se il valore dell'input aumenta in maniera esponenziale, risulterà non efficiente.
+\end{itemize}
+L'algoritmo è classificato considerando il tempo del caso peggiore: $\mathcal{O}(f(n))$, con $n=|x|$ dove $x$ è l'input del problema.\\
+
+Ci sono vari tipo di \textbf{problemi} che possono essere svolti in tempi diversi. Un problema può essere:
+\begin{itemize}
+    \itemsep1pt\parskip0pt\parsep0pt
+    \item \textbf{trattabile}: problema che si può trattare nella pratica, per il quale si può trovare un algoritmo che lavori in tempo polinomiale.
+    \item \textbf{intrattabile}: problema per il quale non è stato trovato un algoritmo polinomiale in grado di risolverlo. Si ha una certa divisione, infatti si possono considerare problemi intrattabili che sono anche:
+        \begin{itemize}
+            \item \textbf{dimostrabilmente intrattabile}: problema per il quale è possibile dimostrare che non esista alcun algoritmo polinomiale in grado di risolverlo.
+        \item \textbf{tra i più difficili}: problema per il quale non è stato dimostrato che esista un algoritmo polinomiale in grado di risolverlo.
+        \item \textbf{altro}
+        \end{itemize}
+    \item \textbf{indecidibile}: problema per il quale è dimostrato che non esista alcun algoritmo in grado di risolverlo. Può darsi che per qualche input, esista un algoritmo in grado di dare la risposta corretta, ma non per tutti: esiste almeno un input per il quale nessun algoritmo è in grado di rispondere correttamente.
+\end{itemize}
+
+\subsection{Macchine di Turing}
+Non riesco a garantire che ogni operazione sia esprimibile con un insieme finito di operazioni. Per poterlo fare mi dovrà ricondurre alle Macchine di Turing.\\
+Una \textbf{Macchina di Turing} si serve di tre elementi (nastro infinito, meccanismo che si pone in uno stato e una testina di lettura e scrittura) per effettuare un certo tipo di computazioni:
+\begin{itemize}
+    \itemsep1pt\parskip0pt\parsep0pt
+    \item si legge cosa c'è scritto sulla casella indicata dalla testina.
+    \item sulla base del simbolo letto e dello stato si possono effettuare una o più delle seguenti operazioni:
+    \item scrivere un altro simbolo al posto di quello appena letto
+    \item cambiare lo stato
+    \item spostarsi di una casella a sinistra o a destra
+\end{itemize}
+
+Durante gli anni si è sviluppata una \textbf{Tesi},che non è stata dimostrata che dice: Non esiste nessun formalismo di calcolo che sia più potente della macchina di Turing.\\
+Il calcolo viene definito come ciò che è computabile attraverso una macchina di Turing o attraverso uno dei meccanismi ad essa equivalenti.\\
+Dire che un problema ha una certa soluzione equivale a dire che è possibile effettuare per mezzo di una macchina di Turing un procedimento che permetta di dire come dall'input si giunga all'output e dimostrare che quel procedimento è corretto per ogni input.
+
+\textbf{Descrizione di una macchina di Turing (TM)}:
+\begin{itemize}
+    \itemsep1pt\parskip0pt\parsep0pt
+    \item $K$: insieme di stati
+    \item $\Sigma$: alfabeto finito di simboli scrivibili sul nastro
+    \item $s_0$: stato iniziale della macchina di Turing
+    \item $\delta$: funzione di transizione, che prende in input uno stato e un simbolo e restituisce uno stato, un simbolo e una direzione, $\delta : K \times \Sigma \to K \times \Sigma \times \{\to, \leftarrow, -\}$.
+    \item $F$: insieme degli stati finali, che concludono la computazioni. $F$
+      potrebbe essere uguale a $\{H, Y, N\}$, dove:
+        \begin{itemize}
+            \item $H$: stato di halt, nel quale si ferma la computazione e si restituisce come risultato i simboli riportati sul nastro di lettura e scrittura.
+            \item $Y$: stato di yes, nel quale si ferma la computazione e si risponde  sì.
+            \item $N$: stato di no, nel quale si ferma la computazione e si risponde no. 
+      \end{itemize}
+\end{itemize}
+
+Definizioni differenti di macchina di Turing sono tutte riconducibili a una stessa definizione.
+Assumiamo che sul nastro ci siano spazi vuoti $\sqcup$ tranne che dove abbiamo il nostro input. Usiamo il simbolo $\triangleright$ per indicare l'inizio del nostro input.\\
+Non abbiamo operazioni divisi per difficoltà, per ogni operazione il tempo di esecuzione nella macchina di Turing è uguale. Possiamo calcolare il tempo necessario ad una Macchina di Turing di riportare in output la soluzione in base al numero di operazione eseguite per raggiungere il risultato. \\
+
+Una \textbf{Macchina di Turing deterministica} è una macchina di Turing in cui si abbia una funzione di transizione. Al posto di una funzione di transizione si potrebbe infatti avere una relazione di transizione, ovvero una relazione per la quale dato un stesso input, potrebbe restituire output diversi: tutto ciò è però comunque riconducibile a una macchina di Turing deterministica.\\
+La computazione è espressa tramite una sequenza di configurazioni. Una configurazione non è data dalla coppia di stato simbolo. Una configurazione di una macchina di Turing è espressa nella forma: 
+$$\textnormal{(stato in cui si trova, stringa sul nastro, posizione della testina)}$$  oppure:
+$$\textnormal{(stato in cui si trova, simboli a sinistra della testina (testina compresa), simboli a destra della testina)}$$
+
+Abbiamo una configurazione iniziale della macchina che si trova nella forma: $(s_o, \triangleright x, 1)$, dove $\triangleright$ è il simbolo di inizio della stringa di input $x$, e $1$ è la posizione della puntina. Sarà in grado di dire grazie alla configurazione iniziale che dopo un certo numero di passi, arrivo nello stato di Halt: $(s_o, \triangleright x, 1) \to \dots \to (H, \triangleright y, n)$, con $y$ come output. Alternativamente, la configurazione finale potrebbe essere $(Y, \triangleright y, n)$ con $Y$ come output.
+
+\subsubsection{Esempio}
+Dobbiamo una TM che restituisce il successore di un numero binario. Per farlo definisco $(S, \Sigma, \delta,s_0)$
+ \begin{itemize}
+    \item $S=\{s_0,s_1\}$, inizio e successore, in $s_0$ leggiamo
+    \item $\Sigma =\{\triangleright, \sqcup, 0,1\}$
+    \item per la funzione di transizione si hanno le differenti casistiche:
+    \begin{itemize}
+        \item $\delta\to(s_0,[\triangleright, 0,1])\to(s_0,[\triangleright, 0,1], \rightarrow)$
+        \item $\delta\to(s_0,\sqcup)\to(s_1,\sqcup,\leftarrow)$
+        \item $\delta\to(s_1,0)\to(H,1,-)$
+        \item $\delta\to(s_1,1)\to(s_1,0,\leftarrow)$
+        \item $\delta\to(s_1,\triangleright)\to(H,\triangleright,-)$
+    \end{itemize}
+    ovvero scorro fino alla fine e inverto l'ultimo numero (se è 0 diventa 1 e fine ma se è 1 lo rendo 0 e poi mi sposto a sinistra e se è un 1 diventa 0 e così via, fino alla fine dove metto 1, come prevede la somma binaria)
+    \item $s_0$ è lo stato iniziale
+\end{itemize}

@@ -1,0 +1,140 @@
+\section{Ricerca esatta con algoritmo di Baeza-Yates e Gonnet (BYG) o paradigma SHIFT-AND}
+Per tale algoritmo si hanno due fasi fondamentali:
+\begin{enumerate}
+    \item Preprocessig del pattern $P$ di lunghezza $m$ in tempo $\mathcal{O}(|\Sigma|+m)$, tramite il calcolo di una tabella $B$ di $|\Sigma|$ parole di $m$ bit. 
+    \item Scansione del testo $T$ di lunghezza $n$ in tempo $\mathcal{O}(n)$ per cercare le occorrenze esatte di $P$.
+\end{enumerate}
+In questo caso abbiamo che $\Sigma$ altro non è che l'alfabeto di definizione del testo e del pattern. \\
+L'algoritmo \textit{BYG} non funziona sul confronto di simboli ma si basa sul  paradigma SHIFT-AND compiendo operazioni su parole di bit.
+
+\subsection{Operazioni usate da BYG}
+\begin{itemize}
+    \item  congiunzione: \textbf{AND} \\
+    $w_1$ AND $w_2$ restituisce una parola $w$ tale che: $w[i]=1 \iff w_1[i]=1 \land w_2[i]=1$; $w[i] = 0$, altrimenti.
+    \item  disgiunzione: \textbf{OR}\\
+    $w_1$ OR $w_2$ restituisce una parola $w$ tale che: $w[i]=1 \iff w_1[i]=1 \lor w_2[i]=1$; $w[i] = 0$, altrimenti.
+    \item  shift dei bit di una posizione a destra con bit più significativo uguale a 0: \textbf{RSHIFT}\\
+    RSHIFT($w_1$) restituisce una parola $w$ tale che: $w[1]=0$ e $w[i] = w_1[i-1]$ se $2 \leq i \leq |w|$.
+    \item  shift dei bit di una posizione a destra con bit più significativo uguale a 1: \textbf{RSHIFT1}\\
+    RSHIFT1($w_1$) restituisce una parola $w$ tale che: $w[1]=1$ e $w[i] = w_1[i-1]$ se $2 \leq i \leq |w|$.
+
+  È una combinazione di RSHIFT e OR: RSHIFT1($w_1$) = RSHIFT($w_1$) OR $100..0$.
+\end{itemize}
+
+\subsection{Tabella B}
+Una \textit{parola} $B_{\sigma} = b_1 \dots b_m$, per $\sigma \in \Sigma$, è tale che $B_{\sigma}[i] = b_i = 1 \iff P[i] = \sigma$. \\ L’uguale a $1$ possono sparire perché i bit hanno in sé il concetto di verità e falsità. Quindi si potrebbe scrivere soltanto $B_{\sigma}[i] = b_i \iff P[i] = \sigma$.
+
+La \textit{tabella} $B$ è l'insieme delle parole $B_\sigma$, $\forall \sigma \in \Sigma$. La costruzione della tabella permette di rispondere alla domanda: $P[i] = \sigma$?
+\[P[i] = \sigma \iff B_{\sigma}[i] =1\]
+
+L’uguale a 1 è omissibile perché trattando valori binari, essi contengono già il valore di verità.
+
+\subsubsection{Algoritmo di calcolo della tabella B}
+\begin{enumerate}
+    \item Tutte le parole $B_\sigma$ vengono inizializzare a $m$ zeri.
+    \item Viene inizializzata una parola $M$ (maschera) di $m$ bit tutti uguali a $0$ tranne il più significativo che è uguale a $1$. 
+    \item Si esegue una scansione di $P$ da sinistra verso destra e per ogni posizione $i$: 
+    \begin{enumerate}
+        \item $B_{P[i]} = M$ OR $B_{P[i]}$
+        \item $M = $ RSHIFT($M$)
+    \end{enumerate}
+\end{enumerate}
+
+\begin{algorithm}[H]
+\SetAlgoLined
+\KwResult{the table B of the words $B\sigma$}
+    $ m \leftarrow |P|$\;
+    \For{each $\sigma \in \Sigma$}{
+        $B\sigma \leftarrow 000\dots0$\;
+    }
+    $m \leftarrow 100\dots0$\;
+    \For{$i \leftarrow 1$ to $m$}{
+        $\sigma \leftarrow P[i]$\;
+        $B\sigma \leftarrow M$ OR $B\sigma$\;
+        $M = RSHIFT(M)$\;
+    }
+ \caption{Procedura Compute-B(P)}
+\end{algorithm}
+
+
+Complessità: $\mathcal{O}(|\Sigma|+m)$
+
+\subsection{Scansione del testo}
+Si seguono alcuni step:
+\begin{enumerate}
+    \item Il testo $T$ viene scandito dalla prima all’ultima posizione.
+    \item Per ogni posizione $j$ del testo $T$ viene calcolata una parola $D_j$ di $m$ bit.
+    \item Ogni volta che $D_j$ ha il bit meno significativo uguale a $1$, viene prodotta in output l’occorrenza esatta alla posizione $j-m+1$.
+\end{enumerate}
+Si denoti con $P[1, i] = suff(T[1, j])$ il fatto che $P[1,i]$ occorre esattamente come suffisso di $T[1,j]$.
+
+\subsubsection{Definizione di parola \texorpdfstring{$D_j$}{}} 
+Definiamo la parola $D_j$ ($0 \leq j \leq n$) nel seguente modo:
+\[D_j = d_1 \dots d_m \mbox{ tale che } d_i = D_j[i] = 1 \iff P[1, i] = suff(T[1, j])\]
+In particolare, per definizione, $D_0 = 00\dots 0$ ($\forall i, P[1,i] \neq suff(T[1,0])$).
+Inoltre, $d_m = D_j[m] = 1 \iff P[1,m] = suff(T[1,j])$, ovvero se $P$ ha un’occorrenza in $T$ che inizia in $j-m+1$ e finisce in $j$.
+
+\subsection{Scansione del testo}
+Lo step di scansione del testo $T$ inizia dalla parola $D_0 = 00\dots0$. Per ogni $j$ da $1$ a $n$, calcola la parola $D_j$ a partire dalla parola $D_{j-1}$ (calcolata per $j-1$). Ogni volta che $D_j$ ha il bit più a destra uguale a $1$, viene prodotta in output la posizione $j-m+1$ dell’inizio di un’occorrenza di $P$ su $T$.
+
+\subsubsection{Calcolo di \texorpdfstring{$D_j$}{} a partire da \texorpdfstring{$D_{j-1}$}{}}
+\begin{itemize}
+    \item Nel primo caso abbiamo che $i>1$\\
+    \begin{equation*}
+        \begin{split}
+            D_j[i] = 1 &\iff  P[1,i] = \mbox{suff}(T[1,j]) \\
+            & \iff P[1, i-1] = \mbox{suff}(T[1, j-1]) \land  P[i] = T[j]\\
+            & \iff D_{j-1}[i-1] = 1 \land P[i] = T[j]\\
+            & \iff D_{j-1}[i-1] = 1 \land B_{T[j]}[i] = 1
+        \end{split}
+    \end{equation*}
+        Gli uguale a $1$ possono sparire perché i bit hanno in sé il concetto di verità e falsità, possiamo quindi riscivere che:
+        \[D_j[i] = D_{j-1}[i-1]  \land B_{T[j]}[i]\]
+    \item Dobbiamo valutare anche la possibilità in cui $i=1$ \\
+    \begin{equation*}
+        \begin{split}
+        D_j[i] = 1  & \iff P[1,i] = \mbox{suff}(T[1,j]) \\
+                    & \iff P[1] = T[j] \\ 
+                    & \iff B_{T[j]}[1]=1
+        \end{split}
+    \end{equation*}
+        Il risultato non cambia se si effettua l’AND logico con un bit uguale a $1$: \[D_j[i] \iff 1 \land B_{T[j]}[1]\]\\
+        Tutto questo ci porta a poter dire che \[D_j[i] = 1 \land B_{T[j]} [1] \]
+\end{itemize}
+Alcune notazioni da ricordarsi, come definizioni raggiunte per il calcolo ricorsivo, per quando andiamo a calcolare la nostra $D_j$ sono:
+\begin{itemize}
+    \item $D_j[i] = D_{j-1}[i-1] \land B_{T[j]}[i]$
+    \item $D_j[i] = 1 \land B_{T[j]} [1]$ 
+\end{itemize}
+I due punti eseguiti in tal modo, corrisponde a eseguire rispettivamente:
+\begin{itemize}
+    \item $D_j[i] =$ RSHIFT1($D_{j-1}$)$[i] \land B_{T[j]}[i]$
+    \item $D_j[i] =$ RSHIFT1($D_{j-1}$)$[1] \land B_{T[j]} [1]$ 
+\end{itemize}
+Le due formule possono essere unite: $D_j[i] =$ RSHIFT1($D_{j-1}$)$[i] \land B_{T[j]}[i]$, per $i \geq 1$
+
+\subsubsection{Scansione del testo}
+L’algoritmo di scansione del di $T$ inizializza una maschera $M = 00 \dots 01$ di $m$ bit tutti uguali a $0$ tranne quello più a destra che è uguale a $1$ e inizializza la parola $D_0 = 00\dots 0$.\\
+Per $j$ compreso tra $1$ e $n$, calcola la parola $D_j = $ RSHIFT1($D_{j-1}) \land B_{T[j]}$.
+Ogni volta che la parola ($D_j \land M$) è uguale a $00 \dots 01$, viene prodotta in output la posizione $j-m+1$ dell’inizio di un’occorrenza di $P$ su $T$. 
+
+
+\begin{algorithm}[H]
+\SetAlgoLined
+    $ B \leftarrow $ Compute-B(P)\;
+    $n \leftarrow |T|$\;
+    $D \leftarrow 00\dots00$\;
+    $M \leftarrow 00\dots01$\;
+    \For{$j \leftarrow 1 $ to $n$}{
+        $\sigma \leftarrow T[j]$\;
+        $D \leftarrow RSHIFT1(D) \land B\sigma$\;
+        \If{$(D \land M) == 00\dots01$}{
+            return $j-m+1$
+        }
+    }
+ \caption{Procedura BYG(P,T)}
+\end{algorithm}
+
+
+
+Complessità: $\mathcal{O}(|\Sigma| + m + n)$

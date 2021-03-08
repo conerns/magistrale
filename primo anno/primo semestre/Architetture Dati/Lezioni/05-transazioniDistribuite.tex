@@ -1,0 +1,160 @@
+\section{Transazioni distribuite}
+Vediamo l'accesso in scrittura, più complicato dell'accesso in lettura affrontante nella lezione precedente. Sono più complicate da gestire in quanto un conto è avere delle \textbf{remote requests (read-only)}, ovvero un numero arbitrario di query SQL in sola lettura, un altro è avere delle \textbf{remote transactions (read-write)}, ovvero un numero arbitrario di operazioni SQL che prevedono anche \textit{insert} e \textit{update}. E queste sono in ottica di transazioni dirette ad un unico server remoto. 
+
+Nel caso in cui le transazioni sono dirette ad un numero arbitrario di server, prendiamo in considerare:
+\begin{itemize}
+    \item \textbf{Distributed requests}: read only arbitrarie, nelle quali ogni singola operazione SQL si può riferire a qualunque insieme dei server. Richiede un ottimizzatore distribuito.
+    \item \textbf{Distributed transactions}: numero arbitrario di operazioni SQL (select, insert, delete, update) ognuna delle quali è diretta ad un unico server. Le transazioni possono modificare più di un DB. Richiede un protocollo transazionale di coordinamento distribuito, two-phase commit (in questo caso si ha spesso a che fare con sistemi \textit{eterogenei} e \textit{federati}).
+\end{itemize}
+Le proprietà ACID che devono valere per un DBMS, possiamo dire  che la distribuzione non ha conseguenze su consistenza e durabilità. 
+\begin{itemize}
+    \item Consistenza: non dipende dalla distribuzione, perché i vincoli descrivono solo proprietà logiche dello schema (indipendenti dall’allocazione).
+    \item Durabilità: garantita localmente da ogni sistema. 
+\end{itemize} 
+Invece, è necessario rivedere alcuni componenti dell’architettura: concurrency control (isolamento) e reliability control, recovery manager (atomicità).
+
+\subsection{Controllo di concorrenza (isolamento)}
+Data una transazione $t_i$ si ha che essa viene scomposta in sotto-transazioni $t_{ij}$ a seconda del nodo $j$-simo su cui viene eseguita. A sua volta una transizione $t_{ij}$ viene nominata $r_{ij}$ per le operazioni di lettura e $w_{ij}$ per le operazioni di scrittura. L'uso di una risorsa $x$ viene indicata, per esempio, con $r_{ij}(x)$ o $w_{ij}(x)$.
+Ogni sotto-transazione viene schedulata in modo indipendente dai server di ciascun nodo. La schedule globale dipende quindi dalle schedules locali su ogni nodo. Purtroppo la serializzabilità locale di ogni schedule non garantisce la sua serializzabilità globale.
+
+Se il DB non è replicato e ogni schedule locale è serializzabile, allora la schedule globale è serializzabile se gli ordini di serializzazione, ovvero il flusso delle transazioni deve essere lo stesso,sono gli stessi per tutti i nodi coinvolti.
+
+Qualora si abbia un db replicato si aggiunge un altro problema qualora le scritture riguardino due repliche diverse. In tal caso si può violare la \textbf{mutua consistenza} (che dice che al termine della transazione tutte le copie devono avere lo stesso valore) dei due db locali, anche con due schedule localmente seriali. Si introduce quindi un \textbf{protocollo di controllo delle repliche}. Il \textbf{protocollo di controllo delle repliche} viene chiamato \textbf{ROWA (\textit{Read Once Write All})}. In base a questo protocollo, dato un item logico $X$ (con $x_1\ldots x_n$ items fisici), si ha che le transazioni vedono solamente $X$ ed è il protocollo che si occupa di eseguire una lettura \textit{read(X)} su una copia qualunque mi devo assicurare che viene eseguita una scrittura \textit{write(X)} su tutte le copie. Questa condizione può essere rilassata con protocolli asincroni, più efficienti. ROWA è implementato nelle estensioni a 2PL. 
+
+\subsection{2 Phase Locking in ambito DDBMS}
+L’algoritmo 2PL si estende al caso distribuito, mediante due strategie: \textbf{Centralized} (or Primary Site) 2PL basato sui siti e \textbf{Primary copy 2PL} basato sulle copie. Quando si effettua una transazione occorre prendere tutti i lock e poi rilasciarli tutti, solo una volta che la transazione ha committato.
+
+Ogni nodo ha un \textbf{lock manager} e uno di essi viene eletto \textbf{lock manager coordinatore} e gestisce i locks per l’intero DDB. Il \textbf{transaction manager} del nodo dove inizia la transazione è considerato \textbf{transaction manager coordinatore}. La transazione è anche eseguita su altri \textbf{Data Processor} e corrispondenti nodi. Il \textbf{transaction manager coordinatore} formula al lock manager coordinatore le richieste di \textit{lock}, che vengono concesse tramite l'\textit{algoritmo 2PL}. Il TM le comunica ai DP (data processor) gli accessi dati e le assegnazioni lock, in seguito i DP comunicano al TM il fine accesso. Il TM comunica al LM la fine delle operazioni. 
+Si ha però un effetto collo di bottiglia sul nodo del LM che deve gestire moltissime richieste e fino a che non risponde sistema va in \textit{wait}.
+
+\subsubsection{Strategia Primary Copy 2PL}
+Per ogni risorsa è individuata una copia primaria, prima dell’assegnazione dei lock.
+Diversi nodi hanno lock managers attivi, ognuno gestisce una partizione dei lock complessivi, relativi alle risorse primarie residenti nel nodo.
+Per ogni risorsa nella transazione, il TM comunica le richieste di lock al LM responsabile della copia primaria, che assegna i lock.
+Conseguenze:
+\begin{itemize}
+    \item Si evita il bottleneck.
+    \item È necessario determinare a priori il lock manager che gestisce ciascuna risorsa.
+    \item  È necessaria una directory globale, che diventa un collo di bottiglia.
+\end{itemize}
+
+\subsection{Deadlock distribuito}
+Indipendentemente da quanto appena discusso si può creare un'\textbf{attesa circolare} tra transazioni di due o più nodi. Bisogna quindi applicare un algoritmo distribuito. Per costruire l'algoritmo dobbiamo ragionare che siamo in una rete tra pari \textit{Peer-to-Peer} (e non master-slave) e quindi bisogna definire un protocollo, quindi un insieme di regole, su cui costruire l'algoritmo \textit{asincrono e distribuito}.
+
+
+Si assume che le sotto-transazioni siano attivate in modo sincrono, tramite Remote Procedure Call bloccante. $t_1$ attende $t_2$.
+Questo può dare origine a due tipi di attesa:
+\begin{enumerate}
+    \item attesa da remote procedure call: $t_{11}$ sul nodo 1 attende $t_{12}$ sul nodo 2 perché aspetta la sua terminazione.
+    \item attesa da rilascio di risorsa: $t_{11}$ sul nodo 1 attende $t_{21}$ sullo stesso nodo perché attende il rilascio di una risorsa. 
+\end{enumerate}
+La composizione dei due tipi di attesa può dar luogo a uno stato di deadlock globale.
+
+E’ possibile caratterizzare le condizioni di attesa su ciascun nodo tramite condizioni di precedenza e serve quindi specificare qualche notazione, per rappresentare il fatto che ogni nodo deve capire quali sono le transazioni sono in attesa per una chiamata esterna o per l'accesso ad una risorsa interna: 
+\begin{itemize} 
+    \item $EXT_i$ per una chiamata all'esecuzione di una transazione sul nodo remoto $i$ 
+    \item $x < y$ per indicare che $x$ sta aspettando il rilascio di una particolare risorsa da parte di $y$ (che può essere anche $EXT$) 
+    \item indichiamo quindi la \textbf{sequenza di attesa generale} al nodo $k$ come: $EXT < T_{ik} < T_{jk} < EXT$
+\end{itemize}
+L’algoritmo asincrono e distribuito di rilevazione del deadlock viene attivato periodicamente sui diversi nodi del DDBMS: \begin{enumerate}
+    \item In ogni nodo, l’algoritmo integra la sequenza di attesa con le condizioni di attesa locale degli altri nodi logicamente legati da condizioni $EXT$.
+    \item Analizza le condizioni di attesa sul nodo e rileva i deadlock locali.
+    \item Comunica le sequenze di attesa ad altre istanze (nodi) dello stesso algoritmo.
+\end{enumerate}
+È possibile che lo stesso deadlock venga riscoperto più volte. Per evitare questo problema, e rendere più efficiente l’algoritmo, l’algoritmo invia le sequenze di attesa: in avanti, verso il nodo dove è attiva la sottotransazione $t_i$ attesa da $t_j$ e solamente quando $ i > j$ dove i e j sono gli identificatori dei nodi.
+
+\subsection{Recovery management (atomicità)}
+Un sistema distribuito, solitamente, è soggetto oltre a guasti locali, anche a perdita di messaggi su rete e partizionamento della rete (isolamento dei nodi). 
+
+Tipi di guasti e conseguenze:
+\begin{itemize}
+    \item Guasti nei nodi: possono essere soft o hard.
+    \item Perdita di messaggi: lasciano l’esecuzione di un protocollo in una situazione di indecisione. Ogni messaggio del protocollo è seguito da un acknowledgment: in caso di perdita del messaggio oppure dell’ack, si genera una situazione di incertezza: non e’ possibile decidere se il messaggio e’ stato ricevuto, e quindi se e’ arrivata l’informazione.
+    \item Partizionamento della rete: una transazione distribuita può essere attiva contemporaneamente su più sottoreti temporaneamente isolate. In questa situazione i singoli nodi non riescono a capire bene chi sia isolato e la cosa può portare i nodi a fare scelte contraddittorie
+\end{itemize}
+
+\subsection{Protocollo Two Phase Commit (2PC)}
+I protocolli di commit consentono ad una transazione di giungere ad una decisione di abort/commit su ciascuno dei nodi che partecipano ad una transazione. La decisione di commit/abort tra due o più partecipanti è coordinata e certificata da un ulteriore partecipante. I server sono chiamati resource managers (RM). Il coordinatore é chiamato transaction manager (TM). Il protocollo 2PC si basa sullo scambio di messaggi tra TM e RM, i quali mantengono ognuno il proprio log. Si è quindi di nuovo in una architettura master-slave.
+
+\subsubsection{Protocollo 2PC in assenza di guasti}
+Nella prima fase del protocollo il TM chiede a tutti i nodi come intendano terminare la transazione. Ogni nodo decide autonomamente se effettuare commit o abort e comunica unilateralmente la sua decisione irrevocabile. \\
+Nella seconda fase invece il TM prende la decisione globale (se un solo nodo vuole abort, abort per tutti, altrimenti commit) e la comunica a tutti per le azioni locali.
+
+Come abbiamo detto precedentemente si ha la raccolta di \textit{log} nei quali compaiono due tipi di record:
+\begin{enumerate}
+  \item \textbf{record di transazione}, con le informazioni sulle operazioni effettuate
+  \item \textbf{record di sistema}, con l'evento di \textit{checkpoint} e di \textit{dump} (ovvero la copia esatta del db in un certo stato)
+\end{enumerate}
+Le scritture sui log avvengono prima della decisione delle operazioni, che a loro volta si suddividono in \textit{prepare} e \textit{global decision}.
+
+Quali sono le informazioni che devono essere inserite in un file di log?
+\begin{itemize}
+    \item \textbf{Prepare} record (\textbf{begin\_commit} in figura): contiene l’identità di tutti i RM (nodi + transazioni).
+    \item \textbf{global commit} o \textbf{global abort} record: descrive la decisione globale. La decisione del TM diventa esecutiva quando il TM scrive nel proprio log il record global commit o global abort.
+    \item \textbf{complete} (\textbf{end of transaction} in figura) record: scritto alla fine del protocollo
+    \item \textbf{ready} record: disponibilità irrevocabile del RM a partecipare alla fase di commit. Può assumere diverse politiche sul protocollo di 2PL (recoverable, 2PL, ACR, strict 2PL) e contiene anche l’identificatore del TM.\\    Inoltre, come nel caso centralizzato, vengono scritti anche i records begin, insert, delete, update, commit. 
+    \item \textbf{not ready} record (\textbf{abort} in figura): indisponibilità del RM al commit.
+\end{itemize}
+
+\subsubsection{Gestione del timeout}
+Sia nella prima fase che nella seconda fase possono avvenire guasti. In entrambe tutti i partecipanti devono poter prendere delle decisioni connesse allo stato in cui si trovano. Questo avviene utilizzando timers e stabilendo un intervallo di tempo di timeout.
+
+Vediamo meglio le due fasi del 2PC:
+\begin{enumerate} 
+    \item il TM scrive \textit{prepare} nel suo log e invia un messaggio di \textit{prepare} a tutti i RM. Sempre il TM fissa un timeout massimo per le riposte. Gli RM che sono \textit{recoverable}, ovvero pronti al \textit{commit}, scrivono \textit{ready} nel loro log e inviano un messaggio \textit{ready} al TM. Gli RM che non \textit{recoverable}, ovvero non pronti al \textit{commit} a causa di un deadlock, scrivono \textit{not-ready} nel loro log e terminano il protocollo, con un \textit{log unilaterale}. \\
+    A questo punto il TM, come detto scrive nel suo log \textbf{global commit} o il \textbf{global abort}, il secondo nel caso in cui ci sia anche solo un \textit{not-ready} o che scatti il timeout (assumendo che i nodi che non hanno risposto son in uno stato di \textit{failure}). 
+    \item Nella seconda fase TM trasmette la decisione globale e fissa un secondo \textit{timeout}. Gli RM \textit{ready} agiscono di conseguenza scrivendo \textit{commit} o \textit{abort} nei loro log e inviando un \textit{ack} al TM. Solo dopo effettuano in locale \textit{commit} o \textit{abort}. Il TM raccoglie gli \textit{ack} e, in assenza di qualche risposta, fissa un nuovo \textit{timeout} ripetendo la trasmissione per gli RMs problematici. Questo fino a che non avrà ricevuto da tutti un \textit{ack} e in quel momento scrive \textit{complete} nel suo log.
+\end{enumerate}
+
+Paradigmi di comunicazione tra TM e RMs 
+\begin{itemize}
+    \item \textbf{Centralizzato}: la comunicazione avviene solo tra TM e ogni RM. Non avviene alcuna comunicazione tra RMs.
+    \item \textbf{Lineare}: gli RM comunicano tra loro secondo un ordine prestabilito e il TM è il primo nell’ordine. Paradigma utile solo per reti senza possibilità di broadcast. 
+    \item \textbf{Distribuito}: Nella prima fase, il TM comunica con gli RMs. Gli RMs inviano le loro decisioni a tutti gli altri partecipanti. Ogni RM decide in base ai voti che ascolta dagli altri. Non occorre la seconda fase di 2PC.
+
+\end{itemize}
+
+\subsubsection{2PC in caso di guasto}
+Un RM nello stato \textbf{ready} perde la sua autonomia e attende la decisione del TM: un eventuale guasto nel TM lascerebbe quindi l’RM in uno stato di incertezza dove tutte le risorse allocate alla transazione restano bloccate. \\
+L’intervallo tra la scrittura di ready nel log dei RMs e la scrittura di commit o abort è detta \textbf{finestra di incertezza}. In questo intervallo tutte le risorse del sistema acquisite tramite meccanismi di lock sono bloccate. \\
+2PC riduce al minimo questo intervallo di tempo, che però esiste. In seguito a guasti, TM o RMs utilizzano protocolli di recovery.
+
+Tipi di guasti da governare con protocolli 
+\begin{enumerate}
+    \item \textbf{guasti di componenti}: Devono essere utilizzati protocolli con due diversi compiti, per assicurare la terminazione della procedure, \textbf{attraverso protocolli di terminazione}, e assicurare il ripristino, \textbf{attraverso protocolli di recovery}. Si può dimostrare che i protocolli funzionano nell’ipotesi di guasto di un solo partecipante.
+    \begin{itemize}
+        \item \textbf{Guasto di un resource manager}: nel caso di un timeout nello stato \textbf{wait}, il TM attende al risposta dei RMs e può solo decidere global-abort. Nel caso in cui invece si ha un timeout nello stato \textbf{commit} o \textbf{abort}, il Il TM non può sapere se le procedure di commit/abort sono state completate dai recovery manager di ogni nodo, ma è obbligato a mantenere la decisione globale presa. Il TM deve continuare a inviare lo stesso messaggio global-commit oppure global-abort e ad aspettare il consenso. Quando l’RM con il guasto riprende, manda un messaggio di consenso al TM. \\
+        In questa tipologia di guasto intervengono i \textbf{protocolli di ripristino in caso di guasto del resource manager}. 
+        \begin{itemize}
+            \item \textbf{l’ultimo record del log è di azione, abort o commit}: Come nel caso centralizzato, si usa la sequenza di warm restart: se ritrovo un abort o azione eseguo un undo della transazione. Se invece mi ritrovo un commit eseguo una redo della transazione.
+            \item \textbf{l’ultimo record del log è ready}: Il RM si blocca perché non conosce la decisione del TM. Durante il warm restart, gli ID delle transazioni in dubbio sono inserite nel \textbf{ready set}. In questa casistica esistono due possibili soluzioni: Il partecipante chiede al coordinatore cos’è accaduto (richiesta di remote recovery), oppure il coordinatore riesegue la seconda fase del protocollo.
+        \end{itemize}
+        \item \textbf{Guasto di un transaction manager} Iotizzando che anche gli RM possano attivare un timeout. Se il tiemout accade nello stato di \textbf{initial}, il RM attende il messaggio prepare, mentre il TM dev’essere caduto nello stato initial. Il RM può fare un abort unilaterale. Se invece si ha un timeout nello stato di \textbf{ready} \\ In questo stato, l’RM ha votato per il commit e attende la decisione del TM. Non è però in grado di prendere una decisione unilaterale e pertanto resta bloccato in attesa di ulteriori informazioni. Può unilateralmente decidere di abortire. TM, se è caduto, quando riprende vota abort. Se invece gli RMs sono in grado di comunicare tra loro, è possibile sbloccare la situazione anche in assenza di TM. Gli RMs infatti comunicano fra loro per cercare di prendere una decisione. Anche in un caso del genere abbiamo i \textbf{Protocolli di ripristino in caso di guasto del transaction manager}. 
+        \begin{itemize}
+            \item \textbf{l’ultimo record del log è prepare}: il guasto del TM può aver bloccato alcuni RMs. Ci sono due opzioni di recovery: decidere global-abort e procedere con la seconda fase di 2CP oppure ripetere la prima fase, sperando di giungere a un global commit.
+            \item \textbf{l’ultimo record del log è global-commit o global-abort}: alcuni RMs potrebbero non essere stati informati, mentre altri possono essere bloccati. Il TM deve allora ripetere la seconda fase.
+            \item \textbf{l’ultimo record del log è complete} La caduta del coordinatore non ha effetto.
+        \end{itemize}
+    \end{itemize}
+    \item \textbf{Perdita di messaggi e partizionamento della rete}
+    \begin{itemize}
+        \item  Il TM non è in grado di distinguere tra perdita di messaggi prepare o ready nella prima fase. In entrambi i casi, la decisione globale è abort in seguito a timeout nella prima fase.
+        \item Anche la perdita di messaggi di acknowledgement o di decisioni da parte dei RMs non sono distinguibili. In entrambi i casi, la seconda fase viene ripetuta in seguito a timeout.
+        \item Un partizionamento della rete non causa problemi ulteriori, dato che una transazione può avere successo solo se il TM e tutti i RM appartengono alla stessa partizione.
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Ottimizzazione nel protocollo 2PC}
+Gli obiettivi delle ottimizzazioni sono di ridurre il numero di messaggi trasmessi tra coordinatore e partecipanti e di ridurre il numero di scritture nei log.
+\begin{itemize}
+    \item \textbf{ottimizzazione read-only}:  Quando un RM sa che la propria transazione non contiene operazioni di scrittura, non deve influenzare l’esito finale della transazione.  Quindi, risponde read-only al messaggio di prepare e termina l’esecuzione del protocollo. Il TM ignora i partecipanti read-only nella seconda fase e quindi i partecipanti per cui è noto a priori che siano di sola lettura, possono essere esclusi dal protocollo.
+    \item \textbf{ottimizzazione presumed abort}: \textit{Scordarsi gli abort, ricordarsi i commit}\\
+    Il TM abbandona la transazione subito dopo aver deciso per abort e non scrivere global-abort nel log. Non aspetta quindi risposta dai RMs. Perciò quando il TM riceve una richiesta di remote recovery da parte di un RM che non sa come procedere in seguito a un guasto e il TM non trova abort nel log, l’RM può chiedere solo in uno stato in cui non c’è stato il commit. Il TM decide sempre per il global-abort.
+    Gli unici record che vengono scritti sono global-commit, ready e commit. Non occorre scrivere i record di prepare e global-abort.
+\end{itemize}
+
+\subsubsection{Protocollo X/Open DTP}
+
+X/Open è un consorzio di venditori che si sono messi d’accordo per poter condividere un’architettura per le transazioni distribuite.
+
+L’Application Program (AP) effettua richieste al RM mediante l’interfaccia native; AP delinea i confini delle transazioni a TM tramite l’interfaccia TX; mentre l’interfaccia XA permette a TM di dire a RM quando la transazione inizia, effettua commit o roll back. TM, inoltre, si occupa del recovery.

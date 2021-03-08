@@ -1,0 +1,127 @@
+\section{Ricerca esatta con BWT}
+La BWT $B$ è definita in modo tale che $B[i]$ è il simbolo finale dell’$i$-esima rotazione nell’ordinamento lessicografico delle rotazioni del testo $T$. L’array $F$ è definito in modo tale che $F[i]$ è il simbolo iniziale dell’$i$-esima rotazione.
+
+\subsection{LF-mapping}
+L’$r$-esimo simbolo $\sigma$ nella BWT $B$ e l’$r$-esimo simbolo $\sigma$ in $F$ sono lo stesso simbolo del testo $T$.\\
+
+In termini di suffissi e di Suffix Array, il BWT $B$ è definita in modo tale che $B[i]$ è il simbolo che nel testo $T$ precede l’$i$-esimo suffisso nell’ordinamento lessicografico dei suffissi di $T$, cioè il suffisso di indice $S[i]$. L’array $F$ è definito in modo tale che $F[i]$ è il simbolo iniziale dell’$i$-esimo suffisso.\\
+Sempre in termini di suffissi e di SA, l’$r$-esimo simbolo $\sigma$ nella BWT $B$ è il simbolo iniziale dell’$r$-esimo suffisso nell’ordine lessicografico che inizia con un simbolo $\sigma$. In generale, dato il simbolo $B[i]$ della BWT $B$ precedente il suffisso di indice $S[i]$, allora il suffisso $B[i]T[S[i],n]$ è l’$r$-esimo suffisso che inizia con un simbolo $\sigma=B[i] \iff$ in $B[1,i]$ esistono esattamente $r$ simboli uguali a $B[i]$.\\
+
+Quindi, la posizione assoluta $j$ del suffisso $B[i]T[S[i],n]$ sarà: $j = p + r$. Dove $p$ è il numero di suffissi che sono lessicograficamente inferiori a $B[i]$.
+\subsection{\texorpdfstring{$Q$}{}-intervallo}
+Del $Q$-intervallo dobbiamo dare due definizioni diverse, una in base al BWT e una in base a al SA:
+\begin{enumerate}
+    \item Data la BWT $B$ di un testo $T$ e una stringa $Q$ definita su $\Sigma$ (escluso $\$$), il $Q$-intervallo è l’intervallo $[b,e)$ di posizioni che contiene i simboli che precedono i suffissi che condividono $Q$ come prefisso.
+    \item Dato il Suffix Array $S$ di un testo $T$ e una stringa $Q$ definita su $\Sigma$ (escluso $\$$), il $Q$-intervallo è l’intervallo $[b,e)$ di posizioni che contiene gli indici dei suffissi che condividono $Q$ come prefisso.
+\end{enumerate}
+Nota bene: $[1, n+1]$ è il $Q$-intervallo per $Q=\varepsilon$, relativo ai suffissi che condividono la stringa nulla come prefisso (cioè tutti i suffissi di $T$).\\
+
+Dato un $Q$-intervallo $[b,e)$, i valori del Suffix Array in $[b,e)$ forniscono le occorrenze della stringa $Q$ nel testo e i simboli della BWT in $[b,e)$ sono i simboli che precedono le occorrenze della stringa $Q$ nel testo.\\
+
+Dato un $Q$-intervallo $[b,e)$, le occorrenze di $Q$ in $T$ sono in numero $e-b$, iniziano nelle posizioni $S[b, e-1]$ e sono precedute dai simboli $B[b,e-1]$.
+
+\subsection{Backward extension di un \texorpdfstring{$Q$}{}-intervallo}
+Dato un $Q$-intervallo $[b,e)$ e un simbolo $\sigma$, backward extension di $[b,e)$ con $\sigma$ è il $\sigma Q$-intervallo. \\
+
+In particolare $S[b,e)$ sono gli indici dei suffissi che condividono il prefisso di Q, mentre $B[b,e)$ sono i simboli che precedono i suffissi che condividono il prefisso comune di Q.\\
+
+Come si trovano le posizioni di tutti i suffissi che condividono il prefisso comune  $\sigma Q$?\\
+Si considerano tutte le posizioni $i_1,i_2, \dots i_k$ del $Q$-intervallo $[b,e)$ tali che $B[i_p]=\sigma$ per ogni $i_p$ da $1$ a $k$.
+Si supponga $i_1 < i_2 < \dots < i_k$:\\
+I k suffissi di indici  $S[i_1],S[i_2],\dots, S[i_k]$ condividono il prefisso comune di Q  e sono preceduti da $k$ simboli $B[i_1],B[i_2], \dots B[i_k]$ tutti uguali a $\sigma$.\\
+Di conseguenza i k suffissi che ottengo \[B[i_1]T[S[i_1],n],B[i_2]T[S[i_2],n], \dots, B[i_k]T[S[i_k],n]\] condividono il prefisso $\sigma Q$ e hanno posizioni pari a:
+$j_1=LF(i_1),j_2=LF(i_2), \dots, j_k=LF(i_k)$. L'intervallo continuo di posizioni $[j_1,j_k+1)$ è il $\sigma Q$-intervallo.\\
+
+Siamo in grado di calcolare $b'$ e $e'$, infatti dato un $Q$-intervallo $[b,e)$ e un simbolo $\sigma$, il $\sigma Q$-intervallo $[b',e')$ è calcolato come:
+\begin{itemize}
+    \item $b' = LF(i_1)$, con $i_1$ la più piccola posizione in $[b,e)$ tale che $B[i_1] =\sigma$ 
+    \begin{equation*}
+        \begin{split}
+           b' & =  LF(i_1) \\
+           & = C(B[i_1]) + Occ(i_1, B[i_1]) + 1\\
+           & = C(\sigma) + Occ(i_1, \sigma) + 1 \\
+           & = C(\sigma) + Occ(b, \sigma) + 1
+        \end{split}
+    \end{equation*}
+    Dove $Occ(i_1, \sigma)$ è uguale a $Occ(b, \sigma)$ in quanto nelle posizioni da $b$ a $i_1 - 1$ non esistono simboli uguali a $\sigma$
+    \item $e' = LF(i_k) + 1$, con $i_k$ la più grande posizione in $[b,e)$ tale che $B[i_k] =\sigma$
+    \begin{equation*}
+        \begin{split}
+           e' & = LF(i_k) +1 \\
+           & = C(B[i_k]) + Occ(i_k, B[i_k]) + 1 + 1 \\
+           & = C(\sigma) + Occ(i_k, \sigma) + 1 + 1 \\
+           & = C\sigma) + Occ(i_k + 1 ,\sigma) + 1 \\
+           & = C\sigma) + Occ(e ,\sigma) + 1
+        \end{split}
+    \end{equation*}
+     Dove $Occ(i_k, \sigma) + 1$ è il numero di simboli uguali a $\sigma$ in $B[i_k]$. Questo ci dice che $Occ(i_k, \sigma) + 1$ altro no è che uguale a $Occ(i_k + 1, \sigma)$. Di conseguenza si denota che $Occ(i_k + 1, \sigma)$ è uguale a $Occ(e,\sigma)$ in quanto nelle posizioni $i_k + 1$ a $e-1$ non esistono simboli uguali a $\sigma$.
+\end{itemize}
+
+\subsection{Ricerca esatta}
+Andiamo a visualizzare come viene effettuata la ricerca esatta di un pattern $P$ di lunghezza $m$ in un testo $T$ di lunghezza $n$ di cui si conosce la BWT. Si hanno diversi passaggi, di seguito abbimao:
+\begin{itemize}
+    \item Si compiono $m$ iterazione di backward extension successive a partire dal $\varepsilon$-intervallo $[1, n+1]$.
+    \item  All’ultima iterazione $m$-esima viene trovato il $Q$-intervallo $[b,e)$ per $Q=P$. 
+    \item I valori $S[b,e)$ del Suffix Array nel $P$-intervallo trovato forniscono le occorrenze di $P$ in $T$.
+    \item Se $P$ non occorre nel testo, non si arriva a trovare i $P$-intervallo (in quanto non esiste) e le iterazioni si fermano prima.
+\end{itemize}
+Più nel dettaglio, indicando con $i$ il generico indice di iterazione ($1 \leq i \leq m$) si ha che la generica iterazione $i$ estende il $Q$-intervallo per $Q=P[i+1, m]$ con il simbolo $P[i]$ e ottiene il $Q$-intervallo per $Q=P[i,m]$.
+In particolare, 
+\begin{itemize}
+    \item la prima iterazione $(i=m)$ estende l’$\varepsilon$-intervallo $[1,n+1]$, con il simbolo $P[m]$ per ottenere il $Q$-intervallo per $Q=P[m]$.
+    \item l’ultima iterazione $(i=1)$ estende il $Q$-intervallo per $Q=P[2,m]$ con il simbolo $P[1]$ per ottenere il $Q$-intervallo per $Q=P[1,m]$, cioè $P$.
+\end{itemize}
+$P$ non occorre in $T \land P[q,m] = $ massimo suffisso che occorre in $T \implies$ all’iterazione $i = q-1$ la backward extension prodotta è nulla.\\
+
+La questione che ci interessa, quando andiamo a fare la backward extension, è quello di trovare, dato un $Q$-intervallo $[b,e]$ e un simbolo $\sigma$, il $\sigma Q$-intervallo $[b',e')$.
+\begin{itemize}
+    \item Si considerano sulla BWT tutte e le sole $k$ posizioni in $[b,e)$ che contengono il simbolo $\sigma$.
+    Le si chiamino $i_1, \dots, i_k$ (elencate in ordine crescente).
+    \item I $k$ simboli $B[i_1], \dots, B[i_k]$ (tutti uguali a $\sigma$) precedono i $k$ suffissi di indici $S[i_1], \dots, S[i_k]$ (rispettivamente), che condividono $Q$ come prefisso comune.
+    \item I $k$ suffissi che si ottengono concatenando ogni simbolo $B[i_1], \dots, B[i_k]$ al relativo suffisso che precedono condivideranno il prefisso comune   $\sigma Q$.
+    \item Le $k$ posizioni $j_1, \dots, j_k$ di tali suffissi, nell’ordinamento lessicografico dei suffissi di $T$, determinano un intervallo continuo di posizioni che sarà proprio il $\sigma Q$-intervallo, ovvero $[b',e') = [j_1, j_k+1]$.
+\end{itemize}
+
+
+
+\section{FM-index}
+
+L’FM-index di un testo $T$ di lunghezza $n$ è stato proposto da Ferragina e Manzini (2000) come rappresentazione numerica della BWT di un testo.
+Permette la ricerca esatta di un pattern di lunghezza $m$ in tempo $\mathcal{O}(m)$ ed è un self-index (la rappresentazione numerica racchiude tutta l’informazione di BWT e testo ed è quindi sempre possibile passare dall’uno all’altro).
+
+Dato un testo $T$ di lunghezza $n$ di cui si conosce la BWT $B$, il suo FM-index è composto dalle due funzioni:
+\begin{itemize}
+    \item $C : \Sigma \to \mathbb{N}$ tale che $C(\sigma) = $ numero di simboli in $B$ tali che siano $< \sigma$.
+    $C(\sigma)$ fornisce il numero di suffissi che iniziano con un simbolo $< \sigma$ e la massima posizione (nell’ordinamento lessicografico) di un suffisso che inizia con il simbolo immediatamente inferiore a $\sigma$.\\
+        \begin{algorithm}[H]
+        \SetAlgoLined
+            $n \leftarrow |B|$\;
+            \For{\textbf{each} $\sigma \in \Sigma$}{
+                $C(\sigma) \leftarrow 0$\;
+            }
+            \For{$i \leftarrow 1 $ to $n$}{
+                $\sigma \leftarrow B[i]$\;
+                \For{$\sigma' \in \Sigma $ tale che $\sigma'>\sigma$}{
+                    $C(\sigma') \leftarrow C(\sigma')+1$\;
+                }
+                return $C$
+            }
+            \caption{Procedura compute-C-function}
+        \end{algorithm}
+    \item $Occ : \{1, \dots, n+1\} \times \Sigma \to \mathbb{N}$ tale che $Occ(i,\sigma) =$ numero di simboli uguali a $\sigma$ in $B[1, i-1 ]$.\\
+        \begin{algorithm}[H]
+        \SetAlgoLined
+            $n \leftarrow |B|$\;
+            \For{\textbf{each} $\sigma \in \Sigma$}{
+                $Occ(1, \sigma) \leftarrow 0$\;
+            }
+            \For{$i \leftarrow 2 $ to $n+1$}{
+                $\sigma \leftarrow B[i-1]$\;
+                $Occ(i,.) \leftarrow Occ(i-1,.)$\;
+                $Occ(i,\sigma) \leftarrow Occ(i, \sigma)+1$\;
+                return $Occ$
+            }
+            \caption{Procedura compute-Occ-function}
+        \end{algorithm}
+\end{itemize}
+FM-index è un self-index: dalla funzione $Occ$ è possibile ricostruire la BWT (guardando quale cella è stata incrementata rispetto alla riga precedente) e dalla BWT è possibile ricostruire il testo.

@@ -1,0 +1,157 @@
+\section{Richiami sistemi centralizzati}
+Un \textbf{DBMS (\textit{DataBase Management System})} è un sistema, ovvero un
+  software, in grado di gestire collezioni di dati che siano:
+  \begin{itemize}
+    \item \textit{grandi}, ovvero di dimensioni maggiori della memoria centrale
+    dei sistemi di calcolo usati (se ho a che fare con una quantità di dati non
+    così grande e con un uso personale posso affidarmi ad una \textit{hashmap}
+    piuttosto che ad un db)
+    \item \textit{persistenti}, ovvero con un periodo di vita indipendente dalle
+    singole esecuzioni dei programmi che le utilizzano e per molto tempo 
+    \item \textit{condivise}, ovvero usate da diversi applicativi e diversi
+    utenti (fattore che porta anche allo studio del carico di lavoro,
+    \textit{workload}). L'accesso può essere sia \textit{in scrittura} che
+    \textit{in lettura} (ovviamente anche entrambi) a seconda del caso. SI
+    pongono quindi problemi di concorrenza e sicurezza
+    \item \textit{affidabili}, sia resistente dal punto di vista hardware (un
+    guasto non deve farmi perdere i dati) che dal punto di vista della sicurezza
+    informatica. Le transazioni devono essere quindi \textbf{atomiche} (o tutto
+    o niente) e \textbf{definitive} (che non verranno più dimenticate). Il
+    software può cambiare mentre i dati no
+  \end{itemize}
+  
+ A livello di architettura per un \textit{DBMS centralizzato} si hanno:
+\begin{itemize}
+  \item uno o più \textit{storage} per memorizzare i dati, a loro volta su uno o   più file del \textit{file system}
+  \item il \textit{DBMS}, il componente software che funge da componente logico
+  \item diverse applicazioni che elaborano i dati provenienti dal db 
+  \item il \textbf{DBA (\textit{DataBase Administrator})} che tramite riga di
+  comando o GUI si occupa di manutenzione, sicurezza, ottimizzazione etc $\ldots$  del DBMS.
+\end{itemize}
+
+L'architettura dati di un DBMS è definita dall'ente \textit{ANSI/SPARC} 
+e è a tre livelli:
+\begin{enumerate}
+  \item diversi \textbf{schemi esterni}, porzioni di db messi a disposizione per
+  le varie applicazioni
+  \item uno \textbf{schema logico (o concettuale)}, che fa riferimento al
+  \textit{modello relazionale} dei dati ed è indipendente dalla tecnologia
+  usata. Avendo un unico schema logico si ha un'unica semantica (perlomeno a
+  livello astratto). Si ha unica base di dati, quindi un unico insieme di record
+  interrogati e aggiornati da tutti gli utenti. Non si ha nessuna forma di
+  eterogeneità concettuale 
+  \item uno \textbf{schema fisico}, che fa riferimento alla tecnologia usata per
+  implementare le tabelle per salvare i dati. Si ha un'unica rappresentazione
+  fisica dei dati e quindi nessuna distribuzione e nessuna eterogeneità fisica
+\end{enumerate}
+
+Le caratteristiche di un DBMS centralizzato sono :
+\begin{itemize}
+    \item unico schema logico,quindi unica semantica (spesso accade che si diano diversi significati agli stessi termini).
+    \item unica base di dati, ovvero unico insieme di record interrogati e aggiornati da tutti gli utenti, questo comporta nessuna forma di eterogeneità concettuale.
+    \item Unico schema fisico quindi unica rappresentazione fisica dei dati. Nessuna distribuzione e nessuna eterogeneità fisica.
+    \item Esiste un unico \textit{linguaggio di interrogazione}, quindi unica modalità di accesso, aggiornamento e gestione delle transazioni
+    \item unica modalità di \textit{ripristino} a fronte di guasti 
+    \item unico amministratore dei dati, quindi nessuna autonomia gestionale 
+\end{itemize}
+
+Le principali azioni nei DBMS riguardano:
+\begin{itemize}
+    \item Memorizzazione fisica efficiente delle strutture dati in memoria secondaria (per  garantire la persistenza)
+    \item Scelta efficiente delle pagine (della memoria secondaria) da trasferire nel buffer in memoria centrale (per garantire una grande quantità di dati)
+\end{itemize}
+
+Una base di dati è una risorsa integrata e condivisa fra le varie applicazioni, prevede perciò:
+\begin{itemize}
+    \item attività diverse su dati in parte condivisi
+    \item attività multi-utente su dati condivisi, necessitano un controllo della concorrenza. Intuitivamente, le transazioni sono corrette se seriali (prima una e poi l'altra), ma in molti sistemi reali l'efficienza sarebbe penalizzata troppo: il \textit{controllo della concorrenza} permette un ragionevole compromesso.
+    
+\end{itemize}
+
+Le basi di dati vengono interrogate e pertanto è necessario ottimizzare l’esecuzione delle interrogazioni.
+Gli utenti vedono il modello logico (relazionale), mentre i dati sono all'interno della memoria secondaria. Le strutture logiche non sarebbero efficienti in memoria secondaria, motivo per cui che servono strutture dati opportune. Inoltre la memoria secondaria è molto più lenta della memoria principale quindi serve una interazione fra memoria principale e secondaria che limiti il più possibile gli accessi alla secondaria. 
+ 
+Le basi di dati sono una risorsa per chi le possiede, e debbono essere conservate anche in presenza di malfunzionamenti (affidabilità).
+Le transazioni devono essere: atomiche (o tutto o niente) e definitive (dopo la conclusione, non si dimenticano gli effetti).
+
+Per garantire le precedenti caratteristiche e qualità, l’architettura di un DBMS deve essere organizzata in termini di un insieme di funzionalità cooperanti tra loro.
+
+L'architettura funzionale di un DBMS corrisponde a:
+\begin{itemize}
+  \item un \textbf{query compiler} che prende una query in SQL e la traduce con
+  un compilatore
+  \item un \textbf{gestore di interrogazioni e aggiornamenti} che trasforma le
+  query in SQL in algebra relazionale facendo operazioni di ottimizzazione
+  \item un \textbf{gestore dei metodi di accesso} per permettere il passaggio
+  tra file e tabelle passando dal \textbf{gestore del buffer} e il
+  \textbf{gestore della memoria secondaria} dove i dati non sono in forma
+  tabellare ma di file e pagine
+  \item \textbf{Gestore delle transazioni} che esegue le transazioni, garantendo, grazie all’interazione con il gestore dell’affidabilità e il gestore della concorrenza (scheduler), il rispetto delle proprietà transazionali
+  \item un \textbf{DDL compiler}, dove DDL sta per Data Description Language,
+  che si occupa dei comandi del DBA
+  \item un \textbf{gestore della concorrenza}, che garantisce il controllo della
+  concorrenza
+  \item un \textbf{gestore dell'affidabilità}, che garantisce che un dato non
+  vada perso
+\end{itemize}
+
+\subsection{Ottimizzazione delle interrogazioni}
+
+Il primo step è il \textbf{parsing}, che stabilisce se la query è sensata dal punto di vista sintattico e se i vari nomi di tabelle e attributi sono coerenti con lo schema. Per questo ultimo aspetta ci si appoggia al \textbf{Data  Catalog}, un particolare db che contiene informazioni sui vari database, in primis sui vari nomi delle tabelle e per ciascuna sui nomi di ogni attributo.
+Si ha quindi una soluzione per gestire i metadati. Il parser effettua un'analisi lessicale, per la sintattica e la semantica, usando il dizionario e la traduzione in algebra relazionale, producendo un \textbf{query tree}. Il query tree viene trasformato in un query plan logico contenente operazioni di algebra relazionale sulle tabelle logiche dello schema, che viene ottimizzato rispetto al costo.
+
+A una interrogazione SQL possono corrispondere diverse espressioni in algebra relazionale e quindi diversi query plan logici, viene perciò scelto quello che ottimizza il costo di esecuzione. Ad esempio, in genere conviene che le selezioni siano anticipate rispetto ai join, perché in questo modo i join operano su tabelle di minore dimensione.
+
+L'ottimizzatore va oltre (magari invertendo i \textit{where} etc$\ldots$)  con un query plan più efficiente che permette di cambiare automaticamente le  query in altre più efficienti. \newline
+Si ha un db chiamato \textbf{Statistics} che contiene statistiche sulla storia delle query nonché altre informazioni sui dati. L'uso di tale db permette di ottimizzare le query. L'ottimizzazione ha complessità \textbf{esponenziale} e quindi si introducono approssimazioni basate su euristiche, usando un'\textbf{alberatura di costi} usando la tecnica del \textbf{Branch\&Bound}.
+ 
+\subsection{Transazioni}
+\begin{quote}
+    Insieme di istruzioni di lettura e scrittura sulla base di dati, eventualmente inserite in un linguaggio programmativo.
+    L’insieme delle istruzioni gode di alcune proprietà che garantiscono la corretta esecuzione in un ambiente concorrente e non affidabile.
+\end{quote}
+
+La transazione è una parte di programma caratterizzata da un inizio (begin-transaction, start transaction in SQL), una fine (end-transaction, non esplicitata in SQL) e al cui interno deve essere eseguito una e una sola volta uno dei seguenti comandi:
+\begin{itemize}
+    \item commit work  per terminare correttamente la lettura e/o  scrittura 
+    \item rollback work per abortire la transazione
+    \item 
+\end{itemize}
+Un sistema transazionale \textbf{OLTP} è in grado di definire ed eseguire transazioni per un numero di applicazioni concorrenti molto alto. 
+
+Bisogna approfondire quindi le \textbf{unità di elaborazione} che godono delle proprietà  \textbf{ACID}:
+\begin{itemize}
+  \item Atomicità, ovvero una transazione è un'unità atomica di elaborazione. Non si può lasciare il db in uno stato intermedio. Un problema prima del commit cancella tutto le operazioni svolte (UNDO) e un problema dopo il commit non deve avere conseguenze, se  necessario vanno ripetute le operazioni (REDO). Proprietà garantita dal \textit{gestore dell’affidabilità}.
+  \item Consistenza, ovvero la transazione rispetta i vincoli di integrità (se lo stato iniziale è corretto lo è anche quello finale). Quindi se ci sono violazioni non devono restare alla fine (nel caso rollback). Proprietà garantita dal \textit{gestore delle transazioni}.
+  \item Isolamento, ovvero la transazione non risente delle altre transazioni concorrenti. Una transazione non espone i suoi stati intermedi evitando l'\textit{effetto domino} (si evita che il rollback di una transazione vada in cascata con le altre). L'esecuzione concorrente di una collezione di transazioni deve produrre un risultato che si potrebbe ottenere con una esecuzione sequenziale.
+  \item Durata (ovvero persistenza), ovvero gli effetti di una transazione andata in commit non vanno persi anche in presenza di guasti (a tal fine si sfrutta il \textbf{recovery manager}, che garantisce l'affidabilità, del DBMS)
+\end{itemize}
+ 
+ \subsection{Gestore della concorrenza}
+ Garantisce la possibilità di poter eseguire quasi in parallelo più operazioni.
+ Uno \textbf{scheduler} è una sequenza di esecuzione di un insieme di transazioni. Uno scheduler è di tipo seriale se una transazione termina prima che la successiva inizi .
+
+Qualora non sia seriale si potrebbero avere problemi.\\
+Si sfrutta quindi la \textbf{proprietà di isolamento} facendo in modo che ogni transazione esegue come se non ci fosse concorrenza, coincide con la proprietà per cui : un insieme di transazioni eseguite concorrentemente produce lo stesso risultato che produrrebbe una (qualsiasi) delle possibili esecuzioni sequenziali delle stesse transazioni allora si ha la proprietà di isolamento.
+
+Si ha quindi che uno schedule è serializzabile se l'esito della sua esecuzione è lo stesso che si avrebbe con una qualsiasi sequenza seriale delle transazioni contenute.
+
+Possibili sistemi per il controllo della concorrenza:
+\begin{itemize}
+    \item Controllo basato su Conflict Equivalence
+    \item Controllo basato su locks
+    \item Protocollo 2PL o Two phase locking: implementato nei DBMS
+    \item Controllo basato su timestamps
+\end{itemize}
+
+Controllo di concorrenza tramite locks: si basa sull’idea di definire un protocollo che garantisca a priori la conflict serializability. Richiede la presenza di uno scheduler nell’architettura del DBMS.
+
+Operazioni che richiedono l’utilizzo e il rilascio esclusivo di una risorsa:
+\begin{itemize}
+    \item lock esclusivo: chiedo una risorsa in modo esclusivo.
+    \item unlock: rilascio la risorsa.
+\end{itemize}
+
+Il compito dello scheduler è quello di trasformare le transazioni aggiungendo i comandi di lock, sulla base della conoscenza delle assegnazioni precedenti, in modo da garantire la serializzabilità e memorizzare tali assegnazioni in una tabella di lock.
+Un’ulteriore regola di 2PL è che, in ogni transazione, tutte le richieste di lock precedano tutti gli unlock.
+

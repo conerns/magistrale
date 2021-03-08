@@ -1,0 +1,227 @@
+\section{Esercitazione uno}
+Si consideri un db con le seguenti relazioni (e quindi tabelle): 
+\begin{itemize} 
+    \item PRODUCTION (\underline{SerialNumber}, PartType, Model, Quantity, Machine) 
+    \item PICKUP (\underline{SerialNumber}, \underline{Lot}, \textbf{Client, SalesPerson},  Amount) 
+    \item CLIENT (\underline{Name}, City, Address) 
+    \item SALESPERSON (\underline{Name}, City, Address) 
+\end{itemize} \textit{(con sottolineate le chiavi primarie e in grassetto le chiavi di integrità referenziale)}\\
+Ci poniamo i seguenti obiettivi:
+\begin{itemize}
+    \item si hanno 4 centri di produzione (Dublino, San Jose, Zurigo e Taiwan). Ciascuno responsabile rispettivamente di cpu, keyboard, screen e cable. Siano poi noti i 3 centri di vendita (San Jose, Zurigo  e Taiwan)
+    \item le vendite sono distribuite secondo le località geografiche, i clienti a Zurigo sono serviti solo dai venditori di Zurigo e così via. Si ha però che i venditori di Zurigo servono anche Dublino.
+    \item ogni area geografica ha il proprio db (avremo quindi 4 db)
+\end{itemize}
+
+Vogliamo studiare una \textbf{frammentazione orizzontale} della relazione $PRODUCTION$. La si esegue in base ai componenti. 
+\begin{itemize}
+    \item $PRODUCTION_1 = \sigma_{partType = CPU} (PRODUCTION)$
+    \item $PRODUCTION_2 = \sigma_{partType = Keyboard} (PRODUCTION)$
+    \item $PRODUCTION_3 = \sigma_{partType = Screen} (PRODUCTION)$
+    \item $PRODUCTION_4 = \sigma_{partType = Cable} (PRODUCTION)$
+\end{itemize}
+
+Vogliamo fare inoltre la \textbf{frammentazione orizzontale} della relazione $PICKUP$. Per farlo bisogna eseguire una Join ($\Pi$), per poter ricavare i componenti del PC, con la Tabella $PRODUCTION$: \\
+Siano $ValProiezione = SerialNumber, PartType, Model, Quantity, Machine$.
+\begin{center}
+    \begin{itemize}
+        \item $PICKUP_1 = \Pi_{ValProiezione} ( \sigma_{partType = CPU} (PICKUP \  SerialNumber = SerialNumber \ PRODUCTION) )$
+        \item $PICKUP_2 = \Pi_{ValProiezione} ( \sigma_{partType = Keyboard} (PICKUP \  SerialNumber = SerialNumber \ PRODUCTION) )$
+        \item $PICKUP_3 = \Pi_{ValProiezione} ( \sigma_{partType = Screen} (PICKUP \  SerialNumber = SerialNumber \ PRODUCTION) )$
+        \item $PICKUP_4 = \Pi_{ValProiezione} ( \sigma_{partType = Cable} (PICKUP \  SerialNumber = SerialNumber \ PRODUCTION) )$
+    \end{itemize}
+\end{center}
+Prendo quindi una proiezione di tutti gli elementi di \textit{PICKUP} separando nei vari \textit{PICKUP} in base al prodotto.\\ 
+Passo a alle tabelle \textnormal{SALESPERSON}. Abbiamo 3 punti di vendita, quindi, circa come per \textnormal{PRODUCTION}, frammento in base alle città di vendita, si esegue sempre una \textbf{frammentazione orizzontale}:
+
+\begin{itemize}
+    \item $SALESPERSON_1 =( \sigma_{City = San Jose} (SALESPERSON) )$
+    \item $SALESPERSON_2 =( \sigma_{City = Zurigo} (SALESPERSON) )$
+    \item $SALESPERSON_3 =( \sigma_{City = Taiwan} (SALESPERSON) )$
+\end{itemize}
+
+Anche nel caso di $CLIENT$ divido in base alle città, ricordando che Zurigo e Dublino sono clienti entrambi di Zurigo:\\
+In questo caso decidiamo di chiamare $ValProiezione = (Name, City, Address)$
+\begin{itemize}
+    \item $CLIENT_1 =( \sigma_{City = San Jose} (CLIENT) )$
+    \item $CLIENT_2 =( \sigma_{City = Zurigo \lor Dublin} (CLIENT) )$
+    \item $CLIENT_3 =( \sigma_{City = Taiwan} (CLIENT) )$
+\end{itemize}
+
+Abbiamo finito la frammentazione e quindi dobbiamo solo distribuire tali tabelle, in base alla Location: 
+\begin{itemize}
+ \item Avrò, per San Josè tutte le proiezioni orizontali $PH$ con indice 1. ($PRODUCTION_1 \dots$).
+ \item Taiwan tutte le proiezioni orizontali $PH$ con indice 2. ($PRODUCTION_2 \dots$).
+ \item Zurigo tutte le proiezioni orizontali $PH$ con indice 3. ($PRODUCTION_3 \dots$).
+ \item Per Dublino invece il discorso cambia, non avendo $SALESPERSON_4$ e La nostra proiezione $CLIENT_3$ include già Dublino, assente quindi $CLIENT_4$ date le specifichie di questo problema. 
+\end{itemize}
+
+Vediamo un esercizio in merito alla trasparenza, che ricordiamo essere a tre livelli: frammentazione, di replicazione/allocazione e di linguaggio.\\
+
+
+Si chiede di fare delle interrogazioni, tenendo conto dei livelli di trasparenza, sul db costruito nell'esercizio precedente.\\ 
+La prima query ci chiede di determinare la quantità dei prodotti che hanno valore \textit{77y6878} (abbiamo quindi a che fare con la trasparenza di \textbf{frammentazione}, infatti interroghiamo come se avessimo a che fare con un solo db):
+\begin{lstlisting}
+PROCEDURE Query1 (:Quant)
+    SELECT Quantity IN :Quant
+    FROM Production
+    WHERE SerialNumber = '77y6878'
+END PROCEDURE;
+\end{lstlisting}
+Se invece volessimo fare l'interrogazione in base al tipo di trasparenza \textbf{replicazione/allocazione}, si deve eseguire nel seguente modo, infatti considero i singoli fragmenti:
+
+\begin{lstlisting}
+PROCEDURE Query2 (:Quant)
+    SELECT Quantity IN :Quant
+    FROM Production_1
+    WHERE SerialNumber = '77y6878'
+    IF:Empty THEN 
+        SELECT Quantity IN :Quant
+        FROM Production_2
+        WHERE SerialNumber = '77y6878'
+        IF:Empty THEN 
+            SELECT Quantity IN :Quant
+            FROM Production_3
+            WHERE SerialNumber = '77y6878'
+                IF:Empty THEN 
+                    SELECT Quantity IN :Quant
+                    FROM Production_4
+                    WHERE SerialNumber = '77y6878'
+END PROCEDURE;
+\end{lstlisting}
+
+Vediamo ora invece come funziona per la trasparenza di \textbf{linguaggio}. In tal caso dobbiamo considerare sia le frammentazioni che i vari indirizzi di allocazione, ovvero i \texttt{company.città.com}, la nostra query sopra svolta diventa la seguente:
+\begin{lstlisting}
+PROCEDURE Query2 (:Quant)
+    SELECT Quantity IN :Quant
+    FROM Production_1@company.sanJose.com
+    WHERE SerialNumber = '77y6878'
+    IF:Empty THEN 
+        SELECT Quantity IN :Quant
+        FROM Production_2@company.Zurich.com
+        WHERE SerialNumber = '77y6878'
+        IF:Empty THEN 
+            SELECT Quantity IN :Quant
+            FROM Production_3@company.Taiwan.com
+            WHERE SerialNumber = '77y6878'
+                IF:Empty THEN 
+                    SELECT Quantity IN :Quant
+                    FROM Production_4@company.Dublin.com
+                    WHERE SerialNumber = '77y6878'
+END PROCEDURE;
+\end{lstlisting}
+
+Sempre sul db del primo esercizio effettuiamo la seguente query: 
+\textit{determinare le macchine che utilizzano come componente \textit{keyboard} e sono vendute al cliente \textit{Brown}}.\\ Vediamo solo la trasparenza di \textbf{frammentazione} e quella di \textbf{allocazione}.\\
+Frammentazione : \\
+\begin{lstlisting}
+PROCEDURE Query3 (:Machine)
+    SELECT Machine IN :Machine
+    FROM Production JOIN Pickup ON SerialNumber = SerialNumber
+    WHERE PartType like 'keyboard' AND Client = 'Brown'
+END PROCEDURE;
+\end{lstlisting}
+
+Allocazione, avendo già solo componenti di tipo \textit{keyboard}, lo evitiamo nella richiesta WHERE:
+\begin{lstlisting}
+PROCEDURE Query3 (:Machine)
+    SELECT Machine IN :Machine
+    FROM Production_2 JOIN Pickup_2 ON Production_2.SerialNumber = Pickup_2.SerialNumber
+    WHERE Client = 'Brown'
+END PROCEDURE;
+\end{lstlisting}
+
+Pensiamo ora di voler cambaire il valore di un record. effettuiamo il cambiamento di indirizzo del cliente Brown che si sposta da \textit{27 Church St.  Dublino}, a \textit{43 Park Hoi St. Taiwan}. Abbiamo quindi un cambio di allocazione nel db:
+
+\begin{lstlisting}
+PROCEDURE Update1
+    UPDATE Client
+    SET Address = '43 Park Hoi St.', City= 'Taiwan'
+    WHERE Name = 'Brown'
+END PROCEDURE;
+\end{lstlisting}
+Quello che deve cambiare ora, bisogna cancellare dalle partizioni il cliente, rimuovendolo dalla vecchia area di acquisti, alla nuova. 
+
+\begin{lstlisting}
+PROCEDURE Update2
+    DELETE Client_2
+    WHERE Name = 'Brown'
+    INSERT INTO Client_3 (Name, City, Address) VALUES (Brown, '43 Park Hoi St.', 'Taiwan')
+END PROCEDURE;
+\end{lstlisting}
+Se avessimo voluto fare anche la trasparenza di linguaggio non sarebbe cambiato nulla poiché le frammentazioni sono in locazioni diverse.\\
+
+Sempre sul db del primo esercizio effettuiamo la seguente query:\\ 
+\textit{calcolare la somma di tutti gli ordini ricevuti a SanJose, Zurigo e Taiwan}.\\ Partiamo con la trasparenza di frammentazione:
+\begin{lstlisting}
+PROCEDURE Query5
+    SELECT City, SUM(Amount)
+    FROM Pickup JOIN Person ON SalesPerson = Name
+    GROUP BY City
+END PROCEDURE;
+\end{lstlisting}
+
+Dobbiamo eseguire il metodo utilizzando di trasparenza \textbf{allocazione}, procedo creando una tabella unica dovendo fare 3 join diverse.
+\begin{lstlisting}
+PROCEDURE Query6 
+    CREATE  VIEW Pickup AS
+            Pickup_1 UNION Pickup_2 UNION Pickup_3 UNION Pickup_4
+    SELECT  City, SUM(Amount)
+    FROM    SalesPerson_1 JOIN Pickup ON SalesPerson = Name
+    UNION
+    SELECT  City, SUM(Amount)
+    FROM    SalesPerson_2 JOIN Pickup ON SalesPerson = Name
+    UNION
+    SELECT  City, SUM(Amount)
+    FROM    SalesPerson_3 JOIN Pickup ON SalesPerson = Name #ho tutti i dati uniti ora
+END PROCEDURE;
+\end{lstlisting}
+
+\subsection{Inter Query}
+Sempre sul db del primo esercizio cerchiamo di massimizzare il parallelismo delle inter-query. Prendiamo per esempio la seguente query: \textit{Estrarre la somma delle quantità di produzione che sono raggruppate secondo i tipi e i modelli delle componenti}.\\
+
+\begin{lstlisting}
+PROCEDURE Query1 
+    SELECT sum(Quantity), Model, PartType
+    FROM Production
+    GROUP BY Model, PartType
+END PROCEDURE;
+\end{lstlisting}
+Vogliamo però massimizzare il parallelismo, divido quindi tra le varie frammentazioni, possiamo eseguirla con 4 query differenti collegate alle singole tabelle $PRODUCTION_i$ create. 
+
+\begin{lstlisting}
+PROCEDURE Query2
+    SELECT sum(Quantity), Model, PartType
+    FROM Production_1
+    GROUP BY Model, PartType
+    
+    SELECT sum(Quantity), Model, PartType
+    FROM Production_1
+    GROUP BY Model, PartType
+     
+    SELECT sum(Quantity), Model, PartType
+    FROM Production_1
+    GROUP BY Model, PartType
+    
+    SELECT sum(Quantity), Model, PartType
+    FROM Production_1
+    GROUP BY Model, PartType
+END PROCEDURE;
+\end{lstlisting}
+massimizziamo il parallelismo inter-query se si consideriamo che ogni partizione ha un DBMS diverso. Volendo potrei dividere la query ancora a seconda del modello, evitando il \texttt{group by}. \\
+
+Se l'esercizio in questione consiste nel estrarre il valore medio di parti vendute per ogni salespeople, raggruppato in base al tipo e al modello delle parte, otteniamo:
+\begin{lstlisting}
+PROCEDURE Query3 
+    SELECT avg(Quantity), Model, PartType
+    FROM Production_1 
+    GROUP BY Model, PartType
+END PROCEDURE;
+\end{lstlisting}
+
+
+Vediamo un esempio di db replicato che può produrre inconsistenza.\\
+Supponiamo che ogni frammento di \textnormal{PRODUCTION} sia allocato a tutti i DBMS. Però ogni DBMS utilizza un frammento e trasmette i cambiamenti del frammento agli altri DBMS, permettendo di avere copie del db. In caso di fallimento di un DBMS il db sarebbe comunque accessibile dagli altri sistemi e non so avrebbe problemi con le query, avendo che il fallimento è trasparente sia ai client che al db stesso.\\
+Purtroppo quando si ha un fallimento si può generare un partizionamento di rete e questo può comportare delle inconsistenze. Se, per esempio, due transazioni tolgono 800 ad una certa quantità, una delle transazioni  (in ordine temporale la seconda)fallirà ma se avvengono in due DBMS non connessi non falliranno, producendo inconsistenza.
+
+Per esmpio, data una replicazione simmetrica dire quando produce inconsistenza. Un esempio è un db senza il \textit{concurrency control} e quindi due transazioni come quelle dell'esercizio precedente possono causare inconsistenza anche senza fallimento della rete.

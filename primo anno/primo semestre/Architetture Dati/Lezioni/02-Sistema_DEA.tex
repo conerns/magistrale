@@ -1,0 +1,97 @@
+\section{Sistemi DEA (Distribuite, Eterogenee e Autonome)}
+In un sistema distribuito si hanno tante basi di dati locali, diverse applicazioni su ogni nodo di elaborazione (architetture shared nothing).  
+Esempio: passaggio, in una singola organizzazione, da base dati centralizzata a distribuita. Unica base di dati, localizzata a Milano acceduta da tutti i nodi con transazioni centralizzate. Può essere utile per esigenze di efficienza o affidabilità spostare o duplicare alcuni dati presso altri nodi frammentando la base di dati in frammenti, scelti ad esempio sulla base degli accessi dai vari nodi. 
+\begin{table}[h!]\centering
+\begin{tabular}{|l|l|l|l|}
+\hline
+Sistema               & Distribuzione & Eterogeneità & Autonomia \\ \hline
+Base dati distribuite & Alta          & Bassa        & Bassa     \\ \hline
+Multidatabase         & Alta          & Alta         & Alta      \\ \hline
+\end{tabular}
+\end{table}
+
+Nella realizzazione di un sistema con caratteristiche di distribuzione si pone il problema di cosa distribuire.
+Un sistema distribuito è un sistema per cui si verifica almeno una delle seguenti condizioni:
+\begin{itemize}
+    \item Le applicazioni, fra loro cooperanti, risiedono su più nodi elaborativi (elaborazione distribuita)
+    \item L’archivio informativo è distribuito su più nodi (base di dati distribuita)
+\end{itemize}
+Ad esempio la workstation ed un server possono ripartirsi le funzionalità di elaborazione, oppure su una schiera di sistemi server possono essere ripartiti diversi sottoprogrammi che implementano diverse funzionalità.
+
+La distribuzione si dice essere \textit{ortogonale e trasparente} agli altri.\\
+È importante in fase di definizione architetturale capire cosa distribuire. Capire cosa distribuire è una parte consistente dello studio di come costruire un'architettura distribuita (magari frutto di situazioni particolari come la fusione di due sistemi a causa di un'acquisizione aziendale etc, dove diverse logiche applicative e diverse strutture dati possono creare situazioni molto pericolose).\\
+
+\subsection{Criteri di classificazione dei database distribuiti}
+Un \textbf{DBMS Distribuito Eterogeneo Autonomo} è in generale una federazione di DBMS che collaborano nel fornire servizi di accesso ai dati con livelli di \textit{trasparenza} definiti (infatti le diversità tra db nei nodi vengono nascosti a vari \textit{livelli di trasparenza} per distribuzione, eterogeneità e autonomia). 
+L’esigenza di integrare a posteriori (o talvolta progettare fin dall’inizio) sistemi di tipo federato emerge in molti casi:
+\begin{itemize}
+    \item Evoluzione e/o integrazione di componenti applicativi sviluppati separatamente (per ragioni tecniche, organizzative o temporali)
+    \item cooperazione di processi in precedenza separati 
+    \item cooperazione (o fusione) di enti o aziende indipendenti 
+\end{itemize} ed è stimolata dallo sviluppo delle reti.
+
+Possiamo quindi dividere i livello di federazione su tre categorie tra loro ortogonali (ovvero indipendenti): 
+\begin{itemize}
+    \item \textbf{Autonomia} che fa riferimento al grado di indipendenza tra i nodi. Si distinguono diverse forme di autonomia
+    \begin{itemize}
+        \item \textbf{di progetto}: ogni nodo adotta un proprio modello dei dati e sistema di gestione delle transazioni.
+        \item \textbf{di condivisione}: ogni nodo sceglie la porzione di dati che intende condividere con altri nodi.
+        \item \textbf{di esecuzione}: ogni nodo decide in che modo eseguire le transazioni che gli vengono sottoposte.
+    \end{itemize}
+    Da qui possiamo distinguere diversi tipi di autonomia
+    \begin{itemize}
+        \item \textbf{DBMS strettamente integrati}: nessuna autonomia. Dati logicamente centralizzati, esiste quindi un unico data manager responsabile delle transazioni applicative e i data manager locali non operano in modo autonomo
+        \item \textbf{DBMS semi-autonomi}: Ogni data manager è autonomo ma partecipa a transazioni globali, una parte dei dati è condivisa. Richiedono modifiche architetturali per poter fare parte della federazione 
+        \item \textbf{DBMS totalmente autonomi} (o Peer to Peer) : Ogni DBMS lavora in completa autonomia ed e’ inconsapevole dell’esistenza degli altri
+    \end{itemize} 
+    \item \textbf{Distribuzione} che fa riferimento alla distribuzione dei dati. Inoltre la distribuzione è di tipologia:
+    \begin{itemize}
+        \item \textbf{client/server}: la gestione dei dati è concentrata nei server, mentre i client forniscono l’ambiente applicativo e la presentazione. 
+        \item\textbf{ peer-to-peer}: non c'è distinzione tra client e server, e tutti i nodi del sistema hanno identiche funzionalità DBMS.
+        \item nessuna distribuzione
+    \end{itemize}
+    \item \textbf{Eterogeneità} riguarda invece:
+    \begin{itemize}
+        \item \textbf{il modello dei dati} (relazionale, XML, Object Oriented).
+        \item \textbf{il linguaggio di query} (diversi dialetti SQL, Query by Example, Linguaggi di interrogazione OO o XML).
+        \item \textbf{la gestione delle transazioni} (diversi protocolli per il concurrency control e per il recovery)
+        \item \textbf{schema concettuale e schema logico} (un concetto rappresentato in uno schema come attributo e in un altro come entità).
+    \end{itemize}
+\end{itemize}
+
+Tipologie più rilevanti di DBMS:
+\begin{itemize}
+  \item \textbf{DBMS distribuito omogeneo (DDBMS)}: quando si ha alta distribuzione ma non si hanno autonomia ed eterogeneità (gestiti solitamente dallo stesso vendor).
+  \item \textbf{DBMS distribuiti eterogenei}: strettamente integrati ma con eterogeneità di varia.
+  \item \textbf{DBMS federati e logicamente integrati}: semi-autonomi, eterogenei.
+  \item \textbf{DBMS federati distribuiti}: quando si ha alta  distribuzione, semi autonomia e non eterogeneità.
+  \item \textbf{multi Data Base MS}: totalmente autonomi ed eventualmente omogenei o eterogenei.
+  \item \textbf{Data Warehouse}: centralizzati, ma risultato della integrazione fuori linea di fonti eterogenee.
+\end{itemize}
+
+\subsection{Architetture dati e funzioni}
+I DBMS distribuiti omogenei (DDBMS) sono strettamente integrati, omogenei. Studiamo uno schema in cui si passa da un sistema centralizzato ad un sistema distribuito.\\
+Per ciascuna funzione (query processing, transaction manager, ecc) vi può essere una gestione:
+\begin{itemize}
+    \item Centralizzata/gerarchica vs distribuita
+    \item Con assegnazione statica vs dinamica dei ruoli
+\end{itemize}
+Nei DDBMS gli schemi locali sono viste dello schema globale che perciò viene progettato prima.
+
+La natura fortemente integrata dei DDBMS porta a adottare per essi un approccio top-down alla progettazione, che rispetto alla progettazione di applicazioni DBMS introduce una nuova fase, la progettazione della distribuzione.
+
+\textbf{Analisi dei requisiti $\to$ Progettazione concettuale $\to$ Progettazione logica $\to$ Progettazione fisica.\\}
+Inoltre, progettazione logica e fisica sono ora effettuate sui nodi locali.\\
+\textbf{Analisi dei requisiti $\to$ Progettazione concettuale $\to$ Progettazione della distribuzione $\to$ Progettazione logica locale $\to$ Progettazione fisica locale.}
+ \newline \newline
+Si introduce il concetto di \textbf{portabilità}, ovvero la capacità di eseguire le stesse applicazioni DB su ambienti runtime diversi (anche con SQL diversi e differenti dallo standard). 
+Si ha anche il concetto di \textbf{interoperabilità} (tra vendors diversi), ovvero la capacità di eseguire applicazioni che coinvolgono contemporaneamente sistemi diversi ed eterogenei (con zero autonomia). A tal fine sono stati introdotti dei \textit{middleware}, tra cui \textbf{ODBC} che si occupa dell'accesso a dati di diversi vendor. ODBC, a livello architetturale, si pone sopra il DBMS e da un'immagine indipendente da ciò che c'è sotto. Si hanno anche dei protocolli, come \textbf{X-Open Distributed Transaction Processing (\textit{DTP})}, che consentono di eseguire delle transazioni secondo una logica diversa.
+
+Normalmente è limitata al livello di accesso.
+\begin{itemize}
+    \item Basi di Dati Parallele: incrementano le prestazione mediante parallelismo sia di storage devices che di processore
+    \item Basi di Dati Replicate: replicano la stessa informazione su diversi server per motivi di performance.
+    \item Data warehouses: DBMS centralizzati, risultato della integrazione di fonti eterogenee, dedicati specificamente alla gestione di dati per il supporto alle decisioni.
+\end{itemize}
+
+

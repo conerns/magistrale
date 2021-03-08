@@ -1,0 +1,107 @@
+\section{Strutture di indicizzazione di un testo}
+\begin{teorema}{Struttura di indicizzazione}{}
+Struttura dati che riorganizza un testo in maniera da rendere facile ed efficiente un compito che compiuto sul testo originale risulta essere difficile e inefficiente.
+\end{teorema}
+Occorre innanzitutto: 
+\begin{itemize}
+    \item fissare un ordinamento dei simboli dell’alfabeto $\Sigma$ del testo (ordinamento lessicografico).
+    \item estendere l’alfabeto $\Sigma$ con un simbolo sentinella, considerato lessicograficamente minore di tutti gli altri simboli ($\$$).
+    \item aggiungere la sentinella alla fine del testo.
+\end{itemize}
+
+\subsection{Suffisso}
+Il suffisso di indice $j$ è il suffisso $T[j, |T|]$ che inizia in posizione $j$ di $T$.
+Se $j=|T|$, $T[j, |T|] = \$$, detto suffisso nullo.
+
+Fissato l’ordine lessicografico dei simboli di $\Sigma$, si può stabilire l’ordinamento dei suffissi di $T$.
+
+\subsubsection{Regola per ordinare due suffissi \texorpdfstring{$s_1$}{} e \texorpdfstring{$s_2$}{}}
+Sia $i$ la prima posizione a sinistra tale che $s_1[i] \neq s_2[i]$.
+\[s_1[i] < s_2[i] \implies s_1 < s_2\]
+\[s_1[i] > s_2[i] \implies s_1 > s_2\]
+
+La sentinella serve per non avere due suffissi uguali e per non avere che un suffisso sia suffisso di un altro.
+
+\subsubsection{Rotazione}
+La rotazione di indice $j$ è la concatenazione del suffisso $T[j, |T|]$ con il prefisso $T[1, j-1]$.
+
+\subsection{Suffix Array (SA)}
+
+Il suffix array di un testo $T$ di lunghezza $n$ è stato proposto da Myers e Manber (1990) e occupa $\mathcal{O} (n \log n)$ in spazio, permettendo la ricerca esatta di un pattern di lunghezza $m$ in un testo in tempo $\mathcal{O}(m \log n)$.
+Inoltre, non contiene informazioni sui simboli del testo.
+
+\begin{teorema}{Suffix Array}{}
+Il Suffix Array di un testo $T$ ($\$$-terminato) di lunghezza $n$ è un array $S$ di $n$ interi, tale che $S[i] = j \iff $ il suffisso di indice $j$ è l’$i$-esimo suffisso nell’ordinamento lessicografico dei suffissi di $T$.
+\end{teorema}
+
+Significa che se noi abbiamo il SA di un testo, $T[S[i], n]$: è l'$i$-esimo suffisso di $T$, che rappresenta l'indica di inizio del nostro suffisso. \\
+Siano due posizioni del testo $i,i'$, possiamo affermare che $i < i' \implies T[S[i], n] < T[S[i'], n]$, Inoltre il suffix array occupa $\mathcal{O}(n \log n)$ in spazio: $n$ valori interi e i valori variano da $1$ a $n$.
+
+\subsubsection{Ricerca esatta con SA}
+\begin{itemize}
+    \item Preprocessing del testo $T$ per costruire il Suffix Array.
+    \item Ricerca in tempo $\mathcal{O}(m \log n)$ del pattern $P$ di lunghezza $m$.
+\end{itemize}
+\subsubsection{Osservazioni}
+\begin{itemize}
+    \item Se il pattern $P$ occorre $k$ volte in $T$, allora $P$ è prefisso di $k$ suffissi di $T$, i cui indici sono le occorrenze di $P$ in $T$.
+    \item Gli indici dei $k$ suffissi di cui $P$ è prefisso sono consecutivi nel Suffix Array.
+    \item Se $P$ occorre in posizione $j$ di $T$ (cioè $P$ è prefisso del suffisso di indice $j$) ed è lessicograficamente minore (o maggiore) di un suffisso di indice $j'$, allora il suffisso di indice $j$ è lessicograficamente minore (o maggiore) del suffisso di indice $j'$. Significa dire:
+    \begin{enumerate}
+        \item $P = $ prefisso di $T[j, n] \land P < T[j', n] \implies T[j, n] < T[j', n]$
+        \item $P = $ prefisso di $T[j, n] \land P > T[j', n] \implies T[j, n] > T[j', n]$ 
+    \end{enumerate}
+\end{itemize}
+
+\subsubsection{Algoritmo di ricerca esatta in  \texorpdfstring{$\mathcal{O} (m \log n)$}{}}
+\begin{itemize}
+    \item Si considera inizialmente tutto l’intervallo $[1,n]$ di posizioni su $S$ (intervallo corrente di ricerca $[L,R]$).
+    \item Si considera il suffisso di indice $S[p]$ relativo alla posizione di mezzo $p$ di $[L,R]$, e si verifica in tempo $\mathcal{O}(m)$:
+    \begin{enumerate}
+        \item se $P < T[S[p], n]$: si ripete (2) considerando la prima metà dell’intervallo corrente di ricerca come nuovo intervallo di ricerca $[L,R]$.
+        \item se $P > T[S[p], n]$: si ripete (2) considerando la seconda metà dell’intervallo corrente di ricerca come nuovo intervallo di ricerca $[L,R]$ 
+        \item  \label{riferimento}se $P = $ prefisso di $T[S[p], n]$: $P$ occorre in posizione $S[p]$ di $T$.
+    \end{enumerate}
+\end{itemize}
+
+La posizione di mezzo $p$ è calcolata come $(L+R)/2$ troncato all’intero inferiore. $\left( \lfloor \frac{L+R}{2} \rfloor \right)$.\\ 
+Se $P$ non occorre in $T$, si raggiungerà un intervallo di ricerca vuoto. L’algoritmo trova una sola occorrenza di $P$ in $T$. Per trovarle tutte, il punto (\ref{riferimento}) dev’essere modificato per trovare tutti i suffissi di $T$ che hanno $P$ come prefisso.
+
+\subsection{Burrows-Wheeler Transform (BWT)}
+
+La Burrows-Wheeler Transform di un testo $T$ di lunghezza $n$ è stata proposta da Burrows e Wheeler (1994) e occupa $\mathcal{O}(n \log |\Sigma|)$ in spazio.
+Contiene i simboli del testo ed è stata proposta inizialmente per renderlo più adatto ad essere compresso (bzip2).
+\begin{teorema}{Definizione operativa (sulla base della sua costruzione) di BWT}{}
+    Burrows-Wheeler Transform esegue la permutazione reversibile dei simboli del testo $T$.
+    La BWT $B$ di un testo $T$ è la permutazione dei simboli di $T$ tale che $B[i]$ è l’ultimo simbolo della $i$-esima rotazione (nell’ordinamento lessicografico delle rotazioni di $T$). La BWT occupa $\mathcal{O}(n \log |\Sigma|)$ in spazio.\\
+\end{teorema}
+\begin{itemize}
+    \item Costruire tutte le rotazioni del testo $T$ da quella di indice $1$ a quella di indice $n$.
+    \item Ordinare lessicograficamente le rotazioni, costruendo una matrice delle rotazioni
+    \item L’ultimo simbolo di ogni rotazione, ovvero l’ultima colonna della matrice delle rotazioni, costituisce la BWT del testo.
+\end{itemize}
+La prima colonna della matrice delle rotazioni, detta $F$, è sempre la successione lessicografica dei simboli della BWT (quindi il ordinamento del testo) $B$ (e di $T$).
+
+\subsubsection{Proprietà}
+\begin{enumerate}
+    \item Per ogni posizione $i$, il simbolo $B[i]$ precede il simbolo $F[i]$ nel testo $T$. Precede inteso come contiguo, immediatamente precedente. Il simbolo $B[1]$ è sempre l’ultimo simbolo del testo $T$ (prima della sentinella $\$$). Inoltre, il simbolo $B[i]$ è per definizione il simbolo del testo $T$ in una certa posizione $k$, cioè $B[i]$ coincide con $T[k]$.
+    \item \textit{Last-First Mapping}: l’$r$-esimo simbolo $\sigma$ in $B$ e l’$r$-esimo simbolo $\sigma$ in $F$ sono lo stesso simbolo del testo $T$.
+            La \textit{Last-First (LF) function} è la funzione che fa corrispondere a una posizione $i$ sulla BWT $B$ la posizione $j$ su $F$ in modo tale che $B[i]$ e $F[j]$ siano lo stesso simbolo del testo $T$.( $j = LF(i)$ )
+\end{enumerate}
+
+Queste due proprietà rendono la BWT reversibile. Ricostruzione di $T$ da $B$:
+\begin{enumerate}
+    \item $T$ ha la stessa lunghezza di $B$ ($\$$ incluso).
+    \item Si determina il vettore $F$ riordinando i simboli di $B$.
+    \item Si parte dalla prima posizione di $F$ che contiene sempre un $\$$ e che in $T$ è sempre in ultima posizione.
+    \item Utilizzando la prima proprietà si ricava in $B$ quale simbolo precede $\$$ e grazie alla seconda proprietà ottengo a quale simbolo di $F$ corrisponde il simbolo che precede $\$$ trovato in $B$. Proseguo fino ad ottenere il testo.
+\end{enumerate}
+
+\subsection{Relazione tra BWT e SA}
+La BTW $B$ è la permutazione dei simboli di un testo tale che $B[i]$ è il simbolo che precede l’$i$-esimo suffisso in ordine lessicografico. Quindi $B[i]$ è il simbolo del testo $T[S[i]-1]$.\\
+Infatti, la colonna degli indici della matrice delle rotazioni che elenca gli indici delle rotazioni secondo il loro ordine lessicografico è il suffix array del testo.\\
+
+Conoscendo BWT e SA è possibile posizionare un simbolo nel testo senza dover ricostruire tutto il testo.\\
+
+La BWT $B$ di un testo $T$ è un array di lunghezza $n$ tale che $B[i]$ è il simbolo che precede l’$i$-esimo suffisso di $T$ nell’ordinamento lessicografico dei suffissi di $T$. $B[i]$ precede $T[S[i],n] \implies B[i]$ è il simbolo $T[S[i]-1]$\\
+La BWT di un testo può essere calcolata dal SA in tempo $\mathcal{O}(n)$.

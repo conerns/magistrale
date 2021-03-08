@@ -1,0 +1,96 @@
+\documentclass[a4paper,openany]{article} 
+\input{head}
+\tcbuselibrary{theorems}
+\usepackage{listings}
+\usepackage{color}
+\usepackage[ruled,vlined,longend,linesnumbered]{algorithm2e}
+
+\definecolor{darkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\newtcbtheorem[]{teorema}{}%
+{colback=gray!15,colframe=gray!70}{th}
+
+\lstset{frame=tb,
+  language=java,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{darkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+
+\begin{document}
+
+%-------------------------------
+%	TITLE SECTION
+%-------------------------------
+
+\fancyhead[C]{}
+\hrule \medskip % Upper rule
+\begin{minipage}{0.295\textwidth} 
+\raggedright
+\footnotesize
+Andrei Gabriel Taraboi \hfill\\   
+\hfill\\
+\end{minipage}
+\begin{minipage}{0.4\textwidth} 
+\centering 
+\large 
+Teoria della Computazione\\ 
+\normalsize 
+\end{minipage}
+\begin{minipage}{0.295\textwidth} 
+\raggedleft
+\hfill\\
+\end{minipage}
+\medskip\hrule 
+\bigskip
+
+\raggedbottom
+%-------------------------------
+%	CONTENTS
+%-------------------------------
+\tableofcontents
+\newpage
+\part{Lezioni frontali - Bonizzoni}
+\input{Lezioni/Bonizzoni/lezione_06_ottobre}
+\input{Lezioni/Bonizzoni/lezione_12_ottobre}
+\input{Lezioni/Bonizzoni/lezione_13_ottobre}
+\input{Lezioni/Bonizzoni/lezione_15_ottobre}
+\input{Lezioni/Bonizzoni/lezione_19_ottobre}
+\input{Lezioni/Bonizzoni/lezione_20_ottobre}
+\input{Lezioni/Bonizzoni/lezione_27_ottobre}
+\input{Lezioni/Bonizzoni/lezione_3_novembre}
+\input{Lezioni/Bonizzoni/lezione_19_novembre}
+\input{Lezioni/Bonizzoni/lezione_23_novembre}
+\part{Lezioni frontali - Zandron}
+\input{Lezioni/Zandron/lezione_8_ottobre}
+\input{Lezioni/Zandron/01-lezione_26_ottobre}
+\input{Lezioni/Zandron/02-lezione_29_ottobre}
+\input{Lezioni/Zandron/03-lezione_02_novembre}
+\input{Lezioni/Zandron/04-lezione_05_novembre}
+\input{Lezioni/Zandron/05-lezione_09_novembre}
+\input{Lezioni/Zandron/06-lezione_12_novembre}
+\input{Lezioni/Zandron/07-lezione_16_novembre}
+
+\part{Esercitazioni - Rizzi}
+\input{Esercitazioni/lezione_22_ottobre}
+\input{Esercitazioni/02-lezione_17_novembre}
+\input{Esercitazioni/03-lezione_26_novembre}
+\input{Esercitazioni/04-lezione_30_novembre}
+\input{Esercitazioni/05-lezione_3_dicembre}
+\input{Esercitazioni/06-lezione_4_novembre}
+\input{Esercitazioni/07-lezione_10_novembre}
+\input{Esercitazioni/08-lezione_14_dicembre}
+
+\end{document}

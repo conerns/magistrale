@@ -1,0 +1,85 @@
+\section{Lezione del 29 ottobre}
+Una computazione di una macchina di Turing è una sequenza di passi singoli di computazione, dove ogni passo singolo è il passaggio da una configurazione a quella immediatamente successiva, che avviene secondo quanto definito dalla funzione di transizione. La funzione di transizione deve essere ben definita, cioè deve prevedere sempre cosa fare per ogni coppia (stato, simbolo) in cui sia possibile trovarsi. Ad un certo punto arriverò in uno stato finale $H$ ($H, \vartriangleright z, \sim)$ , lo stato di arresto, la macchina si arresta, infatti la funzione di transizione non prevede più passaggi.\\
+
+La macchina di Turing può anche entrare in un loop infinito, eseguendo una serie di passi che portano a cambiare la configurazione ma che portino un certo punto a una configurazione già ottenuta prima e non entrando mai in uno stato di arresto: si ha una computazione non terminante e la macchina non produce alcun output.
+
+Analizziamo meglio gli stati terminanti $Y$ e $N$ il primo indicante che la stringa in input è accettata, avendo certe caratteristiche richieste, il secondo che la stringa viene rifiutata. Non ho quindi più bisogno della stringa $z$ in output, mi serve solamente se ha certe caratteristiche portando come risposta $Y$ oppure $N$.
+
+Riprendiamo l'esempio del successivo del valore binario in modo che anche il riporto venga calcolato questa volta, mi ritrovo quindi con la seguente sequenza di stati da considerare, ma prima consideriamo la versione senza riporti:
+\begin{itemize}
+    \item $\delta\to(s_0,[\vartriangleright, 0,1])\to(s_0,[\vartriangleright, 0,1], \rightarrow)$, riscrivo quello che c'è già e si sposta a destra
+    \item $\delta\to(s_0,\sqcup)\to(s_1,\sqcup,\leftarrow)$ arrivo alla fine della stringa e si inizia a tornare indietro
+    \item $\delta\to(s_1,0)\to(H, 1, - )$ non appena trovo uno 0, lo cambio in 1, e ho finito
+    \item $\delta\to(s_1,1)\to(s_1, 0, \leftarrow )$ se invece trovo un 1 lo cambio in 0 e procede indietro
+    \item $\delta\to(s_1, \vartriangleright)\to(H, \vartriangleright, -)$ arrivo all'inizio della stringa e non ho ancora trovato uno 0, mi fermo senza effettuare il riporto
+\end{itemize}
+Questo però abbiamo detto che non considera il riporto, e quello che mi serve fare  è costruire una macchina che esegue quasi le stesse operazioni:
+\begin{itemize}
+    \item $\delta\to(s_0,[\vartriangleright, 0,1])\to(s_0,[\vartriangleright, 0,1], \rightarrow)$
+    \item $\delta\to(s_0,\sqcup)\to(s_1,\sqcup,\leftarrow)$ 
+    \item $\delta\to(s_1,1)\to(s_1, 0, \leftarrow )$ 
+    \item $\delta\to(s_1,0)\to(H, 1, - )$ 
+    \item $\delta\to(s_1, \vartriangleright)\to(s_2, 1, \leftarrow)$
+    \item $\delta\to(s_2,\sqcup)\to(H, \vartriangleright, - )$, eseguire shift 
+\end{itemize}
+Quello che facciamo usando lo stato $s_2$ è praticamente eseguire uno spostamento del simbolo inizio stringa e sovrascrivere quello di prima con il valore 1 corrispondente al riporto. \\
+
+
+\textbf{\Large Esercizio: riconoscere stringa palindroma}\\
+\begin{itemize}
+    \item $\delta(s_0,\triangleright)\to (s_0,\triangleright, \rightarrow)$ è uno step che quasi sempre devo eseguire
+    \item $\delta(s_0,0)\to (zero,\sqcup, \rightarrow)$ se vedo 0 vado nello stato $zero$, scrivo $\sqcup$ e vado a destra
+    \item $\delta(s_0,1)\to (uno,\sqcup, \rightarrow)$ se sto leggendo 1, vado nello stato $1$ scrivendo blank
+    \item $\delta\to([zero, uno],[0,1])\to(\delta\to([zero, uno],[0,1],\rightarrow)$ vado in fondo alla stringa (qualsiasi incrocio tra gli stati $uno$ e $zero $ e simboli 1 e 0 legga vado a destro riscrivendo lo stesso simbolo)
+    \item $\delta(zero, \sqcup)\to(zero', \sqcup, \leftarrow)$ sono in fondo alla stringa, se sono in stato $zero$ scrivo blank e torno indietro, in uno stato $zero'$
+    \item $\delta(uno, \sqcup)\to(uno', \sqcup, \leftarrow)$ sono in fondo alla stringa, se sono in stato uno scrivo blank e torno indietro, in uno stato $uno'$ 
+    \item $\delta(zero', 0)\to(s_1,\sqcup, \leftarrow)$ se sono in $zero'$ e leggo $0$ vado in stato $s_1$ e vado a sinistra 
+    \item $\delta(zero', 1)\to(N,\sim, \sim)$ se sono in $zero'$ e leggo $1$ la stringa non è palindroma, esco con stato $N$ e non mi interessa cosa scrivo sul nastro
+    \item $\delta(uno', 1)\to(s_1,\sqcup, \leftarrow)$ 
+    \item $\delta(uno', 0)\to(N,\sim, \sim)$
+    \item $\delta(s_1,[0,1])\to(s_1,[0,1], \leftarrow)$ ora proseguo a sinistra fino ad un blank riscrivendo quanto letto
+    \item $\delta(s_1\sqcup)\to(s_0,\sqcup, \rightarrow)$ sono nel blank e torno allo stato iniziale, potendo ricominciare la computazione
+    \item $\delta(s_0,\sqcup)\to(Y, \sqcup,-)$ ma se la stringa (di cardinalità pari) è palindroma cancello tutto, devo      quindi specificare che se in $s_0$ ho blank la stringa è valida    
+    \item $\delta([zero',uno'], \sqcup)\to(Y, \sim, \sim)$ se invece la stringa è di cardinalità dispari, allo stato attuale, entra in loop, dobbiamo quindi aggiungere un uscita da $zero'$ o $uno'$, anche qui non ci interessa cosa rimane sul nastro, ho comunque ricevuto la mia risposta, in questo caso un Yes.
+\end{itemize}
+
+\textbf{\Large Esercizio: decidere se la stringa in input è nella forma $a^n \ b^n \ c^n$}\\
+Per esempio : $aabbcc$ va bene, mentre $aabcc$ non va bene perché non ha tutti i simboli nella stessa numerosità. Nemmento $bbaacc$ va bene in quanto l'ordine non rispecchia il requisito. Per farlo gli stati della macchina di Turing che svolge il mio problema hanno il prossimo insieme di definizioni\\
+\begin{itemize}
+    \item $\delta(s_0, a)\to(A, a', \rightarrow)$
+    \item $\delta(s_0, [b,c])\to(N,[b,c], - )$, questo significa che inizio con $b$ oppure $c$,e a me non va bene.
+    \item $\delta(A, a)\to(A,a, \rightarrow)$
+    \item $\delta(A, b)\to(B,b', - )$
+    \item $\delta(A, c)\to(N,c , - )$, non ci sono delle $b$ dopo la $a$, posso rifiutare l'input.
+    \item $\delta(A, b')\to(A, b', \rightarrow )$
+    \item $\delta(A, c')\to(N, \sim , \sim )$, se trovo una $c'$ significa che non ho le b
+    \item $\delta(B, [a,a'])\to(N,[a, a'] , - )$
+    \item $\delta(B, [b,c'])\to(B,[b, c'], \rightarrow )$
+    \item $\delta(B, c)\to(C, c', \leftarrow )$, torno indietro
+    \item $\delta(C, c')\to(C, c', \leftarrow )$
+    \item $\delta(C, [b,b'])\to(C, [b, b'], \leftarrow )$, facciamo finta che siano tutte ordinate correttamente
+    \item $\delta(C, a)\to(C, a, \leftarrow )$
+    \item $\delta(C, a')\to(s_0, a', \rightarrow )$, sono sul primo carattere che è valido
+    \item $\delta(s_0, a')\to(s_0, a', \rightarrow)$
+    \item $\delta(s_0, [b',c'])\to(s_0, [b',c'], \rightarrow)$
+    \item $\delta(s_0,\sqcup)\to(check, \sqcup, \leftarrow)$; non so se l'ordine è corretto, so solo che la numerosità sia corretta, devo quindi controllare questo aspetto
+\end{itemize}
+
+\subsection{Macchina di Turing multinastro}
+É una macchina di Turing che ha $k$ nastri di lettura e scrittura, che può avere l'input solo su un nastro o su multipli. La macchina legge uno stato e $k$ simboli definiti che si presentano nella forma $\{\sigma_1\ldots,\sigma_k\}$. 
+Eventualmente si può considerare che inizialmente l’input è scritto sul primo nastro e solo dopo si inizi a scrivere anche sugli altri. La macchina non legge più uno stato e un simbolo, ma uno stato e $k$ simboli, uno per ogni nastro: $(S, \Sigma_1, \dots, \Sigma_k) \to (S, \Sigma_1, \dots, \Sigma_k, direzione_1, \dots, direzione_k)$.
+La macchina di Turing a $k$ nastri non è più potente di una macchina di Turing a singolo nastro essa infatti permette di risolvere gli stessi problemi, semplificando solo le funzioni di transizione. 
+
+Una macchina di Turing è in grado di:
+\begin{itemize}
+    \item Computare funzioni su stringhe.
+    \item Decidere un linguaggio [\label{decidibile}*] (un insieme finito o infinito di stringhe), questo significa che data una stringa in input è sempre in grado di dire se la stringa appartiene o meno al linguaggio (possibilmente un linguaggio infinito). 
+    \item Un linguaggio è decidibile se esiste almeno una macchina di Turing in grado di decidere quel linguaggio. 
+    \item Accettare un linguaggio. Una macchina di Turing accetta un linguaggio se si comporta come segue:
+        \begin{itemize}
+            \item se si fornisce in input una stringa che appartiene al linguaggio: la macchina di Turing la riconosce come tale e si arriva in uno stato YES.
+            \item se si fornisce in input una stringa che appartiene al linguaggio: la macchina di Truing potrebbe: riconoscere che la stringa non appartiene al linguaggio e fermarsi in uno stato NO, oppure entrare in un loop infinito.
+        \end{itemize}
+    Nel caso in cui la macchina stia lavorando da un certo periodo di tempo, senza aver ancora dato una risposta, non è possibile sapere se in futuro la macchina terminerà la computazione o è entrata in un loop infinito. 
+\end{itemize}
+Linguaggio ricorsivo (informalmente, linguaggio decidibile): linguaggio per cui esiste almeno una macchina di Turing in grado di deciderlo, significa che una macchina di Turing ci dirà sempre se la stringa appartiene o meno al linguaggio. Abbiamo poi il linguaggio ricorsivamente enumerabile, è linguaggio per cui esiste almeno una Macchina di Turing in grado di accettare la stringa in input. 

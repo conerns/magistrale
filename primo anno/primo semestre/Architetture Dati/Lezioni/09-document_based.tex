@@ -1,0 +1,193 @@
+\section{Document Based System}
+Il document based system consiste in un’evoluzione del modello chiave-valore, in quanto si ha una chiave, ovvero un \textbf{object identifie}r, che può essere indicizzata tramite un meccanismo di hashing. I documenti solitamente vengo memorizzati in file JSON o XML e possono essere cercati a qualsiasi livello.\\
+Il modello documentale, a differenza del modello relazionale, ha una struttura ad albero e quindi l’accesso ai dati deve partire dal nodo radice e scendere verso le foglie (anche se si può avere un accesso a indici per accedere alle informazioni necessarie). Si ha quindi il concetto di elemento più importante degli altri (quello nella radice); concetto assente nel modello relazionale definibile pertanto un modello “piatto” (ad eccezione delle data warehouse dove si ha effettivamente una tabella principale).\\
+La rappresentazione documentale è più vicina al pensiero umano in quanto a suddivisione in cartelle per varie tipologie di informazioni.
+
+Caratteristiche del modello documentale:
+\begin{itemize}
+    \item è multidimensionale, ad albero
+    \item ogni campo può contenere zero valori, un valore, valori multipli o altri documenti
+    \item si possono effettuare query ad ogni campo e in ogni livello
+    \item lo schema è flessibile: due documenti della stessa collezione possono avere uno schema diverso di rappresentazione dei dati
+    \item si possono aggiungere “in linea” nuove informazioni
+    \item gli elementi sono legati tra loro nei documenti e pertanto sono richiesti molti meno indici per effettuare le query. 
+    Ciò permette di avere performance migliori non dovendo, come nel caso relazionale, prendere $n$ tabelle in $n$ file diversi nel filesystem e effettuare poi il join.
+\end{itemize}
+Il modello documentale permette due tecniche principali:
+\begin{enumerate}
+    \item \textbf{referencing}: come per il modello relazione, si relazionano due documenti tramite un certo attributo.
+    \item \textbf{embedding}: si aggiunge quello che nel \textbf{referencing} è un secondo documento come specifica di un certo valore, aggiungendo quindi un livello di profondità.  Ciò va ad aumentare lo spazio utilizzato, ma non è più un problema.
+\end{enumerate}
+
+A causa del \textbf{time to/in market} sempre più ridotto, ormai quasi ogni applicazione ha il suo db e questo obbliga ad avere una certa flessibilità dello schema.
+Questa flessibilità garantisce che una modifica allo schema (un’aggiunta o modifica degli attributi) non sia un problema (come sarebbe per un modello relazionale). 
+Questa flessibilità però comporta che in fase di query non si abbia uno schema prefissato tramite il quale interrogare (e non si possano nemmeno vedere i primi $n$ documenti per dedurre lo schema in quanto l’$n+1$ potrebbe essere comunque diverso). Questa problematica la si riscontra soprattutto nel caso in cui si utilizzi un database costruito da terzi.
+
+Non si ha più un unico linguaggio di query come per i modelli relazionali (SQL), ma uno per vendor (tra cui jsoniq, jmespath, jaql, JLINQ).
+
+\subsection{Mongo DB}
+\textbf{MongoDB} è un DBMS non relazionale documentale che memorizza i dati in un modello chiamato binary json (\textit{Bson}), che consente maggior efficienza tramite una rappresentazione binaria. Tramite l’embedding dei dati consente di non eseguire i join e permette anche l’accesso tramite indici. Supporta comunque il referencing anche se con cali di performances.\\
+Dal punto di vista architetturale si hanno una serie di engine diversi fra loro (attualmente si usa WiredTiger (WT)). Grazie a WT si è introdotto, nella v4, il supporto alle transazioni. \\
+Si ha poi il data model, il MongoDB query language (MQL) (che è proprietario), i componenti di controllo degli accessi e il meccanismo di gestione. 
+Le repliche sono organizzate in replicaSet. \\
+Esempio di schema in Mongodb: 
+
+\begin{lstlisting}
+var p = {
+    '_id': '342',
+    'author': DBRef('User',2),
+    'timestamp': Date('26-10-20'),
+    'tags': ['MongoDB','NoSQL'],
+    'comments':['author': DBRef('User',4),
+                'date': Date('26-10-20'),
+                'text': 'hello',
+                'upvotes': 7,...]
+}
+>db.posts.save(p);            
+\end{lstlisting}
+Nell'esempio osserviamo la definizione di $p$ come un oggetto json. Tra gli elementi che la compongono c’è $tags$ che contiene un array di valori; mentre $comments$ è un array di documenti.
+Nell’ultima riga notiamo una delle chiavi di successo di Mongodb in quanto ha un linguaggio simile a quelli di programmazione. Nel dettaglio si ha il caricamento del documento $p$ nella collezione $posts$. Si ha un meccanismo simile alla OOP e l’integrazione coi linguaggi di programmazione è facilitata dall’ormai molto diffuso supporto ai json.\\
+Si possono inoltre fare indici, tramite ensureIndex (che prende come argomento un json), a ogni campo del documento e a qualsiasi livello (sono possibili indici a documenti, a array o indici geo-spaziali).
+\begin{lstlisting}
+  >db.posts.ensureIndex({'author': 1});      
+\end{lstlisting}
+
+\subsubsection{Replicazione in MongoDB}
+MongoDB rientra nella categoria CP del \textbf{CAP theorem}, non garantendo disponibilità in caso di guasto.
+La replica viene effettuata in modalità master-slave: nel gergo di MongoDB primary-secondary, dove la scrittura avviene sul primary e la replica sui secondary. \textbf{In realtà uno dei nodi replica viene definito a posteriori primary}.
+Si procede per repliche parziali incrementali: all’inizio il nodo fa un sync, prendendo tutti dati dal primary e solo gli ultimi $n$ movimenti dal file di log del primary.
+La garanzia della tolleranza viene garantita tramite il meccanismo di elezione dei nodi, nel caso in cui il nodo primary vada down.
+Si ha che un nodo può assumere uno dei seguenti stati:
+\begin{itemize}
+    \item \textbf{STARTUP}: un nodo che non è membro effettivo di nessun replica set.
+    \item \textbf{PRIMARY}: l’unico nodo nel replica set che accetterà le operazioni di lettura.
+    \item \textbf{SECONDARY}: un nodo che può effettuare la sola replicazione dei dati (può essere promosso a PRIMARY in fase di elezione).
+    \item \textbf{RECOVERING}: un nodo che sta effettuando una qualche operazione di recupero dei dati, magari dopo un rollback (può essere promosso a PRIMARY in fase di elezione).
+    \item \textbf{STARTUP2}: un nodo che è appena entrato nel set (può essere eletto a PRIMARY).
+    \item \textbf{ARBITER}: un nodo non atto alla replicazione dei dati, ma con lo scopo di prendere parte alle elezioni per promuovere i nodi a PRIMARY (può essere eletto a PRIMARY in fase di elezione).
+    \item \textbf{DOWN/OFFLINE}: un nodo irraggiungibile.
+    \item \textbf{ROLLBACK}: un nodo che sta svolgendo un rollback per cui sarà inutilizzabile per le letture (può essere promosso a PRIMARY in fase di elezione).
+\end{itemize}
+Se il nodo primario è riconosciuto come down dalle altre repliche si effettua una elezione e viene scelto quello con la versione più aggioranta dei dati.
+
+\subsection{Elezioni}
+L’elezione consiste nell’eleggere il nodo con la versione più aggiornata dei dati.
+In questa fase le scritture sono interrotte (motivo per cui non è garantita la A di CAP), l’elezione dura comunque pochissimo. Durante il processo di elezione ogni replicaSet manda un “hearbeat” (ovvero un bit ogni due secondi) agli altri nodi. L’invio di un heartbeat dà inizio a un timeout, in modo che si possa assumere che un nodo sia down nel caso in cui scada senza aver ricevuta una risposta. Se il nodo primario risulta down si procede con l’elezione, che in termini umani è di tipo maggioritario con liste bloccate. \\
+Ogni nodo ha un identificativo con un punteggio rappresentante la priorità nelle elezioni (più alto più probabile che venga eletto). Quindi appena il primary va down il secondario con valore più alto viene promosso come nodo primario e richiederà nuove elezioni rispetto agli altri. 
+Si ha che un replica set può avere al massimo 50 membri di cui solo 7 votanti, che esprimono un solo voto. I nodi SECONDARY non votanti hanno priorità 0 e accettano solo operazioni di lettura. Esistono nodi a priorità 0 che sono invece votanti.
+Nel caso di partizionamento della rete si rischia di avere più di un primary eletto e quindi un conseguente problema di riconciliazione, dovendo quindi bloccare la scrittura.
+
+\subsection{Scrittura}
+La scrittura avviene sul nodo primario e si hanno diverse politiche tramite l’opzione \textbf{writeConcern} che dice cosa fare per le \textbf{replicaSet}. 
+Si hanno tre parametri:
+\begin{enumerate}
+    \item $w$: numero di nodi in cui il dato deve essere replicato prima di essere considerata conclusa l’operazione, ovvero numero di nodi sui quali deve essere confermata la scrittura per essere confermata a livello globale.
+    \item $j$: intenzione di scrivere sul log di WiredTiger, tramite la logica write ahead logging (prima si scrive sul file di log e poi sul disco), prima che l’operazione sia stata eseguita. Questo per garantire la persistenza del dato, avendolo comunque nel file di log. Senza l’opzione lo scriverà in un secondo momento.
+    \item $wtimeout$: tempo limite, espresso in ms, da aspettare nel caso in cui $w>0$ (se $0$ non si attende alcuna risposta prima di concludere l’operazione).
+\end{enumerate}
+Aumentare $w$ comporta aumentare il tempo di esecuzione. Nel dettaglio:
+\begin{itemize}
+    \item $w=0$: non da alcuna certezza di inserimento, utile per operazioni veloci.
+    \item $w=1$: implica la scrittura sul nodo primary.
+    \item $w=n$: implica la scrittura su $n$ nodi.
+    \item $w=majority$: almeno la metà dei nodi più 1 deve aver scritto prima della conferma dell’operazione (nella realtà si tenta di scrivere su più nodi ma appena si ha un ack dalla metà più 1 si conferma la scrittura anche se magari si sta ancora scrivendo su altri nodi).
+\end{itemize}
+Qualora si debba caricare una gran quantità di dati, di cardinalità conosciuta, per motivi di efficienza non conviene aspettare che il nodo dia l’ack ma si caricano tutti i dati subito sul primary, controllando poi con `count` se è stato caricato tutto.
+
+\subsection{Frammentazione}
+Si hanno 3 tipi di sharding per la scalabilità orizzontale:
+\begin{itemize}
+    \item \textbf{hash-based}: sulla chiave
+    \item \textbf{range-based}: in base ad un certo range di elementi
+    \item \textbf{tag-aware}: in base a certi attributi
+\end{itemize}
+Si ha un meccanismo dinamico basato su\textbf{ pay as you go}, quindi nel momento in cui si ha lo sharding è MongoDB ad adattarlo ogniqualvolta cambia il volume di dati, effettuando un bilanciamento automatico. \\
+Si ha uno spazio della chiave di shard divisibile in $n$ chunks per $n+1$ chiavi di shard. 
+Il numero massimo di \textbf{chunk} che è possibile definire su una sharded key può definire il numero massimo di shard in un sistema.
+
+Si hanno 3 ruoli fondamentali nella frammentazione:
+\begin{itemize}
+    \item mongos: punto di accesso software per le query, entry point del cluster: tutte le query verranno eseguite su questo processo. Appena lanciato mongos va a leggere il config server.
+    \item config server: server che ospitano i file di configurazione che conosce la struttura degli shard, conoscendo frammentazioni e repliche. Dalla versione 4.0 ogni nodo distribuito è anche replicato.
+    \item shard: istanze di MongoDB.
+\end{itemize}
+
+Quindi il router quando riceve una query capisce dove sono i frammenti, grazie al config server, e quindi procede con la query di tipo:
+\begin{itemize}
+    \item target query: se deve interrogare solo un nodo
+    \item broadcast query: se deve interrogare più nodi
+\end{itemize}
+
+Sia gli shard che il config server sono replicati su replicaSet per evitare che diventino single \textbf{point of failure} (anche per questo dalla 4.0 ogni volta che frammento replico).
+Si ha un primary shard, che contiene l’intero db (ovvero tutte le collezioni) e i secondary shard che contengono frammenti e repliche di alcune collezioni. 
+Solitamente si ha quindi una configurazione a 3 nodi: un primary e due nodi secondari con frammenti diversi e le repliche del primary.
+\subsection{Letture}
+Ho una politica di \textbf{readConcern} (che deve essere consistente con il \textbf{writeConcern}, scegliendo anche in base a quale delle due azioni è la più dispendiosa):
+\begin{itemize}
+    \item \textbf{local}: valore di default per leggere i dati dai nodi in un \textbf{replicaSet}. La query è fatta secondo la località spaziale e quindi se legge un nodo non primary si rischia di leggere dati non ancora replicati.
+    \item \textbf{available}: valore di default per lettura su nodi secondari. Fa vedere che il dato c’è ed è consistente.
+    \item \textbf{majority}: valore utilizzato quando serve che almeno metà più 1 repliche abbiano ricevuto un ack in scrittura sul dato per poter leggere.
+\end{itemize}
+\subsection{Query Mongo Document}
+\begin{minipage}{.50\textwidth}
+\begin{lstlisting}[caption = Scrittura in MongoDB]
+db.user.find({
+	age:{$gt:18},
+	name:1,
+	address:1
+}).limits(5)
+\end{lstlisting}
+\end{minipage}\hfill
+\begin{minipage}{.50\textwidth}
+\begin{lstlisting}[caption = corrispettivo in SQL]
+SELECT name, address
+  FROM user
+  WHERE age>18
+  LIMIT 5
+\end{lstlisting}
+\end{minipage}
+
+Non si hanno le stesse rappresentazioni matematiche, si usano infatti i Query operators abbiamo quindi:\\
+$gt$ = greater than, questo perché si usano identificativi per i confronti (per non utilizzare i simboli $>$, $<$ che darebbero fastidio nelle stringhe). Abbiamo usato inoltre $.limit()$ che ci permette di rappresentare i top 5 elementi complicati del nostro esempio. \\
+Vediamo le varie operazioni:
+
+
+\begin{minipage}{.50\textwidth}
+\begin{lstlisting}[caption = operazione di Insert]
+db.user.insertOne({
+    name: "Andrea" ,
+    age: 26,
+    Teach[<datawarehouse>, <architecture>]
+  })
+\end{lstlisting}
+\end{minipage}\hfill
+\begin{minipage}{.50\textwidth}
+\begin{lstlisting}[caption = operazione di Update]
+Db.user.updateAll({
+    name:{$eq: <Andrea>},
+    {$set: {Role: <PA>}},
+    {$upsert:true}
+})
+\end{lstlisting}
+\end{minipage}
+Usando insertOne si specifica che si vuole inserire un solo documento mentre usando insertAll si specifica che si vogliono inserire tutti i documenti.\\
+Il comando $upsert$ invece corrisponde a un \textbf{insert if not exist}, per permettere l’inserimento in caso di assenza e la modifica in caso di presenza del dato. Tale cosa è assente in SQL, è necessario un doppio comando.
+
+\subsection{Importazione dei dati}
+Si hanno varie utility per importare i dati, da specificare come opzioni al comando\\ \textbf{mongoimport}: mongoimport –d database –c collection –type csv -ignore blanks –file PATH (per importare un csv al path PATH ignorando gli spazi bianchi).
+
+\subsection{Transazioni}
+Dalla versione 4.0 MongoDB ha introdotto nel modello documentale le transazione tramite l’engine Wiredtiger. Viene quindi introdotto il concetto di log per il quale tutto è nel nodo primary. \\
+Si opera sempre sul nodo facendo un lock che può essere di tipo:
+\begin{itemize}
+    \item \textbf{sharded} (S): per le letture
+    \item \textbf{exclusive} (X): per le scritture
+    \item \textbf{intent sharded} (IS): per esprimere l’intenzione di bloccare in modo condiviso uno dei nodi che discende dal nodo corrente
+    \item \textbf{intent exclusive} (IX): per esprimere l’intenzione di bloccare in modo esclusivo uno dei nodi che discende da quello corrente 
+    \end{itemize}
+Il lock garantisce transazioni a livello di singola collezione, mentre prima l’atomicità era garantita a livello della singola operazione. \\
+Nel caso del \textbf{referencing} invece serviva una gestione più approfondita delle transazioni. Essendo WT creato originariamente per un sistema distribuito funziona solo per sistemi distribuiti, infatti avendo un solo nodo si presuppone che si abbia una sola applicazione che accede, cosa che renderebbe a priori più semplice la gestione.
+
+\subsection{Efficienza}
+Spesso il cambiamento del modello può comportare un miglioramento delle prestazioni non indifferente, più del cambiamento di hardware. Avere documenti separati più piccoli migliora il tempo, rendendolo lineare (mentre un grosso documento embedding ha tempi esponenziali nell’inserimento delle righe).
+Con questa soluzione poi bisogna poi sistemare le query.

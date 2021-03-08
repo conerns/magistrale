@@ -1,0 +1,85 @@
+\section{Introduzione NoSQL}
+\textbf{Quando ci chiede un modello document based, non parlare solo di MONGO-DB}\\
+Nel 1970 Codd, impiegato IBM pubbluca un modello in cui presenta un modello di rappresentazione dati indipendente dall’implementazione. Si era passati dal modello gerarchico (in cui bisognava usare i puntatori per accedere ai dati) al modello relazionale. \\
+
+Questo passaggio è stato fondamentale per lo sviluppo del mondo dell’informatica, un mondo dove l’hardware dedicato allo storage era estremamente costoso, poco capiente (nel range di pochissimi megabyte) e logisticamente parecchio ingombrante. 
+Il modello relazionale quindi era studiato principalmente questo contesto, proponendo strategie per la rappresentazione compatta dei dati.\\
+Principali problemi nella memorizzazione di dati: spazio occupato e tempo che ci si impiega per fare un’interrogazione.
+Lo spazio ormai non è più un problema (eccetto casi particolari).\\
+
+\subsection{Aspetti positivi del modello relazionale}
+Sono diversi gli aspetti positivi del modello relazionale:
+\begin{itemize}
+    \item è \textbf{un modello ben definito}, quindi c'è il principio della minimizzazione e il principio della \textbf{closed world assumption}, quest'ultimo assume che tutto quello che la mia applicazione deve sapere è messo all'interno del database. Quello che ne deriva è che si ha anche l’uso del \textbf{NULL value} in caso di assenza di informazione sul valore.
+    \item è \textbf{ un modello chiuso} che contiene tutto il necessario, risultava un modello ragionevole in un contesto come quello “pre anni 2000”, dove un’azienda tipicamente necessitava solo di informazioni interne all’azienda stessa. Infatti non c’erano, per esempio, le informazioni dei social network. Infatti nel post 2000 non esiste più la \textbf{closed world assumption}.
+    \item \textbf{un RBDMS}, è un modello ben studiato, ha infatti più di 35 di sviluppo in sulle tematiche de della sicurezza, ottimizzazione e standardizzazione. Gode inoltre delle proprietà \textbf{ACID}. 
+    Inoltre ormai talmente tante informazioni sono memorizzate tramite il modello relazionale che le aziende sono restie a cambiare modello (a causa dei rischi di perdita dei dati durante un porting (travasare i dati da una parte all’altra), considerando che i dati persi non sono possono non essere recuperabili, a meno di repliche).
+    \item \textbf{modello ben conosciuto}, dovuto anche al fatto che molte aziende utilizzano ancora il modello relazionale, per il punto spiegato prima, il modello relazionale è studiato anche nelle scuole e nelle università.
+    \item \textbf{costituisce la scelta migliore per diversi casi d’uso}
+\end{itemize}
+Tuttavia ci sono alcune limitazioni:
+\begin{itemize}
+    \item è un \textbf{modello chiuso}, questo è quindi sia un pregio che un difetto del modello relazionale. Il principio di minimizzazione, ai giorni nostri, va a discapito delle performance. Motivazione valida anche per dire che il principio della closed world assumption non ha più molto senso. \\
+    Il modello prevede inoltre un sistema di \textbf{un solo valore per ogni attributo}, non ammettendo quindi array o altre strutture per dati con multipli valori. Diventa perciò impossibile fare interrogazioni in modo strutturato all’interno dei valori stessi, dovendo ricorrere a diversi workaround (il metodo standard utilizzato è quello di fare una tabella di join a parte, detta \textbf{tabella di part-of}, coi possibili multi-valori, portando però ad operazioni di join molto dispendiose). \\
+    Un altro aspetto negativo, nel avere un modello chiuso è rappresentato dal fatto che molti linguaggi moderni sono OOP, con la \textbf{object persistency}, paradigma non supportato dal modello relazionale. Come ultimo aspetto il modello non supporta i comportamenti ciclici, comportando limiti modellistici.
+    \item \textbf{sono difficili da modificare} dal punto di vista schematico (tramite alter table).  Cambiare gli schemi è complesso e comporta il fermo del database. E non sono scalabili, in quanto per garantire le proprietà ACID nei sistemi transazionali e per poter garantire il 2PC si ha un limite fisico alla scalabilità
+    Dopo un certo punto di crescita i costi di organizzazione rendono impossibile l’esecuzione dei protocolli che garantiscono ACID, in ambiente distribuito.  Oggigiorno ci sono varie applicazioni, legate in primis ai social network, per le quali è impossibile mantenere certi protocolli.  Il problema della scalabilità è uno degli aspetti più limitanti, specialmente in ottica \textbf{big data}, ma non solo. 
+    
+    \item La \textbf{scalabilità}: I database relazionali si prestano bene alle \textbf{scale up} (scalabilità verticale), ovvero cambiare l’hardware a disposizione, utilizzandone via via di più grandi e potenti, arrivando a costi esorbitanti e al punto in cui si raggiunge il limite tecnologico, ma pochissimo allo \textbf{scale out} (scalabilità orizzontale), ovvero l’integrazione di nuove parti di hardware (comodity), a prezzo più basso, all’hardware originario (il problema consiste nel fatto che l’hardware dedicato storicamente ai db relazionali non prevede questa possibilità).
+
+    Oggigiorno si hanno sempre più spesso le architetture a microservizi (che implementano bene lo scale out).
+    
+    \item \textbf{Il time in market}, ovvero il tempo in cui un applicativo resta in commercio, è sempre più ridotto, portando a rendere obsoleto il processo in cui normalmente si integrano i db relazionali. Anche il time to market, ovvero il tempo di preparazione si è ridotto.
+\end{itemize}
+
+
+Il termine NoSQL è stato coniato da Carlo Strozzi nel 1998, inventandosi una sorta di API per Linux per accedere ai dati relazionali senza usare SQL (no SQL). Il termine è stato ripreso nel 2009 con la logica Not Only SQL, dopo che per circa 9 anni, a partire dal 2000, erano nati nuovi modelli.\hfill 
+
+NoSQL è un'insieme di modelli di rappresentazione dati e relativi software di gestione. 
+Caratteristiche fondamentali:
+\begin{enumerate}
+    \item tutti i modelli sono schema free o schemaless
+    \item tutti i DBMS NoSQL usano il CAP theorem
+    \item si passa da ACID a BASE ovvero: \textbf{B}asic \textbf{A}vailable, \textbf{S}oft state, \textbf{E}ventual consistency
+\end{enumerate}
+
+\subsubsection{Schema free}
+Nel modello relazionale viene prima definito il modello, ovvero l’insieme degli attributi che descrivono i dati e le varie relazioni, e poi viene popolato con i dati veri e propri. Questo comportava che se durante lo sviluppo ci si accorgeva che bisognava aggiungere, ad esempio, un attributo bisognava modificare l’intero schema (nonché i dati già caricati). \\
+
+Con NoSQL il modello non esiste a priori ma si basa sui dati che vengono inseriti (scheme free), quindi di fatto per ogni riga si ha potenzialmente uno schema diverso. Questo concede una grandissima libertà di sviluppo, al costo di un’alta probabilità di inconsistenza tra i dati.  \\
+Tutti i modelli NoSQL assumono l’open word assumption, secondo la quale, in assenza di un dato, non vengono utilizzati i valori NULL  (che vengono eventualmente messi solo per motivi applicativi) , garantendo una grande flessibilità (che può però generare problemi). Tale flessibilità ha un costo anche dal punto di vista delle query, in quanto non si può partire dallo schema ma si deve partire da frammenti del modello. \\ 
+Si ha però il guadagno che in caso di aggiunta di attributi, non bisogna modificare l’intero schema, anche se ovviamente serve una governance più forte del dato (in quanto può anche succedere che il tipo di dato non sia vincolato).
+
+\subsubsection{CAP Theorem}
+Teorema essenziale, proposto da Gilber e Lynch nel 2002 che dimostra la Congettura sulla consistenza, disponibilità e partizionamento dei webserver del 2000 di Brewer:
+Preso un sistema distribuito di nodi si considerino tre aspetti:
+\begin{itemize}
+    \item Consistency (consistenza): tutti i nodi hanno gli stessi i dati nello stesso istante (è diverso dalla consistenza di ACID (vincoli di tipo relazionale uguali)).
+    \item Availability (disponibilità): garanzia che ogni richiesta ricevuta da un sistema riceva una risposta, sia in caso di fallimento che di successo (non si deve avere quindi un’attesa infinita). Ogni client può sempre leggere e/o scrivere.
+    \item Partition tolerance (partizionamento): il sistema deve continuare ad operare anche se si hanno perdite di messaggi o fallimenti di parti del sistema.
+\end{itemize}
+Il Cap theorem garantisce che tra queste tre caratteristiche, in un sistema distribuito, se ne possano soddisfare contemporaneamente solo due su tre. I DDBMS per esempio rinunciano alla partition tolerance, garantendo le prime due caratteristiche (CA) (anche se con un numero limitato di nodi si può arrivare ad avere un CAP).
+I sistemi NoSQL sono tipicamente o CP, non potendo garantire che il DBMS lavori 24/7, o AP, non potendo garantire che i dati siano sempre consistenti.  \\ 
+Non è detto che due db NoSQL che implementano lo stesso modello garantiscano le stesse due caratteristiche CAP. Quindi in fase progettuale la scelta tra due delle caratteristiche CAP è un punto chiave per poi scegliere eventualmente su che DBMS NoSQL appoggiarsi.\\
+In fase progettuale si hanno 3 scelte da effettuare: modello, DBMS e caratteristiche del CAP theorem.
+
+\subsubsection{Base principal}
+Basic Availability: comunque vada, la risposta viene sempre data anche nel caso di consistenza parziale.
+\begin{itemize}
+    \item Soft state: si rinuncia al concetto di consistenza di ACID.
+    \item Eventual consistency: prima o poi i dati convergeranno ad uno stato di consistenza (in opposizione alla consistenza immediata di ACID).
+\end{itemize}
+\subsection{Modelli NoSQL}
+\begin{itemize}
+    \item key-value stores: modello chiave-valore, semplice da memorizzare, e utile per il caching.  Il valore è un blob, quindi non si ha modo di interrogare internamente il valore, ma deve essere l’applicazione a manipolarlo. Il mapping chiave-valore è supportato da meccanismi di hash, per massimizzare le performance. Viene garantito l’hashing distribuito, ovvero la distributed hashed table.
+    \item column family stores: la chiave punta a colonne multiple di valori, ottenendo un formato pseudo-relazione. Ogni riga, in questo schema wide column, ha una sua struttura interna diversa da quella di altre righe, che sono comunque indipendenti. La chiave ovviamente può essere hashata. Non si può fare ranged query.
+    \item document databases: formato da documenti con coppie chiave-valore o chiave-oggetto, dove l’oggetto può anche essere un’altra chiave-valore, un array di valori o un array di oggetti. Nel modello documentale si ha un elemento più importante, detto root che ha al di sotto tutti gli altri.
+    \item graph databases: con nodi e relazioni tra gli stessi (archi). I nodi possono rappresentare entità a cui sono associate varie proprietà (property graph), che sono quindi pertinenti ai nodi. I graph db non scalano bene.
+    \item RDF databases
+\end{itemize}
+
+Il tipo di modello più complesso è anche il meno voluminoso e scalabile e viceversa. 
+Il problema fondamentale in tutti i modelli è come connettere le informazioni e questo diventa un problema fondamentale in termini di prestazioni e analisi da effettuare. 
+Le relazioni sono implicitamente incluse nei dati. 
+La scelta del modello dipende dall’applicativo e ci sono applicativi che possono obbligare ad avere due o più modelli.
+Ogni vendor ha il suo linguaggio di query per il suo DBMS NoSQL.

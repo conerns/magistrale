@@ -1,0 +1,64 @@
+\section{Ottimizzazioni query Distribuite}
+I dati rimangono fermi, è l’applicazione che va ad accedere ai dati. 
+\begin{itemize}
+    \item situazione base: database, DBMS e un'applicazione che si vuole connettere.
+    \item architettura distribuita, modalità shared-nothing: i DBMS sono autonomi e l'applicazione vi accede direttamente. 
+    \item federazione: elemento centrale , federation server, che nasconde a livello applicativo tutte le eterogeneità e le autonomie dei singoli DBMS.
+\end{itemize}  
+I dati vengono spostati:
+\begin{itemize}
+    \item architetture di replica: rende più efficiente le operazioni di interrogazioni, ma necessita di un replication server per tenere aggiornate le repliche nei database.
+    \item event publishing: sistema nei quali ogni volta che si verifica un qualche evento, questo viene pubblicato su una coda e poi l’applicazione vi accede.
+    \item extract transform $\&$ load: architetture in cui due applicazioni diverse con i loro database subiscono un processo di estrazione dei dati, trasformazione, caricamento verso un nuovo database (data warehouse) dove le operazioni che vengono effettuate sono diverse da quelle originali.
+\end{itemize}  
+
+\subsection{Strategie di Query processing nei DDBMS}
+Le query sono ovviamente le operazioni più importanti. Possono essere di sola \textit{lettura} (tramite operazioni come la \textit{select}) o anche di \textit{scrittura}. Le due tipologie di operazioni vengono gestite in modo molto differente. A prescindere dal modello architetturale utilizzato, l’obiettivo comune è quello di effettuare le interrogazioni in maniera il più veloce possibile.
+
+\subsection{Accesso in Lettura}
+Esistono, in un sistema relazionale, una serie di attività che convertono la query in SQL in algebra relazionale e solo dopo si ha la distribuzione dei dati. L'utente, ignaro dello schema distribuito, interroga lo schema logico globale e il DDBMS decompone la query secondo una localizzazione specifica in base ai singoli frammenti. Si ha anche un'ottimizzazione globale della query prima della distribuzione in modo che anche la distribuzione stessa sia ottimizzabile correttamente, infatti il gestore delle interrogazioni manda ai singoli nodi i giusti frammenti di query che verranno ottimizzati localmente. Ho quindi nel complesso 4 fasi che compongono il \textbf{query processor}:
+\begin{itemize}
+    \item \textbf{Query decomposition}: opera sullo schema logico globale, non considerando la distribuzione. Usa tecniche di ottimizzazione algebrica analoghe a quelle centralizzate, producendo in output un query tree, non ottimizzato rispetto ai costi di comunicazione. Il costo di comunicazione riguarda il costo di uso della \textbf{rete} e dipende da vari fattori. Il costo di comunicazione è il vero collo di bottiglia in sistemi distribuiti.
+    \item \textbf{Data localization}: considera la frammentazione delle tabelle e la distribuzione. Si procede quindi all'ottimizzazione delle operazioni rispetto alla frammentazione, tramite \textbf{tecniche di riduzione}. Viene quindi prodotta una query efficiente per la frammentazione ma non ottimizzata.
+    \item \textbf{Global query optimization}: la sua strategia di esecuzione necessita delle statistiche sui frammenti per aggiungere nel query tree gli operatori di comunicazione (send/receive tra i nodi) agli operatori di algebra relazionale. L’obiettivo è quello di trovare l’ordinamento migliore delle operazioni definite dalla fragment query, utilizzando modelli di costo adattativi che tengono conto dei costi di comunicazione. Produce in output le decisioni più rilevanti riguardo i join (l’ordine dei join n-ari e la scelta tra join e semi-join). Gli algoritmi di calcolo del costo adattativi gestiscono anche gli eventi non predicibili come i ritardi nella rete o i cambiamenti nella gestione delle policies nei nodi. Esiste una fase di re-ottimizzazione a run time dove si fa il monitor dell’esecuzione delle query, si adatta il modello di costo e si riottimizza la query se lo scarto dovesse essere molto elevato. È il DBA che stabilisce delle soglie temporali entro le quali ottenere una risposta. Per questo conta la trasparenza, in quanto non è l'applicazione che deve interessarsi di questo aspetto. \\
+    I parametri utilizzati per raggiungere l'obiettivo dei query processing distribuito sono:
+    \begin{itemize} 
+        \item \textbf{costo di messaggio}($C_{MSG}$): costo fisso di spedizione o ricezione di un messaggio (setup). 
+        \item \textbf{costo di trasmissione}($C_{TR}$): costo, fisso rispetto alla topologia, di trasmissione dati 
+        \item \textbf{costo di comunicazione}: somma tra il costo del messaggio, moltiplicato per il numero di messaggi, più il costo di trasmissione, moltiplicato per il numero di \textit{bytes} trasmessi.\\ $Costo = C_{MSG} \cdot \#msgs + C_{TR} \cdot \#bytes$
+        \item \textbf{costo totale}: somma dei costi delle operazioni (\textit{I/O} e \textit{CPU}) più i costi di comunicazione (\textit{trasmissione}) 
+        \item \textbf{response time} come la somma dei costi qualora si tenga conto del \textit{parallelismo delle trasmissioni}.
+    \end{itemize} 
+    I costi più rilevanti sono quelli di trasferimento dei blocchi da memoria secondaria a principale. Nel tempo di risposta, a differenza del costo di trasmissione, i costi delle operazioni in parallelo non si sommano. Tempo di risposta (solo comunicazione) è dato quindi da \\ $C_{MSG} \cdot seq\_ \#msgs + C_{TR} \cdot seq\_ \#bytes$. \\
+    Dove $seq\_ \#msgs$ è il massimo numero di messaggi che devono essere comunicati in modo sequenziale.
+    
+    Si ha quindi che: nelle \textbf{grandi reti geografiche} i costi di \textit{comunicazione} sono molto maggiori del costo di \textit{I/O}, circa di 10 volte e che nelle \textbf{reti locali} i costi di \textit{comunicazione} e \textit{I/O} sono paragonabili.
+    
+    Possiamo essere interessati a minimizzare: 
+    \begin{itemize}
+        \item \textbf{il tempo di risposta}: aumentando il parallelismo, che può portare a un aumento del costo totale, ottenendo un maggior numero di trasmissioni e un maggior processing locale, cioè i nodi lavorano di più. 
+        \item \textbf{il costo totale}: la somma dei costi non tiene conto del parallelismo. Vengono meglio utilizzate le risorse, ottenendo un aumento del throughput, ma c’è un peggioramento del response time in generale.
+    \end{itemize}
+    
+    In un DBMS distribuito l’operazione di semi-join può essere in alcune circostanze una alternativa più’ efficiente alla operazione di join. L'operazione di semijoin è definita nella forma \\ $R \ semijoin_A  \ S = \pi_{R^*}\cdot (R \ join_A\  S)$\\ Dove $R^*$ è l'insieme degli attributi di R. Il semi-join $R \ semijoin_A  \ S$ perciò è la proiezione sugli attributi di $R$ dell’operazione di join. Attenzione: il semi-join è non commutativo!
+    
+    Prese due tabelle allocate su nodi differenti, il join tra di esse può quindi essere calcolato tramite operazioni di semijoin, valgono infatti le seguenti equivalenze : 
+    \begin{itemize} 
+        \item $R \ join_{\theta} \ S \iff (R \ semijoin_{\theta} \ S)$ 
+        \item $R \ join_{\theta} \ S \iff R \ join_\theta(S \ semijoin_{\theta} \ R)$ 
+        \item $R \ join_{\theta} \ S \iff (R \ semijoin_{\theta} \ S) join_\theta(S \ semijoin_{\theta} \ R)$ 
+    \end{itemize}
+    L’uso del semi-join è conveniente se il costo del suo calcolo e del trasferimento del risultato è inferiore al costo del trasferimento dell’intera relazione e del costo del join intero.
+    \item \textbf{Local optimization}
+    Ogni nodo riceve una fragment query e la ottimizza in modo indipendente, con tecniche analoghe ai sistemi centralizzati. Per DDBMS in rete geografica, conviene:
+    \begin{itemize}
+        \item Global query optimization con l’obiettivo di ridurre i costi di comunicazione.
+        \item Local optimization.
+    \end{itemize}
+    Per DDBMS in rete locale, conviene:
+    \begin{itemize}
+        \item Global query optimization con l’obiettivo di aumentare il parallelismo
+        \item Local optimization
+    \end{itemize}
+    Nella progettazione delle basi di dati distribuite si dovrebbe anche tenere conto della topologia della rete, delle tipologie di query distribuite e delle stime o statistiche su query distribuite.
+\end{itemize}

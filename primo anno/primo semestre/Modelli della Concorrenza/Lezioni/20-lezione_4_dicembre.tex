@@ -1,0 +1,130 @@
+\section{Logiche temporali e model-checking}
+I metodi di model-checking rendono possibile l'esaminazione dei modelli formali per determinare se soddisfano determinate proprietà di nostro interesse. 
+\subsection{Correttezza dei programmi concorrenti}
+Dato l'esempio Java, dove viene rappresentato un sistema Consumatore Produttore che interagiscono in modo concorrente, gestito tramite Thread, abbiamo compreso che questo non è un caso sempre possibile, non sempre abbiamo un programma che effettua la gestione per noi. Ci sono però dei metodi che ci vengono incontro per capire come garantire, o capire, la correttezza dei programmi concorrenti.\\
+Alcune delle proprietà che devono essere garantite da un programma, affinché possiamo affermare la corretta gestione delle concorrenze, sono:
+\begin{itemize}
+    \item ogni oggetto prodotto viene prima o poi consumato
+    \item nessun oggetto viene consumato più di una volta
+    \item il sistema non raggiunge mai uno stato di deadlock
+    \item due processi non si trovano mai contemporaneamente nella sezione critica
+    \item se un processo richiede l’accesso alla sezione critica, prima o poi avrà il permesso. 
+\end{itemize} 
+Ci sono sistemi per i quali non è possibile applicare la logica di Hoare: si tratta di sistemi concorrenti. \\
+La logica di Hoare si può adattare in una certa misura a sistemi concorrenti ma solo per programmi che obbediscono allo schema generale: dati d’ingresso, elaborazione e stato finale. \\
+Per sistemi con un comportamento potenzialmente infinito nel tempo bisogna trovare un altro metodo.
+
+\subsection{Sistemi reattivi}
+Sono sistemi concorrenti, distribuiti e asincroni, che non obbediscono al paradigma input-computazione-output e pertanto non è possibile analizzarli con gli strumenti della logica di Hoare.
+All’interno di un sistema ci possono essere dei componenti sequenziali con un compito limitato nel tempo la cui correttezza può essere dimostrata utilizzando la logica di Hoare.
+
+\subsection{Analisi di sistemi concorrenti}
+Problema: stabilire se un sistema reattivo è corretto.\\
+Metodo: si esprime il criterio di correttezza come formula di un opportuno linguaggio logico, si rappresenta (modella) il sistema nella forma di \textit{sistemi di transizioni} e si valuta se la formula è vera nel sistema di transizioni.\\
+Strumenti: sistemi di transizioni (modelli di Kripke), logiche temporali e algoritmi.
+
+\subsection{Sistemi di transizioni}
+Gli elementi essenziali di un sistema di transizioni son gli \textbf{stati} e \textbf{transizioni di stato}.
+\[A = (Q, T)\]
+dove $Q$ è l’insieme degli stati e $T \subseteq Q \times Q$ è l’insieme delle transizioni di stato. Deduciamo che un sistema di transizioni è finito se l’insieme degli stati è finito.
+In un sistema di transizioni, un cammino è una sequenza di stati in cui ogni coppia di stati adiacenti è legata da una transizione: \[\pi = q_0 q_1 \dots \; | \; \forall i, \; (q_i, q_{i+1}) \in f\]
+Un cammino massimale è un cammino che non può essere ulteriormente esteso: 
+\begin{itemize}
+    \item è finito se termina in uno stato dal quale non esce alcuna transizione
+    \item è infinito se percorre infinite volte uno o più stati.
+\end{itemize}
+Il suffisso di ordine $i$ di $\pi$ è il cammino $\pi^{(i)} = q_i q_{i+1} \dots$.
+
+\subsection{Modello di Kripke}
+
+
+Sia $Z = \{z_1, z_2, \dots \}$ l’insieme di proposizioni atomiche.
+Dato un sistema di transizioni $A = (Q, T)$, si associa a ogni stato $q \in Q$, l’insieme delle proposizioni atomiche che sono vere in quello stato: \[I : Q \to 2^{AP}\]
+$2^Z$ perché è l’insieme potenza di $AP$ (l’insieme di tutti i sottoinsiemi di $AP$). 
+
+Un modello di Kripke è un’estensione del sistema di transizioni ed è definito come: $A = (Q, T, I)$.
+
+{\centering
+\begin{tikzpicture}[node distance=2.3cm,>=stealth',bend angle=45,auto]
+  \tikzstyle{place}=[circle,thick,draw=blue!75,fill=blue!20,minimum size=6mm]
+  \tikzstyle{transition}=[rectangle,thick,draw=blue!75,minimum size=4mm]
+
+    \node [place] (uno)   [label=left:$q$] {1}; %P1
+    \node [place] (due)   [right of=uno,label=above:$q$] {2}
+        edge[pre] (uno); 
+    \node [place] (tre)   [below of=due,label=right:$q \lor p$] {3}
+        edge[pre] (due); 
+    \node [place] (quattro)   [below of=uno,label=left:$r\lor p$] {4}
+        edge[pre] (tre)
+        edge[post] (uno); 
+    \node [place] (cinque)   [right of=due,label=right:$p$] {5}
+        edge[pre] (due);
+    \node [place] (sei)   [below of=cinque,label=right:$p$] {6}
+        edge[post, bend right] (cinque)
+        edge[pre, bend left] (cinque);
+\end{tikzpicture}
+\par}
+Supponiamo di avere come preposizioni atomiche $AP = \{p,q,r\}$, abbiamo inoltre $Q=\{1,2,3,4,5,6\}$, e l'insieme delle transizioni $T=\{(1,2),(2,3),(2,5),(5,6) \dots\}$, supponiamo inoltre che la funzione di interpretazione abbia una sua definizione: $I(4) = {p,r}$. Questo viene interpretato come \textit{la funzione I sullo stato quattro, ha come valore vero i valori rappresentati in sua vicinanza, in questo caso $r\lor p$, indica che sono vere entrambe}\\
+\subsection{Logica temporale lineare (Linear Temporal Logic, LTL)}
+\subsubsection{Sintassi}
+\begin{itemize}
+    \item $AP = \{p_1, p_2, \dots, p_i, q, r,  \dots\}$	proposizioni atomiche\\
+        Non facendo riferimento al tempo, possono essere verificate immediatamente in un certo stato.
+    \item $FBF_{LTL}$	insieme delle formule ben formate
+        \begin{enumerate}
+            \item Ogni proposizione atomica è una formula ben formata.
+            \item Le costanti logiche \textbf{true} ($\top$) e \textbf{false} ($\bot$) sono formule ben formate.
+            \item Induzione strutturale: se $\alpha$ e $\beta$ sono formule ben formate, anche $\neg \alpha$ e $\alpha \lor \beta$ sono formule ben formate. E quindi lo sono anche $\alpha \land \beta$, $\alpha \implies \beta$ e $\alpha \iff \beta$.
+            \item Induzione strutturale (per introdurre le formule temporali): se $\alpha$ e $\beta$ sono formule ben formate lo sono inoltre formule formate anche le seguenti notazioni:
+            \begin{enumerate}
+                \item $X \alpha$, nel prossimo stato (di computazione)
+                \item $F \alpha \;(\lozenge \alpha)$, prima o poi (eventually, finally) $\alpha$ diventerà vera
+                \item $G \alpha \; (\square \alpha)$, sempre (globally, always), in questo caso $\alpha$ è sempre vera
+                \item $\alpha\  \bigcup \beta$, fino a quando (until), 
+            \end{enumerate}
+            Per $\alpha \bigcup \beta$ la si potrà ritrovare riscritta $\bigcup(\alpha \cdot \beta)$, questo perché $\alpha \bigcup \beta \equiv \bigcup(\alpha \cdot \beta)$\\
+            Alcune volte possiamo ritrovare $\lozenge$ per andare a indicare
+        \end{enumerate}
+\end{itemize}
+
+\subsubsection{Semantica}
+Si interpretano le formule di LTL su un modello di Kripke, procedendo in due fasi:
+\begin{enumerate}
+    \item Si definisce un criterio per stabilire se una formula $\alpha$ è vera in un cammino massimale $\pi$.
+    \item Si dice che la formula è vera rispetto a uno stato $q$ del modello di Kripke se è vera in tutti i cammini massimali che partono da $q$.
+\end{enumerate}
+
+\subsubsection{Esempio}
+{\centering
+\begin{tikzpicture}[node distance=2.3cm,>=stealth',bend angle=30,auto]
+  \tikzstyle{place}=[circle,thick,draw=blue!75,fill=blue!20,minimum size=6mm]
+  \tikzstyle{transition}=[rectangle,thick,draw=blue!75,minimum size=4mm]
+
+    \node [place] (uno)   [label=left:$p$] {$q_1$}; %P1
+    \node [place] (due)   [right of=uno,label=right:$p \lor s$] {$q_2$}
+        edge[pre] (uno); 
+    \node [place] (tre)   [below of=due,label=left:$r \lor s$] {$q_4$}
+        edge[loop right] (tre)
+        edge [pre] (due)
+        edge [post] (uno); 
+    \node [place] (quattro)   [below of=uno,label=left:$r\lor p$] {$q_3$}
+        edge[pre, bend left] (uno)
+        edge[post, bend right] (uno); 
+\end{tikzpicture}
+\par}
+
+Dal che supponiamo di essere interessati a:
+\begin{itemize}
+    \item $\alpha$ F $s$
+    \item $\beta$ F $r$
+    \item $\gamma$ G ($p\lor r$)
+    \item $\delta$, $p \bigcup s$ 
+\end{itemize}
+
+Quello che abbiamo, per quanto riguarda i cammini, dobbiamo vedere se le nostre formule sono vere nei cammini indicati:
+\begin{itemize}
+    \item $\Pi_1$: $q_1,\ q_3, \ q_1,\ q_3  \ q_1, \ q_3 \dots$ abbiamo che $\quad \Pi_1 \nvDash \alpha,\Pi_1 \vDash \beta,\Pi_1 \vDash \gamma,\Pi_1 \nvDash \delta$
+    \item $\Pi_2$: $q_1,\ q_2, \ q_4,\ q_4  \ q_4, \ q_4 \dots$ abbiamo che $\quad \Pi_2 \nvDash \alpha,\Pi_2 \vDash \beta,\Pi_2 \vDash \gamma,\Pi_2 \nvDash \delta$
+    \item $\Pi_3$: $q_1,\ q_2, \ q_4,\ q_3, \ q_1, \ q_3 \dots$ abbiamo che $\quad \Pi_3 \vDash \alpha,\Pi_3 \vDash \beta,\Pi_3 \vDash \gamma,\Pi_3 \vDash \delta$
+    \item $\Pi_4$: $q_1,\ q_2, \ q_4,\ q_3, \ q_1, \ q_3 \dots$ abbiamo che $\quad \Pi_4 \vDash \alpha,\Pi_4 \vDash \beta,\Pi_4 \vDash \gamma,\Pi_4 \nvDash \delta$
+\end{itemize}

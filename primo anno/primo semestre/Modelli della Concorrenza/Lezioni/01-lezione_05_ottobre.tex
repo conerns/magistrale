@@ -1,0 +1,46 @@
+\section{Lezione del 5 ottobre}
+
+La concorrenza è una caratteristica dei sistemi di elaborazione nei quali può verificarsi
+che un insieme di processi o sotto-processi(thread) computazionali sia in esecuzione nello
+stesso istante. 
+
+Per i programmi che presentano concorrenza al loro interno possimao definire delle caratteristiche generali.
+\begin{itemize}
+    \item Competizione per l'accesso alle risorse condivise
+    \item Cooperazione per un fine comune
+    \item Coordinamento di attività diverse
+    \item Sincronia/Asincoria 
+\end{itemize}
+%------------------------------------------------
+
+\subsection{Logica proposizionale}
+\subsubsection{Sintassi}
+Definiamo la sintassi: \hfill \newline
+$\mathbf{P} = \{p_1,p_2 \dots, p_i\}$, sono i nostri simboli preposizionali (infiniti ma numerabili) \hfill \newline
+$\bot$ e $\top$ sono invece le nostre costanti logiche (anche atomiche) \hfill \newline
+$\neg, \ \lor, \ \land , \ \to, \ \Leftrightarrow$ rappresentano i nostri connettivi logici, attraverso loro possiamo creare delle formule ben formate. \hfill \newline
+$( \,,) $ sono invece i delimitatori delle componenti atomiche oppure delle formule ben formate.
+\bigskip
+
+Vogliamo definire l'insieme delle formule ben formate $F_{Prop}$. L'insieme viene definito in modo induttivo:
+\begin{enumerate}
+    \item $\top, \bot, p_i \in F_{Prop}$
+    \item $A \in F_{Prop},  B \in F_{Prop}$: ovvero siano A e B delle formule ben formate, possiamo allora dire che:
+    \begin{itemize}
+        \item $(\neg A), (A \lor B), (A \land B), (A \to B), (A \Leftrightarrow B) \in F_{Prop}$, ovvero che unendo le due formule ben formate attraverso dei connettivi logici, il risultato corrisponde a delle formule ben formate. 
+    \end{itemize}
+\end{enumerate}
+
+\subsubsection{Semantica}
+La semantica di una formula è il suo valore di verità, ovvero il fatto che sia vera o falsa. 
+
+Sia $V: P \to \{0, 1\}$ una assegnazione booleana che assegna ad ogni proposizione atomica un valore di verità. Questa assegnazione, in maniera induttiva, si estende alle formule:
+
+Sia $I_v(p_i) = V(p_i), I_v(\top) = 1, I_v(\bot) = 0$, dobbiamo ora definire per ogni forma composta definita, come queste formano il valore di verità della formula composta.
+\begin{itemize}
+    \item $I_v(\neg A) = 1 - I_v(A)$ (negazione del valore ottenuto)
+    \item $I_v(A \lor B) = I_v(A) \lor I_v(B)$
+    \item $I_v(A \land B) = I_v(A) \land I_v(B)$
+    \item $I_v(A \to B) = I_v(\neg A) \lor I_v(B)$
+    \item $I_v(A \Leftrightarrow B) = I_v(\neg A \lor B) \land I_v(\neg B \lor A)$ (qui si potrebbe andare avanti)
+\end{itemize}

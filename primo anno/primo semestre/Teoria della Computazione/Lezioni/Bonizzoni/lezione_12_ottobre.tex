@@ -1,0 +1,46 @@
+\raggedbottom
+\section{Lezione del 12 ottobre - Bonizzoni }
+Abbiamo come obiettivo principale quello di classificare i problemi sulla base della loro difficoltà di soluzione mediante le macchine di calcolo. La \textit{difficoltà} viene stimata rispetto all'uso delle risorse di calcolo quali tempo e spazio.
+
+La complessità, nel definire le classi dei problemi ha preso in considerazione, come prima classe, i problemi di decisioni.
+Quest'ultimi, ricordiamo, sono descritti da funzioni binarie che hanno in input una stringa su alfabeto $\{0,1\}$ e restituiscono un bit 0/1. Tipicamente il problema è identificato come $\Pi$, che riceve in input $x$ e risponde 0 (no) oppure 1 (YES), relativo alla esistenza di una certa soluzione.
+
+\subsection{Problema di ottimizzazione}
+Sia $\Pi$, tipicamente rappresentano un problema per cui si vuole trovare un output dato un input che ottimizza la soluzione. L'output tipicamente ottimizza una misura, che dipende dalla dimensione dell'input, può essere un problema di minimo o di massimo.\\
+Introducendo un nuovo parametro $k$, possiamo trasformare il nostro problema in un problema di decisione, sia quindi un output $y$, posso chiedere se $\exists y \mbox{ tale che } |y| = K$.
+
+Mediante un problema di decisione possiamo trovare la misura ottima di una determinata soluzione eseguente diverse chiamate.
+
+\subsubsection{Esempio problema di ottimizzazione}
+Prendo il problema $\Pi$ \emph{vertex-cover}. Come input si ha un grafo $G=(V,E)$ e un intero $k$ e come output 0/1.
+Essendo un problema di decisione, e si cerca di capire se $\exists\, V'\subseteq V$ tale che $V'$ è una copertura di $G$. Il sottoinsieme è copertura di un grafo quando $forall\, e\in E$ almeno un estremo dell'arco $e=(u,v)$ è in $V'$. \\
+La copertura con il minor numero di vertici è detta \textbf{minima copertura}.\\ 
+Il problema \emph{vertex-cover} chiede se esiste una copertura del grafo di dimensione $k$. È quindi diventa un \textbf{problema di decisione}. Qualora trovassi una copertura di cardinalità minore di $k$ mi basterà aggiungere vertici arbitrari fino al raggiungimento di $k$. Ovviamente può non esistere una copertura di cardinalità $k$.\\ 
+\subsection{NDTM}
+Sapendo che un \textbf{algoritmo intrattabile} non risolve in modo efficiente tutti gli input. Bisognerà trovare un modo per capire se un algoritmo è \textbf{intrattabile}.\\
+Studiamo ora il tempo di calcolo di una \textbf{macchina di Turing non deterministica (\textit{NTDM})}: \\ 
+Sia $T:\mathbb{N}\to\mathbb{N}$ una funziona calcolabile da TM. Dato $L_\Pi$ un linguaggio di decisione allora una $NDTM$ nondeterministica  $M$ accetta $L_\Pi$ in tempo $T(n)$ se per ogni $x$ in $L_\Pi$ ,con $|x|=n$,  $M$ accetta $x$ in $T(n)$ mosse (o configurazioni).\\ 
+    
+Quindi la \textbf{classe NP} è la classe dei linguaggi di decisione accettati in tempo $T(n)=cn^p,\quad p\in \mathbb{N}$ da una $NDTM$. \\
+Per poter dare una definizione alternativa di NP usando gli algoritmi con certificato, bisogna prima introdurre quest'ultimi.
+
+\subsection{Algoritmo con Certificato}
+La classe $P$, polinomiale, sono i linguaggi accettati da un algoritmo polinomiale in tempo. I problemi invece $NP$, non polinomiali, sono linguaggi accettati da un algoritmo, che fanno uso di un \textit{ certificati}, polinomiale in tempo. 
+
+Un algoritmo con certificato/verificatore è quindi un algoritmo di verifica se $x \in L$ usando y, dove $y$ è una stringa aggiuntiva che viene utilizzata insieme all'input che ci aiuta a dimostrare che $x$ appartiene al linguaggio $L$.\\
+Quindi per un problema \textbf{NP} con certificato non posso trovare soluzione in tempo polinomiale ma posso verificare una soluzione data in tempo polinomiale.\\ 
+
+\subsubsection{Definizione alternativa di NP}
+Sia $L_\Pi$ un linguaggio di decisione, $T:n\to n$ una funzione calcolabile, $y$ una stringa di lunghezza polinomiale nell'input, allora un algoritmo $A$ con certificato accetta $L_\Pi$ in tempo $t(n)$ se per ogni $x$ in $L_\Pi$, con $|x|=n$, A termina su input $(x,y)$ dopo $t(|x|)$ passi di calcolo (istruzioni eseguite) producendo 1 in output.
+  
+Quindi la \textbf{classe NP} è la classe dei linguaggi (o problemi) di decisione accettati in tempo $T(n)=cn^p, \quad p\in\mathbb{N}$ da un algoritmo $A$ certificato
+
+%spiega vertex-cover
+Riprendendo l'esempio di algoritmo di ottimizzazione, affermiamo che \emph{vertex-cover} decisionale è nella classe \textbf{NP} con certificato e, in questo caso, il parametro $y$ è la dimostrazione che posso dare risposta affermativa, per esempio la certezza di avere un sottoinsieme di vertici che effettivamente copre tutto il grafo, quindi $y=V''\subseteq V$ tale per cui $V''$ copre $G$ con cardinalità $k$. 
+
+
+Bisogna capire come trovare e come usare $y$, sapendo che $A$ lavora in tempo polinomiale e che la lunghezza di $y$ è polinomiale in dimensione di $x$.\\ Vedendo che la cardinalità di $y$ è minore di $k$ l'algoritmo A verifica che con i vertici passati con $y$ si è in grado di rispondere al problema in modo affermativo, problema che ha in input $G$ e $k$. In poche parole $A$, per ogni arco, esamina se ogni estremo è in $y$ e, se tutti gli archi hanno un estremo in $y$ allora si ha che usando $y$ si è in grado di verificare l'input $G, k$ è \textbf{accettato}. Questa verifica è in tempo polinomiale e si ha che $|y|=\mathcal{O}(|G,k|)$, soprattutto se $|y|$ è una costante.\\ 
+Ad oggi non si è dimostrato che \emph{vertex-cover} si risolvibile in tempo polinomiale. È quindi un problema \textbf{NP-hard}.\\ \newline
+
+\textbf{P} è vista come sottoclasse la \textbf{NP} dove i problemi di decisione sono risolvibili in tempo polinomiale anche senza certificato. Per dimostrare che $P\subseteq NP$ devo far vedere che ogni $L_\Pi\in P$ ammette un algoritmo $A$ con certificato in tempo polinomiale. Ma questo è vero perché $L_\Pi$ è accettato da un algoritmo $A$, in tempo polinomiale con $y=\emptyset$ e quindi $y$ non è necessario.\\
+Si ha quindi che $P\subseteq NP$. 

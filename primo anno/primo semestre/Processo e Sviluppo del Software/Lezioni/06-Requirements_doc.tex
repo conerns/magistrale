@@ -1,0 +1,222 @@
+\section{Specification $\&$ documentation}
+In questa fase si documentano in modo preciso i requisiti scoperti. Si descrivono in modo preciso le feature e i concetti rilevanti per il progetto. Nel dettaglio si definiscono in modo preciso:
+\begin{itemize}
+  \item obiettivi, concetti, proprietà di dominio rilevanti, requisiti di sistema/software, ipotesi, responsabilità 
+  \item il che cosa c'è dietro a certe decisioni, quindi la ragione (razionale)
+  \item un'indicazione sulle varianti e sulle evoluzioni previste
+\end{itemize}
+Il documento deve avere una struttura coerente. La documentazione del tutto in un formato comprensibile a tutte le parti, mettendo in allegato i costi, il piano di lavoro e i tempi di consegna del risultato. Il documento in output di questa fase  è detto \textbf{requirements Document (\textit{RD})}. Qualora i requisti siano stati messi online si procede alla costruzione di un db che tiene traccia di tutti i requisti. 
+
+In ogni caso il contenuto deve essere accessibile e comprensibile da tutte le parti interessate, aggiungendo spesso in allegato anche costi, workplan e piani di delivery. Bisogna capire come effettivamente documentare i requisiti.\\ La prima opzione è l'utilizzo del linguaggio naturale in modo svincolato, in prosa. Si ha una forte espressività ma, in assenza di regole sulla scrittura si rischia di produrre una sorta di romanzo, producendo qualcosa di poco gestibile. Il linguaggio naturale inoltre può nascondere ambiguità (basti pensare anche solo a sequenze di \textit{or} e \textit{and}, non si sa come andare a combinare queste sequenze non avendo una tabella di verità utile per confronto). Usando il linguaggio naturale privo di vincoli si hanno quindi rischi, esiste una pratica più ragionevole, ovvero usare un \textit{linguaggio naturale strutturato}. Si introducono quindi due tipi di regole:
+\begin{enumerate}
+  \item \textbf{local rules}, che riguardano la scrittura del singolo requisito
+  \item \textbf{global rules}, che riguardano le regole sulla scrittura dell'intero documento e sull'insieme dei requisti
+\end{enumerate}
+Bisogna però introdurre alcune regole stilistiche generali (le stesse che si dovrebbero applicare anche per una tesi):
+\begin{itemize}
+  \item scrivere pensando a chi deve leggere, il modo in cui scriviamo e il livello di astrazione, con il quale affrontare il discorso, viene valutato anche in base al interlocutore. Infatti questo deve essere ben identificato.
+  \item spiegare cosa stiamo per scrivere prima di specificarlo nel dettaglio
+  \item prima motivare le scelte, indicare le scelte e poi fare un sintesi di queste ultime
+  \item assicurarsi che ogni concetto usato nei requisiti sia stato ben definito 
+  \item chiedersi se quanto scritto è comprensibile e rilevante (per capirlo basta cancellare quanto scritto e vedere se si capisce ancora)
+  \item non esporre più di un requisito, assunzione o una proprietà del dominio all'interno di una singa frase. Scrivere frasi brevi
+  \item distinguere ciò che è obbligatorio e deve essere implementato, da ciò che si potrebbe implementare qualora si volesse
+  \item evitare acronimi non necessari ed evitare l'abuso del gergo informatico
+  \item usare esempi esplicativi per meglio chiarire i concetti indicati
+  \item usare diagrammi o illustrazioni quando possibile
+\end{itemize} 
+In termini di \textbf{local rules} si hanno dei template per scrivere i requisiti, usando anche un solo standard per tutti i requisti. Un esempio di template che si potrebbe utilizzare per la stesura dei requisiti potrebbe essere il seguente:
+\begin{itemize}
+  \item identificatore del requisito (con uno schema di naming significativo, magari con uno schema gerarchico con combinazioni di caratteri tramite separatore per specificare al meglio il requisito)
+  \item indicare la categoria di appartenenza del requisito (funzionale, assunzione etc$\ldots$)
+  \item specifica del requisito, questo significa che deve seguire alcune le regole stilistiche
+  \item criterio di fit (una sorta di test di accettazione, usato quindi per quantità/concetti misurabili, essendo critico quindi per requisiti non funzionali) 
+  \item fonti di elicitazione che hanno portato alla elicitation di quel requisito
+  \item la ragione per cui quel requisiit esiste (razionale)
+  \item interazioni con altri requisti (contribuzioni, dipendenze e conflitti)
+  \item stabilire il livello di priorità
+  \item livelli di stabilità (per indicare le chance di cambiamenti)
+\end{itemize}
+
+Per le \textbf{global rules} si ha una forma standard data da \textbf{IEEE std-830}, il più diffuso. Si hanno varie macrocategorie a loro volta suddivise:
+\begin{enumerate}
+  \item Introduzione (dove si specifica anche quale parte del documento interessi ai vari stakeholder)
+  \begin{enumerate}
+    \item motivazioni del documento
+    \item scopo del prodotto, una sua breve descrizione: contiene il dominio, lo scopio e l'obiettivo del system-to-be
+    \item definizioni, acronimi, sigle e abbreviazioni
+    \item reference, quali sono le fonti di elicitazione
+    \item overview dell'organizzazione del documento
+  \end{enumerate}
+  \item Descrizione generale, è importante definire quale sia il confine tra il prodotto che viene realizzato e l'ambiente in quale esso interagisce. 
+  \begin{enumerate}
+    \item prospettive del prodotto
+    \item funzionalità principali
+    \item caratterizzazione degli utenti
+    \item vincoli generali sull'ambiente (che non possono esse modificati ma con i quali si deve integrare il prodotto)
+    \item assunzioni sul prodotto e dipendenze del prodotto
+    \item ripartizione dei requisti
+  \end{enumerate}
+  \item Requisiti specifici, i requisiti vengono indicati con il massimo livello di dettaglio facendo uso di un template. (spesso questa fase è molto importante per gli sviluppatori). Si hanno quindi varie categorie di requisiti che articolano le varie sezioni del capitolo:
+  \begin{enumerate}
+    \item requisiti funzionali (che a sia volta un'organizzazione interna in base a vari fattori, come aree funzionali, componenti etc$\ldots$)
+    \item requisiti per l'interfaccia esterna
+    \item requisiti per le prestazioni
+    \item vincoli di progettazione
+    \item attributi di qualità del software
+    \item altri requisiti
+  \end{enumerate}
+  \item appendice, questo solo c'è qualcosa da allegare al suo interno, possiamo anche omettere questa fase se non si hanno informazioni utili da aggiungere.
+  \item indice
+\end{enumerate}
+
+Si hanno anche opzioni aggiuntive oltre al linguaggio naturale. Si puo fare uso di diagrammi, avendo quindi una \textbf{notazione semi-formale}. Significa che il diagramma ha una sintassi formale essendo i vari diagrammi formalmente definiti ma interpretazione degli stessi può comunque essere ambigua.\\
+I diagrammi sono utili per complementare quello che abbiamo scritto in linguaggio naturale, che risulta spesso troppo complesso e articolato. Un diagramma può semplificare quanto scritto e rappresentare il tutto in modo compatto. L'uso di diagrammi permette di comunicare più semplicemente e viene usato per aspetti specifici del sistema. Facciamo comunque attenzione all'aspetto semi formale che porta con se una certa ambiguità. Si ha quindi la stessa ambiguità di interpretazione che si aveva nei linguaggi naturali\\ 
+\subsection{Tipologie di diagrammi}
+\textbf{Problem diagram} questo tipo di diagramma descrive i requisiti a livello di sistema. Si mostrano le componenti del sistema dove ogni componente è indicato tramite un rettangolo con doppia linea verticale. Il sistema comunica con diversi elementi dell'ambiente, indicati da rettangoli. Il diagramma ci permette di specificare un requisito nella forma testuale, e riferire questo requisito agli elementi dell'ambiente. Posso avere, oltre che dei riferimenti, dei vincoli che si pongono su elementi a partire dal requisito.\\
+Tutte le interazioni sono decorate con gli eventi che sono rilevanti per l'interazione con il produttore dell'evento. All'interno del diagramma indichiamo: \textbf{Componente sistema} \textbf{$!$}  \textbf{Evento che il componente produce}.\\
+Con questo tipo di diagramma si cattura il contesto del requisito, legandolo  componenti dell'ambiente e componenti del sistema, tramite specifici eventi. Si identificano a colpo d'occhio gli elementi rilevanti per un certo requisito. Esistono dei pattern che catturano i problemi più frequenti in modo da facilitare la creazione di un Diagram. Questi prendono il nome di Frame Diagrams. Quello che possimao tirare dai pattern sono:
+\begin{itemize}
+    \item tipo di componente (indicato con un quadratino in basso a destra nel rettangolo della componente) specificato da una lettera:
+        \begin{itemize}
+            \item C: causal, causa-effetto
+            \item B: biddable, non predicibile
+            \item X: lexical, lessicale, specifica artefatti
+        \end{itemize}
+    \item tipo di evento, posto dopo il ! sopra descritto, specificato da una lettera: 
+        \begin{itemize}
+            \item C: causal, diretta conseguenza di altri eventi
+            \item E: event, che non sono diretta conseguenza ma che sono prodotti in modo spontaneo 
+            \item X: lexical, dati che vengono utilizzati per produrre qualcosa
+        \end{itemize}
+\end{itemize}
+I pattern vengono istanziati nei vari casi specifici. 
+
+Abbiamo inoltre il \textbf{Context diagram} che dichiara le componenti del sistema e le loro interfacce, quindi di conseguenza anche la struttura del sistema, cosa è presente nel sistema e cosa gli è esterno e l’ambiente di ogni componente (vicini, interfacce).\\
+
+Un altro diagramma tipico è quello \textbf{ER} che ci permette di specificare quale sono le entità che entrano in gioco in particolari aspetti dei nostri requisiti, specificando tutto in modo schematico.\\
+Si usano anche diagrammi di dominio, di classe etc$\ldots$, non descrivendo più comportamenti ma strutture, domini etc$\ldots$\\
+
+Un altro tipo di Diagrams sono i \textbf{SADT diagrams} che si dividono in due tipi, e permettono di specificare il comportamento di alcune attività che un sistema software deve seguire, scomponendo questo ultimo e aggiungendo varie informazioni. Questi diagrammi possono essere activity-driven o data-driven.
+\begin{enumerate}
+    \item actigram, di tipo activity-driven, si concentra sulle attività e mostra le dipendenze tra attività in termini di dati. 
+        \begin{itemize}
+            \item East$\longrightarrow$ per l'input di dati
+            \item West $\longrightarrow$ per l'output di dati
+            \item North $\longrightarrow$ per il data/event controlling, ovvero dati o eventi che controllano il comportamento dell'attività
+            \item South $\longrightarrow$ per l'unità che processerà l'attività (opzionale)
+        \end{itemize}
+    \item datagram, di tipo data-driven, si concentra sui dati e mostra le dipendenze tra dati in termini di attività.
+        \begin{itemize}
+            \item East $\longrightarrow$ per l'input di attività che producono il dato
+            \item West $\longrightarrow$ per indicare attività le quali devono utilizzare il dato
+            \item North $\longrightarrow$ per le attività di validazione del dato
+            \item South $\longrightarrow$ per le risorse necessarie a memorizzare e gestire il dato
+        \end{itemize}
+\end{enumerate}
+Le attività sono indicate dentro rettangoli e si hanno una serie di frecce che a seconda della direzione variano il significato, noi abbimao usato \textbf{Norh} e \textbf{West}, andrebbe usato $\uparrow$, $\longleftarrow$.\\
+La coerenza tra di due diagrammi è fondamentale avendo una rapporto di \textbf{dualità} tra essi quindi i dati e le attività presenti in uno devono apparire anche nell'altro.\\
+Questo strumento, ovvero il diagramma di tipo \textbf{SADT}, si prestano a documentare workflow molto semplici. In ogni caso:
+\begin{itemize}
+    \item ogni attività \textbf{DEVE} avere un input e un output 
+    \item tutti i dati devono avere un produttore e un consumatore 
+    \item i dati I/O di un'attività devono apparire come dati I/O delle sottoattività 
+    \item ogni attività in un datagramm deve essere definita in un actigramma
+\end{itemize}
+
+Abbiamo poi il \textbf{Dataflow diagram}, diagrammi che catturano le operazioni del sistema collegate per mezzo delle dipendenze tra dati (sono più semplici ma meno espressivi degli actigram).\\
+Un’operazione è un’attività di trasformazione sui dati. I collegamenti di input e di output sono i flussi si dati: le operazioni necessitano di un flusso di dati in entrata per produrre un flusso di dati in uscita.\\
+La regola di trasformazione dei dati deve essere specificata nelle annotazioni in linguaggio naturale strutturato o in un altro DFD (dataflow diagram).\\
+I componenti del sistema e le repository di dati sono l’origine e la fine dei flussi.
+Il soddisfacimento delle regole di consistenza e completezza può essere controllato mediante appositi strumenti.    \\
+
+Un altro diagramma classico è il \textbf{case use diagram} per visualizzare i requisiti identificati, che prendono forma di casi d'uso con gli attori che partecipano allo svolgimento dei requisiti. Si possono mostrare diversi tipi di relazioni, come ad esempio le inclusione o le estensioni.\\
+
+Un altro strumento utile nella definizione di workflow è l'\textbf{event trace diagrams}, ovvero i diagrammi di sequenza. Se ne hanno vari tipi con sintassi più o meno ricche ma in generale si hanno $N$ elementi che partecipano all'esecuzione che viene mostrata visualmente. Si possono inolre mostrare varie richieste e risposte, sincrone o meno, che vengono indicate cronologicamente dall'alto al basso. Questa visualizzazione compatta aiuta nel momento in cui il linguaggio naturale diventa troppo complesso per spiegare una certa sequenza di azioni. \\
+
+Un altro diagramma usato è il \textbf{state machine diagram} per mostrare in quali stati un particolare elemento si trova e quali transizioni/eventi modificano i suoi stati. Questi diagrammi sono utili in quanto in modo compatto rappresenta il ciclo di vita di una certa componente, facilitando la creazione del sistema. \\
+
+\textbf{Statechart}: composizione parallela di diagrammi state machine, uno per ogni variabile che si evolve in parallelo. I componenti spesso controllano diversi item in parallelo. Il problema dei diagrammi $StateMachine$(SM) era che per $N$ variabili (item) ognuno con $M$ possibili valori sarebbero stati necessari $M^N$ stati; per cui alcuni stati degli SM mischiano diverse variabili. Uno stato di uno statechart invece rappresenta l’aggregazione di sottostati correnti e per $M^N$ stati di $SM$ servono solo $M \cdot N$ stati per statechart.\\
+\textit{Semantica interleaving}: se si hanno due transizioni che dovrebbero scattare dallo stesso stato, vengono eseguite in maniera sequenziale (scelta non deterministica).\\
+
+Come altro diagramma abbiamo il \textbf{R-net diagram} che permette di mostrare come reagisce un sistema in base ad un certo stimolo. È un albero che parte con uno stimolo, dopo il begin, posto in un esagono e si sviluppa in base alle varie alternative in corrispondenza di punti di decisione ($\bigoplus$). Nei rettangoli si hanno le azioni che sono svolte in conseguenza allo stimolo.\\
+
+I diagrammi sono tra loro complementari ma hanno anche delle intersezioni tra loro e anche con il testo e tutto deve comunque restare coerente. Si rischia di introdurre inconsistenze. Quando lavoriamo con i diagrammi, visto che abbiamo una sintassi formalmente definita seppure con una semantica ambigua, ci sono alcune regole di consistenza che alcuni strumenti possono applicare per noi.\\
+
+Uno degli standard per la modellazione di diagrammi è il: \textbf{Unified Modeling Language (\textit{UML})}. Al suo interno si hanno, con regole di coerenza tra essi:
+\begin{itemize}
+  \item class diagrams
+  \item use case diagrams
+  \item sequence diagrams
+  \item state diagrams
+\end{itemize}
+
+In conclusione i diagrammi hanno il pro di essere in grado di dare una buona panoramica e struttura/comportamento, facile da trasmettere e comprendere, di aspetti importanti. Sono inoltre supportati da vari tool di analisi. L'elemento debole resta la semantica ambigua che ci limita anche nell'analisi dei diagrammi stessi.\\
+
+Il modo delle notazioni formali, in modo da ottenere oltre a una sintassi formale anche una semantica formale. Questi tipi di linguaggi vengono usati per sistemi critici, questo per via del alto costo che comportano.
+
+\subsection{Notazioni formali}
+Si parla sia di sintassi che di semantica formalmente definite. Tali definizioni formali permettono che il compilatore sia in grado di processarle completamente: viene infatti formalizzata sia la parte dichiarativa (la struttura dell’item come per i diagrammi), la parte assertiva (le proprietà degli item) e i meccanismi per strutturare ampie specifiche in unità più piccole. La loro definizione formale è espressa spesso tramite la logica matematica e vengono definite la sintassi, la semantica e le regole di inferenza per le nuovi informazioni.\\
+Si ha quindi un livello di precisione alto e non si ha ambiguità, permettendo analisi di consistenza e coerenza dei requisiti (fatta direttamente dal calcolatore).\\
+
+Una sintassi/semantica formale è quella data dalla logica proposizionale e dalle \textbf{formule ben formate}. Si ha quindi un linguaggio basato sui connettori logici e sulle regole per avere formule ben formate. Ogni statement può quindi essere interpretato con il valore di verità con le regole definite dalla logica e dalle tabelle di verità (ovviamente può farlo il calcolatore).\\
+La composizione ricorsiva degli statement non decomponibili attraverso i connettici logici limita l’espressività (non ci sono variabili nè quantificatori).\\
+La semantica è definita come segue: \\
+L’interpretazione di uno statement è data dagli specifici assegnamenti delle proposizioni atomiche che lo compongono. Il significato di uno statement data un’interpretazione è il valore booleano complessivo dello statement.\\
+Regole per inferire nuovi statement da statement già disponibili:
+\begin{itemize}
+    \item sound rule: se la conclusione è vera per ogni interpretazione che renda vera la premessa.
+    \item permettono di derivare automaticamente senza effettuare una valutazione semantica.
+\end{itemize}
+
+La logica predicativa del primo ordine permette di estendere l’espressività della logica proposizionale attraverso l’utilizzo di variabili, costanti, quantificatori, relazioni e funzioni.\\
+Per quanto riguarda la semantica, l’interpretazione è la definizione di ciò che le variabili non quantificate, le costanti, le funzioni e i predicati designano nel dominio di interesse: le specifiche dei predicati hanno significato solo all’interno della specifica interpretazione.\\
+Risulta essenziale documentare le interpretazione per la comunicazione, la non ambiguità e il controllo di adeguatezza, in particolare del dominio di interesse di costanti e variabili non quantificate, funzioni e predicati $n$-ari.
+
+\subsubsection{First-order specification languages}
+Abbiamo:
+\begin{itemize}
+    \item variabili. oggetti designati convolti nei requisiti, nelle proposizioni e nelle assunzioni (entità degli ER)
+    \item stato di una variabile: coppia (variabile, valore della variabile) 
+    \item stato del sistema: coppia (set di variabili del sistema, set dei corrispondenti valori)
+\end{itemize}
+In molti linguaggi di specifica, le specifiche sono interpretate sulla base degli stati (le specifiche sono soddisfatte da alcuni stati e falsificate da altri).
+Molti linguaggi di specifica di prim’ordine sono ordinati: le typed variable designano alcune istanza in un set.\\
+Per specificazione formale si intende un set di statement formali (assiomi) dai quali possono essere derivati altri statement (teoremi) tramite regole di inferenza.
+Gli errori di specificazione possono essere: 
+\begin{itemize}
+    \item contraddizioni: non esiste alcuna interpretazione che rende veri tutti gli statement contemporaneamente..
+    \item ridondanza: alcuni statement possono essere derivati da altri.
+\end{itemize}
+Una derivazione automatica dei teoremi è utile per un controllo di adeguatezza (se si vuole una determinata conseguenza) e un controllo di consistenza (se si riesce a derivare false come teorema).
+\subsubsection{Specificazione History-based}
+Le specifiche catturano un set massimale di history di sistemi ammissibili. Una history è una sequenza temporale infinita di stati di un oggetto (dichiarati implicitamente: time e history sono mantenuti impliciti).\\
+Gli statement sono scritti in una logica temporale (TL) costituita da connettivi logici che si riferiscono a stati passati e futuri. Gli statement TL sono interpretati tramite le history (sono soddisfatti da alcune history e falsificati da altre).\\
+Da differenti strutture time/history conseguono differenti TL.
+\subsection{Linear Temporal Logic (LTL)}
+Si basa su punti discreti del tempo (isomorfi ai naturali), history lineari, connettivi proposizionali e costrutti first-order + connettivi temporali.\\
+Si hanno delle estensioni al real-time:
+\begin{itemize}
+    \item $\diamond_{\leq d}$: più avanti nel futuro all’interno della scadenza $d$
+    \item $\ocircle_{\leq d}$ sempre nel futuro fino alla scadenza $d$
+\end{itemize}
+Si vede quanto produrre tutto questo per un progetto enorme risulti costoso. Si può avere un approccio formale anche usando specifiche basate su stato \textbf{state based specification}, dove definiamo in maniera formale e rigorosa che cosa sono gli stati che il nostro sistema può attraversa e come questi modificano il nostro sistema. \\ Si usano linguaggi come $Z$ basati sulla teoria degli insiemi. Ogni stato è caratterizzato da \textit{pre} e \textit{post} condizioni e si studiano le regole in termini di invarianti che lo stato deve soddisfare.
+
+Sopra si hanno tutti gli elementi coinvolti nell'operazione. Nella parte alta abbiamo le nostre precondizioni e nella parte bassa, sotto di loro, le nostre postcondizioni. Sotto la linea orizzontale abbiamo delle invarianti, che devono essere rispettate.\\
+
+Abbiamo inoltre un modo di rappresentazione delle operazioni. Sopra si hanno tutti gli elementi coinvolti nell'operazione. La prima linea della parte sotto è per le precondizioni, quella sotto per le postcondizioni, entrambe con la notazione insiemistica.\\
+I vari elementi che possiamo dichiarare si trovano nella forma sono: 
+\begin{itemize}
+  \item \texttt{stateVar?:Type} indica una variabile di input
+  \item \texttt{stateVar':Type} indica una variabile di output che possono presentare delle modifiche allo stato della variabile
+  \item \texttt{stateVar!:Type} indica una variabile di output di tipo esterma, che non permette modifiche di stato
+  \item \texttt{$\Delta$ schema} indica che si ha una modifica delle variabili importate dallo schema
+  \item \texttt{$\Xi$ schema} indica che non si ha una modifica delle variabili importate dallo schema
+\end{itemize}
+
+\subsubsection{Algebraic specification}
+La specifica viene rappresentata come equazioni di leggi per la composizione di operazioni e operazioni.\\
+Le operazioni vengono viste come funzioni matematiche, non c’è un’esplicata nozione di stata e la storia del sistema è data dalla traccia delle operazioni delle applicazioni.\\
+I vantaggi sono un’analisi efficiente e automatizzata, la produzione di specifiche eseguibili, meccanismi strutturali ricchi; di contro, il potere espressivo è limitato (solo equazioni, non ci sono referenze storiche) e si è vicini alla programmazione.\\
+   
+Quindi per descrivere i requisiti, l’opzione principale è utilizzare il linguaggio naturale strutturato, complementandolo con i diagrammi e utilizzare le notazioni formali sono raramente.

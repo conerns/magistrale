@@ -1,0 +1,108 @@
+\section{Lezione 30 ottobre}
+Dato un CCS abbiamo visto che è possibile associarli un LTS per quanto riguarda la semantica.\\ Si ha una \textbf{precedenza degli operatori}, da quello con meno precedenza a quello con più precedenza: \begin{enumerate} 
+    \item restrizione, $\setminus_L$
+    \item rietichettatura, $[f]$
+    \item prefisso, $\alpha \cdot p$
+    \item composizione parallela, $|$
+    \item somma, $+$
+\end{enumerate}
+Vediamo più nel dettaglio la \textbf{composizione parallela}. Nel caso dovessimo avere la situazione $a \cdot NIL | \overline{a} \cdot NIL$, che si traduce nel LTS:
+
+\begin{center}
+    \begin{tikzpicture}[shorten >=1pt,node distance=4cm,on grid,auto]
+      \node[state] (q_0) {\footnotesize{$a\cdot Nil\,\,|\,\,\overline{a}\cdot
+          Nil$}}; 
+      \node[state] (q_1) [below right=of q_0] {\footnotesize{$a\cdot
+          Nil\,\,|\,\,Nil$}};  
+      \node[state] (q_3) [below left=of q_0]
+      {\footnotesize{$Nil\,\,\,\,|\,\,\overline{a}\cdot Nil$}}; 
+      \node[state] (q_2) [below right =of q_3] {\footnotesize{$Nil|Nil$}};
+      \path[->]
+      (q_0) edge  node {$\overline{\alpha}$} (q_1)
+      (q_1) edge  node {$\alpha$} (q_2)
+      (q_3) edge  node [below left]{$\overline{\alpha}$} (q_2)
+      (q_0) edge  node [above left]{$\alpha$} (q_3)
+      (q_0) edge  node [above left] {$\tau$} (q_2);
+    \end{tikzpicture}
+  \end{center}
+Dall'esempio sopra noto che posso quindi eseguire le due operazioni o in una sequenza o nell'altra.\\ 
+Ho quindi una \textbf{simulazione sequenziale non deterministica} del comportamento del sistema dato dalla composizione parallela.\\
+Con quanto visto in questo esempio è possibile perché nell'ipotesi di Milner si ha
+che $a$ e $\overline{a}$ sono \textbf{operazioni atomiche}.
+
+Si hanno anche modelli di CCS modellati con:  reti di Petri e strutture ad eventi. Sono due modelli in cui si considera la semantica basata sulla \textbf{true concurrency}, a \textit{ordini parziali}, ovvero non si impongono sequenze quindi due processi o si sincronizzano o vengono eseguiti in maniera indipendente/concorrente con l'ambiente.
+
+\subsection{Esempio dell'altra volta}
+Costruisco il sistema di transizioni della specifica: $S=\overline{lez}\cdot S$ 
+
+\begin{center} 
+    \begin{tikzpicture}[shorten >=1pt,node distance=2cm,on grid,auto] 
+        \node[state] (q_0) {$S$}; 
+        \path[->] (q_0) edge [loop right]  node {$\overline{lez}$} (q_0); 
+        \end{tikzpicture} 
+\end{center} avendo: 
+$\displaystyle Uni=(M|LP)_{\backslash\{ coin, caffe\}}$ ,seguendo nei vari step le regole di inferenza legate alla sincronizzazione: \\
+
+$\displaystyle (coin\cdot \overline{caffe}\cdot M \ | \ \overline{lez}\cdot\overline{coin}\cdot caffe\cdot LP)_{\backslash\{ coin, caffe\}}$, eseguendo il passo $\overline{lez}$, mi ritrovo nella fase : \\
+
+$\displaystyle (coin\cdot \overline{caffe}\cdot M \ | \ \overline{coin}\cdot caffe\cdot LP)_{\backslash\{ coin, caffe\}}$, e visto che $coin$ e $\overline{coin}$ non può essere eseguito con l'ambiente, i due processi si sincronizzano sul $coin$ con una $\tau$: \\
+
+$\displaystyle (\overline{caffe}\cdot M \ | \ \cdot caffe\cdot LP)_{\backslash\{ coin, caffe\}}$, a questo punto dobbiamo sincronizzarci con $caffe$, anche in questo caso con una $\tau$: 
+$\displaystyle ( M \ | \  LP)_{\backslash\{ coin, caffe\}}$ che mi riporta allo stato iniziale. Ricordiamo che le due $\tau$ sono diverse.
+
+La domanda che possiamo porci è: Data una implementazione, che corrisponde agli step eseguiti, questa implementazione soddisfa la nostra specifica, $S$, oppure no?
+Innanzitutto per poter dire che una certa implementazione soddisfa (indicata con $implementazione \models specifica$) una certa specifica o se due implementazioni diverse soddisfano la stessa specifica ci serve una \textbf{relazione di equivalenza} tra processi CCS, ovvero una $R$: $R\subseteq P_{CCS}\times P_{CCS}$ che sia riflessiva, simmetrica e transitiva.
+Bisognerà inoltre astrarre: gli stati e considerare le azioni $Act$, dalle sincronizzazioni interne, ovvero dalle $\tau$ e  rispetto al non determinismo. Milner poi asserisce che $R$ deve essere inoltre una \textbf{congruenza} rispetto agli operatori del CCS.\\
+
+\subsection{Relazione di equivalenza}
+Una relazione di equivalenza $R$ è una \textbf{congruenza} sse:$\forall \,\,p,q\in Proc_{CCS} \land \forall c[\cdot] \mbox{ contesto CCS}$, se $p\ R \ q$, allora deve succedere che se io prendo il contesto con all'interno il processo $p$, $C[p]$, e al posto di $p$ sostituisco $q$ allora il contesto $C[q]$ deve essere in relazione con $C[p]$. ($C[q] \ R \ C[p])$.
+
+Dati due processi $p_1$ e $p_2$ a cui assegniamo i due LTS $v_1$ e $v_2$. I due processi sono equivalenti se $v_1$ e $v_2$ sono isomorfi. Possiamo in realtà cercare qualcosa di meno forte rispetto all'isomorfismo ma che garantisca lo stesso risultato. Si va a vedere quindi se i due LTS \textbf{ammettono le stesse sequenze di operazioni}, prendendo l'\textbf{equivalenza forte} tra automi a stati finiti. Questa è detta \textbf{equivalenza rispetto alle tracce}. È comunque più forte di dire che hanno la stessa precondizione e postcondizione.\\ Bisognerà trattare il problema dal punto di vista della congruenza. 
+
+\subsection{Equivalenza rispetto alle tracce}
+Innanzitutto prendo un processo $P \in Proc_{CSS}$ e dico quali sono le tracce di P, $Tracce(P)$. Prendo un processo, prendo un transition system e prendo, non il linguaggio accettato, ma prendo tutte le sequenze di azioni che sono possibili da parte del processo $P$.\\ $Trace(P) = \{w \in \ Act^* \ t.c: \ \exists \ p' \in Proc_{CSS} \ p \stackrel{w} \to p' \}$\\
+
+Preso $P_1\in Proc_{CCS}$ ho che è equivalente rispetto alle tracce a $P_2$, scritto: $P_1 \ \stackrel{T}{\sim} \  P_2$ sse: \\ $Tracce(P_1) = Tracce (P_2)$. Quindi le sequenze di azioni possibili da $P_1$ possono essere fatte anche da $P_2$
+
+\subsubsection{Esempio macchinetta del caffè} 
+Prendiamo $(LP|M_i)_{\backslash\{coin, caff\textnormal{è}\}}$ suppongo di avere due macchinette $M$ che erogano sia caffè che $tea$, per il primo basta una moneta e per il secondo due. \\
+ 
+$M_1 = \overline{coin} \cdot (caff\textnormal{\textit{è}} \cdot M_1 + \overline{coin} \cdot tea \cdot M_1)$ \\
+$M_2 = \overline{coin} \cdot caff\textnormal{\textit{è}} \cdot M_2 + \overline{coin} \cdot \overline{coin} \cdot tea \cdot M_2$ \\
+Le tracce di $M_1$ sono o non sono le stesse di $M_2\stackrel{?}{=} M_1 \ \stackrel{T}{\sim} \ M_2$
+Partiamo a considerare prima $M_1$
+ \begin{center}
+    \begin{tikzpicture}[shorten >=1pt,node distance=5cm,on grid,auto]
+      \node[state] (q_0) {$M_1$}; 
+      \node[state] (q_1) [below=of q_0] {\footnotesize{$caffe\cdot M_1+\overline{coin}\cdot tea\cdot M_1$}};  
+      \node[state] (q_2) [right=of q_1]
+      {$tea\cdot M_1$}; 
+      
+      \path[->]
+      (q_0) edge  node {$\overline{coin}$} (q_1)
+      (q_1) edge  node [above]{$\overline{coin}$} (q_2)
+      (q_2) edge  node [above right] {$tea$} (q_0)
+      (q_1) edge [bend left= 25] node [above left] {$caffe$} (q_0);
+    \end{tikzpicture}
+  \end{center}
+Consideriamo ora invece $M_2$
+\begin{center}
+    \begin{tikzpicture}[shorten >=1pt,node distance=4cm,on grid,auto]
+     \node[state] (q_0) {$M_2$}; 
+      \node[state] (q_1) [below right=of q_0] {$\overline{coin}\cdot tea\cdot M_2$};
+      \node[state] (q_2) [below left=of q_0] {$caffe\cdot M_2$};
+      \node[state] (q_3) [above right=of q_0] {$tea\cdot M_2$}; 
+      
+      \path[->]
+      (q_0) edge  node {$\overline{coin}$} (q_2)
+      (q_0) edge  node {$\overline{coin}$} (q_1)
+      (q_1) edge [right] node {$\overline{coin}$} (q_3)
+      (q_3) edge  node {$tea$} (q_0)
+      (q_2) edge [bend left= 25] node [above left] {$caffe$} (q_0);
+    \end{tikzpicture}
+\end{center}
+
+Si vede quindi che le tracce di $M_1$ sono le stesse di quelle di $M_2$. Vuol dire che $M_1 \ \stackrel{T}{\sim} \ M_2$. Se sostituisco le due macchine si nota che $M_2$ può andare in deadlock, avendo due processi che iniziano con $\overline{coin}$, infatti la macchina potrebbe aspettare una seconda moneta per prendere il $tea$, mentre magari volevo il $caff\textnormal{\textit{è}}$. Questo perché $M_2$ ha un comportamento non deterministico. \\
+
+Lo studio delle tracce quindi non è più sufficiente nel caso di sistemi concorrenti. Si necessità quindi di una nozione più restrittiva.\\ Per ovviare al problema sopra descritto si ha la \textbf{bisimulazione}. 
+$M_1$ e $M_2$ non sono equivalenti rispetto alla \textbf{bisimulazione} e quindi non posso sostituire l'una con l'altra: $M_1\stackrel{Bis}{\not\sim}M_2$

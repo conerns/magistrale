@@ -1,0 +1,110 @@
+\section{Support Vector Machine}
+Per il percettrone semplice veniva usato un algoritmo di apprendimento per fargli imparare solo funzioni di separazione lineari, e mentre il percettrone multistrato poteva imparare funzioni di separazione non lineari complesse, ma con difficoltà di addestramento avendo molti minimi locali e tanti pesi, le \textbf{SVM} funzionano usando un algoritmo di apprendimento efficiente per imparare funzioni di separazione non lineari complesse. 
+
+Viene quindi ripreso comunque il concetto di \textit{separazione lineare} ma con una scelta efficiente dell'iperpiano. Quando si il SVM, si usa un metodo che prende tutte le istanze in input, esegue un calcolo immediato di quelle che è un set di dati buono. Si trova così il \textbf{miglior iperpiano separatore}, per classificare un insieme di punti linearmente separabili, trovando un vettore di pesi $W$ per separare bene le istanze. 
+Si usa la cosiddetto \textbf{teoria statistica dell’apprendimento} che dice che tra tutti gli iperpiani che possiamo usare per separare due classi si sceglie quello che probabilmente sarà in grado di etichettare meglio nel futuro. Con le SVM inoltre si vedrà come si comporta l'iperpiano sugli esempi non visti, generati sempre da una $f$, ma che non abbiamo potuto considerato per poter produrre il vettore, o i vettori, di peso.  
+Per scegliere il miglior iperpiano viene utilizzato con l'intuizione. L'intuizione è quella di prendere un iperpiano ottimo rispetto alla misura della distanza minima che si ha tra gli esempi e l'iperpiano stesso.
+Quello che si fa è guardare tutti i punti del mio training set e cercare di scoprire a quale degli iperpiani si avvicinano di più. L'obbietivo sembra essere inserire l'iperpiano in mezzo ai punti (quindi è la riga che divide in modo perfetto, con le stesse distanze dai punti vicini, l'iperpiano positivo e negativo), in modo che intorno ad esso ci sia massima ampiezza. Tale ampiezza è detta margine (volendo che sia massima la distanza minima tra tutti i punti). SVM usa questa teoria per trovare l'iperpiano migliore in base a questi calcoli probabilistici.  \\
+Notiamo facilmente che non si parla quindi più di neuroni. \\
+
+Se riuscissimo a separare i dati con un largo margine avremmo ragione di credere che (assunto che i punti siano generati sempre dalla stessa “regola” ) il classificatore (ovvero l'iperpiano stesso) sia “più robusto” tanto da avere una migliore generalizzazione. Il nostro classificatore (iperpiano o $f$) divide correttamente i punti su cui è stato addestrato. \\
+Quando arriva quindi un nuovo punto, generato con la stessa regola degli altri, sarà sicuramente classificato correttamente, una volta scelto l'iperpiano.\\ 
+Ci serve quindi la separabilità delle istanze, serve quindi che la funzione generatrice sia linearmente separabile. \\
+La probabilità di avere un buon comportamento su istanze future è valutabile rispetto a una classe di funzioni segrete, generatrici delle istanze, che sia ben nota. Se la classe di separazione fosse non linearmente separabile quello che il mio sistema è molto limitato. 
+\subsection{Vapnik-Cervonenkis - VC}
+Con la teoria statistica dell'apprendimento si dimostra che più allarghiamo il margine meglio l’iperpiano generalizza, raggiungendo la dimensione di Vapnik-Cervonenkis (VC).\\ Prese tutte le funzioni che generano il training set si produce la VC che esprime quanto è difficile sbagliare sulle ipotesi future in base alla scelta dell'iperpiano.\\
+
+Dobbiamo quindi scrivere un algoritmo per trovare l'iperpiano di separazione di massimo margine. In input si hanno le istanze etichettate e in output un vettore (è un numero) che identifica l'iperpiano.\\ 
+Viene usata una notazione matematica, dove supponiamo di avere un insieme di punti di training: \\ $S = \{(x_1,y_1), (x_2,y_2),\ldots, (x_n,y_n)\}$. Ad ogni $x_i$ (vettore) è associata la rispettiva classe di appartenenza $y_i$ (con etichetta binaria non booleana), infatti $y_i \in \{-1,\ +1\}$.\\
+I punti sono linearmente separabili (inoltre dalle formule si nota che l'iperpiano separa positivi e negativi)
+\[
+  \begin{cases}
+    \langle w,x_i\rangle + b >0 &\mbox{ se }y_i=+1\\
+    \langle w,x_i\rangle + b <0 &\mbox{ se }y_i=-1\\
+  \end{cases}
+\] \\
+Ma questo lo possiamo scrivere in modo equivalente usando un solo vincolo: $y_1 \cdot \langle w,x_i\rangle + b >0 \quad i= 1,\dots, n$.\\ 
+Come risultato del nostro apprendimento cerchiamo i valori $w$ e $b$. Si ha che $w$ mi dirà quanto è inclinato il piano mentre $b$ è la distanza tra l'origine e il piano. Queste due variabili identificano i vari iperpiani possibili tra cui cercare il migliore ovvero quello che separa meglio punti positivi e negativi.\\ 
+Noi cerchiamo quindi tra gli iperpiani separatori ($w$, $b$), oppure tra le funzioni di decisione lineari associate, espresse nella forma $h_{w,b}(x) = sgn(\langle w,x \rangle + b)$, il migliore iperpiano, o la migliore funzione di decisione, che meglio separa i punti negativi da quelli positivi. \\
+
+Sia $d_-$ e $d_+$ le distanze tra l’iperpiano separatore e il punto positivo e negativo più vicino definiamo il:
+\begin{itemize}
+    \item \textbf{margine funzionale} di un punto $(x_i,y_i)$ rispetto all’iperpiano $(w,b)$: $\hat{\gamma} = y_i(\langle w, x \rangle +b)$\\ Il margine funzionale dell'iperpiano rispetto al training set $S$ è il valore minimo:$\hat \rho = \displaystyle \min_{i = 1, \dots, n} \hat{\gamma}_i$.
+    Se il punto $x_i$ è tale che $y_i = +1$ ($y_i = -1$), affinché il margine funzionale sia grande, è necessario che la quantità $\langle w, x_i \rangle$ abbia un valore positivo (negativo).\\
+    Per ogni istanza $i$, se $\hat{\gamma}_i > 0$, la classificazione è corretta, ovvero le classi sono linearmente separabili e l’iperpiano $(w, b)$ le separa effettivamente.\\
+    Un ampio margine funzionale dà speranza sulla qualità della predizione ma bisogna tenere conto anche altri aspetti.
+    Il margine funzionale non è invariante rispetto ad un iperpiano riscalato, ovvero per come è stato impostato il classificatore $f$, se si scala l’iperpiano $(w,b) \to (cw, cb)$:
+    \begin{itemize}
+        \item si ottiene lo stesso iperpiano, ovvero lo stesso luogo dei punti
+        \item si ottiene la stessa funzione di decisione, eventualmente con segno invertito se $c$ è negativo
+        \item il margine funzionale viene moltiplicato per $c$ e non è quindi possibile usarlo come distanza di un punto dall’iperpiano perché non è invariante rispetto alla scala. 
+    \end{itemize}
+    \item \textbf{margine geometrico} dell’iperpiano rispetto al training set $S$: $\rho = \displaystyle \min_{i = 1, \dots, n}\gamma_i$.\\
+    Distanza dall’iperpiano a un punto $x$: $d = \displaystyle \frac{\displaystyle  \sum_{i=1}^n w_i x_i + b}{|| w ||} = \displaystyle  \frac{\langle w \cdot x_i \rangle + b}{|| w||}$.\\
+    Margine geometrico di un punto $(x_i, y_i)$ rispetto all’iperpiano $(w,b)$: $\gamma_i = \displaystyle \frac{y_i(\langle w, x_i \rangle + b)}{||w||}$. \\
+    Per ogni istanza $i$, se $\gamma_i > 0$, la classificazione è corretta, come per il margine funzionale. Dato un punto positivo (negativo) il margine geometrico rappresenta la sua distanza geometrica dall’iperpiano in $R^n$.
+
+  Il margine geometrico è invariante rispetto alla scala di w. \\
+  Grazie a tale invarianza, si può riscalare l’iperpiano senza cambiare nulla (il margine non varia). Se si pone $||w|| = 1$, si riscala l’iperpiano $(w,b) \to (\displaystyle \frac{w}{||w||}, \frac{b}{||w||})$, andando a considerare l’iperpiano $(\displaystyle \frac{w}{||w||}, \frac{b}{||w||})$ con vettore pesi $\displaystyle \frac{w}{||w||}$ di norma unitaria.
+\end{itemize}
+
+\bigskip
+
+Un iperpiano è detto \textbf{canonico}, se $\displaystyle \min_{i = 1, \dots, n}|\langle w,x_i \rangle+ b| = 1$. \\
+In altri termini, per un iperpiano canonico il margine funzionale è $1$ e il margine geometrico è $\displaystyle \frac{1}{||w||}$. 
+Se $||w|| = 1$, il margine funzionale è uguale al margine geometrico, infatti: $\gamma_i = \displaystyle \frac{y_i(\langle w, x_i \rangle + b)}{||w||}$ e $\hat \gamma_i = y_i (\langle w,x \rangle + b)$.\\
+
+Relazione tra margine funzionale e geometrico: $\gamma = \displaystyle \frac{\hat \gamma}{||w||}$.\\
+Per quanto detto, sembra naturale il voler cercare di estendere quanto possibile il margine geometrico, risolvendo un problema di ottimo del tipo:  $\max f(x)$ tale che $g(x) \leq 0, \;  h(x)=0$. Non sempre esiste una soluzione e, se esiste, difficilmente la si riesce a trovare per via analitica; a volte si può approssimare con metodi iterativi.
+
+Per assicurarsi che tutti punti (sia positivi che negativi) cadano al di fuori del margine, dato un $\gamma$, per ogni punto $i$, si vuole che $\displaystyle \frac{y_i(\langle w, x_i \rangle + b)}{||w||} \geq \gamma$. Il problema di ottimo diventa quindi: 
+$$\max (\gamma) \mbox{ tale che } y_i(\langle w, x_i \rangle + b) \geq \gamma, \;  ||w||=1$$ 
+
+Un problema così formulato è di difficile soluzione perché presenta un vincolo non convesso. Riformulandolo, in modo da scrivere il margine geometrico come $\gamma = \displaystyle \frac{\hat \gamma}{||w||}$, diventa:  $\max \displaystyle \frac{\hat\gamma}{||w||}$ tale che $y_i(\langle w, x_i \rangle + b) \geq \hat \gamma$. \\
+Sussiste ancora un problema, ovvero il fatto che l’obiettivo sia non convesso. Dal momento che si può scalare l’iperpiano senza cambiare nulla (invarianza), è possibile riscalare $(w,b)$ in modo che il margine funzionale sia $1$ (ottenendo un iperpiano canonico): $\max \displaystyle \frac{1}{||w||}$ tale che $y_i(\langle w, x_i \rangle + b) \geq 1$\\ 
+
+Rendere massimo $\displaystyle \frac{1}{||w||}$ equivale a rendere minimo $\displaystyle \frac{1}{2}||w||^2$, quindi: 
+$$\min \tau(w) = \displaystyle \frac{1}{2}||w||^2 \mbox{ tale che } y_i(\langle w, x_i \rangle + b) \geq 1, \mbox{ con } i = 1, \dots, n$$
+
+e si ha che:$w=\displaystyle \sum_{i\in Q}\alpha_i \cdot x_i$. \\
+Quest’ultima forma è quella su cui si lavora. Si può dimostrare che esiste una sola soluzione al problema, ovvero che esiste un unico iperpiano di massimo margine.
+Due motivi che supportano il metodo delle SVM: la capacità dell’iperpiano di effettuare una separazione di massimo margine e l’esistenza di un’unica soluzione al problema. La soluzione al problema è scritta in termini di un sottoinsieme di esempi del training set (noto come vettori di supporto) che giacciono sul margine dell’iperpiano, prendendo una somma pesata dei contenuti dei vettori.\\
+
+Per classificare un nuovo elemento (vettore)$x$ ci interessa il segno di $\langle w,x\rangle+b$ che possiamo scrivere come:
+
+$$sgn(\langle w,x\rangle+b)=sgn\displaystyle \left(\Big\langle\sum_{i\in Q}\alpha_i\cdot  x_i,x\Big\rangle +b\right)=sgn\left(\sum_{i\in Q}\alpha_i\langle x_i,x\rangle +b\right)$$
+Quindi la funzione di decisione associata alla soluzione può essere scritta in termini del prodotto interno tra i vettori di supporto (\textit{support vector}) $x_i$ e il vettore da classificare $x$.$\alpha$ viene elaborato dai vettori di supporto ma non verrà ora trattato.\\
+
+Passiamo quindi oltre alla sola separabilità lineare.\\
+
+Si usa lo stesso approccio, rivedendo la formulazione, tramite i \textbf{metodi kernel}. Si cerca di mappare lo spazio di input in un nuovo spazio, (in generale di dimensione maggiore), in cui i punti siano linearmente separabili, per classificare mediante superfici non lineari.\\
+
+Dobbiamo trovare una funzione: $\Phi:\mathbb{R}^n\to \mathbb{R}^m,\mbox{con }m>n$ che mappi i dati iniziali non linearmente separabili in uno spazio di dimensione
+superiore in cui siano linearmente separabili.\\
+In questo nuovo spazio la funzione di decisione che classifica l'input $x$ è: $sgn\left(\displaystyle \sum_{i\in Q}\alpha_i\langle \Phi(x_i),\Phi(x)\rangle+b\right)$. \\
+Il calcolo delle immagini $\Phi(x_i)$ è generalmente computazionalmente pesante ma è semplificato nel caso di \textbf{funzioni kernel}.
+\subsection{Funzione kernel}
+Data una trasformazione $\Phi:\mathbb{R}^n\to \mathbb{R}^m$ una \textbf{funzione kernel} è una mappa: \\
+$$K:\mathbb{R}^n\times \mathbb{R}^n\to \mathbb{R}\mbox{ in modo tale che }K(x,y)=\Phi(x)\cdot \Phi(y)$$
+Il kernel ha una particolarità, il \textbf{kernel trick}: che consiste nel computare il prodotto interno delle trasformare di due vettori $x$ e $y$, tramite $\Phi$, senza computare le trasformate, semplificando il calcolo della funzione di decisione:$$sgn\left(\displaystyle \sum_{i\in Q}\alpha_i\langle \Phi(x_i) , \Phi(x) \rangle + b \right)$$ sostituendo $\Phi(x_i)\cdot\Phi(x)$ con $K(x_i,x)$, ottenendo: $sgn\left(\sum_{i\in Q}\alpha_i\cdot K(x_i,x)+b\right)$  con: $K(x,y)=\langle \Phi(x) , \Phi(y) \rangle$\\
+Non si cercano tutte le possibili trasformazioni ma solo alcune.
+
+%###qui fa un esempio, l'ho seguito ma non mi sembrava impo da scrivere
+
+Si hanno alcune proprietà in riferimento alle funzioni kernel:
+\begin{itemize}
+  \item se i dati sono mappati in uno spazio di dimensioni sufficientemente elevate, saranno quasi sempre linearmente separabili
+  \item quattro dimensioni sono sufficienti per separare linearmente un cerchio in qualsiasi punto del piano
+  \item cinque dimensioni sono sufficienti per separare linearmente qualsiasi ellisse
+  \item se abbiamo $N$ esempi sono quasi sempre separabili in spazi di dimensioni $N-1$ o più
+  \item rappresentano un modo per applicare le SVM in modo efficiente in spazi di dimensione molto alta (o infinita): $$
+    K(x,y) = \langle \Phi(x) , \Phi(y) \rangle, \mbox{ con } \Phi: \mathbb{R}^n \to \mathbb{R}^m
+  $$
+  \item calcolare $K(x,y)$ può essere molto economico anche se $\Phi(x)$ è molto costoso, ad esempio con vettori di dimensione elevata, in tali casi (che vanno dimostrati), si addestrano le SVM nello spazio di dimensionalità maggiore senza mai dover trovare o rappresentare esplicitamente i vettori $\Phi(x)$
+\end{itemize}
+
+Vediamo due teoremi:
+\begin{itemize}
+    \item Un kernel definisce una matrice [$K_{ij}$] che è simmetrica e definita positiva
+    \item Ogni matrice simmetrica e definita positiva è un kernel [Teorema di Mercer]
+\end{itemize}

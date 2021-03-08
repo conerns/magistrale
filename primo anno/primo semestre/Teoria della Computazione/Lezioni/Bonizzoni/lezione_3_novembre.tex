@@ -1,0 +1,47 @@
+\section{Lezione del 3 novembre}
+L’algoritmo per Vertex Cover-Approx, nel nostro caso lo chiamiamo $opt(x)$, nel caso migliore prende esattamente un estremo per ogni arco scelto di volta in volta da A.
+$$A(x) = 2k (\mbox{ con } 2k \mbox{ vertici in } C)$$
+$k$: numero di archi, che pone un limite inferiore alla dimensione dell’ottimo ($opt(x) \geq k$).
+$\displaystyle \frac{A(x)}{opt(x)} \leq \frac{2k}{k} \leq 2$
+
+L’idea della 2-approssimazione è quella che:
+\begin{itemize}
+    \item si cerca un limite inferiore $k$ alla dimensione dell’ottimo per il problema su istanza $x$: $opt(x) \geq k$. Ricordiamo che $x$ è una istanza del grafico $G = (V,E)$
+    \item si sviluppa un algoritmo polinomiale $A(x)$ che produce una soluzione ammissibile per il problema tale che il costo di tale soluzione sia $\varepsilon \cdot k$, per $\varepsilon > 1$. Indichiamo come $A(x)$ la dimensione di un matching.
+    \item Dal momento che $opt(x) \geq k$ e $A(x) \leq \varepsilon \cdot k$, con $\varepsilon > 1$, allora $\displaystyle \frac{A(x)}{opt(x)} \leq \frac{\varepsilon \cdot k}{k} \leq \varepsilon$.
+\end{itemize}
+Quindi diciamo che nel caso del Vertex-Cover, dato che $x$, ricordiamo sia una istanza del grafo, allora $A(x)$ è la dimensione di un matching. Si costruisce quindi un matching perfetto, selezionando degli archi del grafo che non condividono i vertici o estremi. Si cerca di utilizzare tutti i vertici.\\
+
+Una copertura minima del grafo deve per forza contenere esattamente un vertice per ogni arco del matching (perché non hanno estremi in comune). Quindi il limite inferiore per $opt(x)$ è il numero di archi del matching. Questo posso indicarlo con $opt(x) \geq$ numero di archi del matching.\\
+L’algoritmo $A$ costruisce in maniera incrementale (un simil greedy) un matching per $G$ come segue: prende un arco $e_i$ e rimuove tutti gli archi incidenti agli estremi di $e_i$.Per fare questo, però inserisce nella soluzione ammissibile i due estremi di $e_i$. L’arco successivo scelto da $A$ non ha estremi condivisi con $e_i$. \\ In sintesi l'unico problema è che la dimensione di $A(x)$ è doppia rispetto al numero di archi del matching (perché salvo tutti i vertici): $A(x) = 2 \times$ numero di archi nel matching, mentre $opt(x) \geq$ numero di archi del matching, perché non è detto che per l'ottimo bastino il numero di archi del matching.
+
+{
+\paragraph{Domanda e-mail}
+
+Esistono dei problemi NP-hard per i quali non si è riusciti a dimostrare che stiano anche in NP, ovvero per i quali non si è riusciti a costruire un algoritmo con certificato.
+}\\
+
+Un problema $\Pi$ è completo per una classe di complessità $K \iff$ il problema $\Pi$ è nella classe stessa, quindi $K$ ed è difficile per la classe $K$.  
+\subsection{Complessità parametrica}
+Dato un problema NP-completo, questo può avere istanze che sono risolvibili in tempo ragionevole se si fissano dei parametri che caratterizzano l’istanza. Se il parametro è piccolo anche un tempo esponenziale in $k$ è accettabile.
+
+Esempio: dato un grafo, esiste un vertex-cover di dimensione al più $k$?
+
+Un problema decidibile $\Pi$ è trattabile fissato il parametro (FTP, Fixed Parameter Tractable) $k \iff \exists$ un algoritmo $A$, una costante $c$ e una funzione computabile $f$ tale che $\forall$ input $\langle x, k \rangle$, $A$ risolve il problema con tempo di calcolo $f(k)|x|^c$. \\
+
+Notiamo che $|x|^c$, ovvero la parte relativa all'input, è un tempo polinomiale, mentre $f(k)$ è un tempo esponenziale.
+Vediamo quindi il tempo $T(n)$ come funzione di $n =|x|$ e di $k$. Deve valere che $k$ è piccolo, essendo esponenziale si accettano valori piccoli. \\
+
+Se mi trovo in un problema di decisione, quindi con un $bound$ imposto, che noi denominiamo $k$, significa che non ho più il problema generale dell'ottimizzazione (quello che abbiamo visto $opt()$), prendo in considerazione una versione ristretta del problema di decisione, questo per via di $k$ che avevamo voler tenere di piccole dimensioni per non avere tempi di calcolo troppo alti. Si crea quindi un algoritmo parametrico che utilizza $k$, tale per cui il tempo di calcolo risulta essere una funzione  $f(k)n^c$, dove $n$ è il massimo della cardinalità dei vertici definiti $e_i$ prima. \\
+
+
+\subsection{Alberi di ricerca limitati}
+Dato che possiamo fissare il tempo imposto un valore di bound $k$ grazie al passaggio di un valore, espresso come parametro , al nostro algoritmo, possiamo costruire algoritmi parametrici.\\
+Solitamente gli algoritmi parametrici, o qualsiasi tecnica parametrica, utilizzano gli alberi di ricerca limitati. 
+
+\begin{teorema}{Teorema}{}
+    Il problema vertex-cover $(G,k)$ è risolvibile in tempo $\mathcal{O}(2^k |V|)$, dove V è l'insieme dei vertici di di G. La costante rappresentata dal nostro $\mathcal{O}$ non dipende da $k$ e nemmeno da $V$. Quella è semplicemente la funzione che esprime il tempo di calcolo.
+    $$\mathcal{O^*}(f(k)) = \mathcal{O}(2^k |V|)$$
+\end{teorema}
+
+L'idea, per riuscire a rappresentare un insieme grande di vertici, è quella di costruire i sotto insieme di un numero $k$ di vertici. Questi sottoinsieme sono in totale $2^k$ quando si raggiunge la profondità $k$ passato come parametro.

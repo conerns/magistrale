@@ -1,0 +1,162 @@
+\section{Validation \& Verification}
+Ultima fase del nostri ciclo di attività che costituiscono il RE. In questa fase si studia l’RD, ovvero la sua garanzia di qualità, analizzando varie attività:
+\begin{itemize}
+    \item \textbf{validazione}: quanto contenuto nell’RD dev’essere adeguato con quanto si necessita.
+    \item \textbf{verifica}: non ci devono essere omissioni o inconsistenze.
+    \item \textbf{correzione}: di eventuali errori e difetti.
+\end{itemize}
+L'output che si deriva è un documento dei requisiti(RD) consolidato.\\
+Si studia durante questa fase quella che è la quality assurance. Ques-  t'ultima si occupa di dare risposta alla domanda \textit{Come faccio a sapere se i requisiti che ho specificato, siano o meno, un coorretto insieme soddisfacente}.\\
+Questa domanda ha una risposta molto complessa, questo perché nel caso dei requisiti, chiedersi se un insieme di requisiti specificati è corretto non ha una risposta immedaita.\\
+Quello che possiamo fare è utilizzare uno dei seguenti approcci:
+\begin{enumerate}
+    \item \textbf{Requirements inspection and reviews}: eseguire una ispezione, manuale, dei requisiti prodotti. Vengono analizzati da un team di revisori che cercano specifici tipi di errori all'interno dei requisiti.(più diffuso e più applicabile, può essere ispezionato sempre un requisito, nonché estremamente costoso)\\
+    Non possiamo analizzare tutto, dato l'enorme costo che comporterebbe, ma solamente alcune parti che riteniamo più importanti. 
+    \item \textbf{Queries on a specfication database}: se i nostri requisiti sono presenti su un database, e se sono ben scritti e ben strutturati, alcuni controlli possono essere automatizzati attraverso delle query che, ad esempio, vanno a verificare se ci sono dei conflitti. L'automazione è parziale, la fase di check è limitata. 
+    \item \textbf{Requirements validation by specification animation}: se si sviluppa modellando sin dall'inizio il comportamento del software, possiamo svolgere una attività di sviluppo che continua a utilizzare dei modelli, che man mano vengono concretizzati fino a quando non si arriva alla stesura del codice vero e proprio. Questo codice può essere generato automaticamente dal nostro modello (diagramma). Dato che per alcuni di questi software si possono fare delle verifiche, anche visuali, è possibile individuare dei problemi già nella specifica dei requisiti. 
+    \item \textbf{Formal checking}: può rivelare bug sottili, richiede specifiche formali e esperti dei linguaggi formali.
+\end{enumerate}
+
+La qualità va assicurata e controllata perché possono esserci errori e difetti nei documenti sui requisiti che possono essere di diversi tipi (omissioni, contraddizioni, ecc) e possono essere i più costosi, numerosi, persistenti e pericolosi errori nel progetto.
+
+Approcci di di verifica della qualità dei requisiti: 
+
+- ispezione e revisione (operazione manuale e costosa in termini di tempo, ma è sempre applicabile)
+ 
+ L’idea base è quella di chiedere a un gruppo di persone di ispezionare individualmente l’RD e successivamente di mettersi d’accordo sui problemi da risolvere.
+ Ne esistono forme walkthroughs dove l’ispezione interna viene fatta dai membri del progetto e forme più strutturate dove i valutatori sono esterni, i meeting vengono ben preparati e vengono ispezionati i report. 
+ L’ispezione e la revisione sono molto comuni per il source code. 
+ Studi empirici hanno mostrato che è processo efficace anche per i requisiti.
+ 
+ 1. pianificazione dell’ispezione: determina le revisioni, la tempistica, lo scopo dei meeting e il formato dei report.
+ 2. revisione individuale: 
+    - free mode: non ci sono direttive su dove cercare cosa.
+    - checklist-based: si concentra su problemi specifici o su specifiche parti dell’RD.
+    - process-based: si assegna un ruolo specifico ad ogni valutatore, comprensivo di procedure specifiche, tecniche di analisi. È il modo più efficace.
+ 
+ Linee guida sull’ispezione:
+ 
+ - il report dell’ispezione dovrebbe essere informativo, accurato, costruttivo (senza opinioni né commenti offensivi).
+ - Le ispezioni dovrebbero essere indipendenti dagli autori dell’RD e rappresentative di tutti gli stakeholder quindi avere background differenti.
+ - Le ispezioni non dovrebbero avvenire né troppo presto é troppo tardi: meeting più corti e frequenti sono più efficaci.
+ - Le ispezioni richiedono una maggiore attenzione per le parti critiche: più difetti ci sono in una parte più richiede attenzione.
+ 
+ Esistono diversi tipi di checklist per l’ispezione il cui obiettivo è guidare la ricerca di difetti verso problemi specifici: 
+ 
+ - *defect-driven*: lista di domande generiche suddivise per tipo di difetto.
+ - *quality-specific*: suddivide le domande defect-driven in specifiche categorie NFR (sicurezza, affidabilità, performance, ecc) e si focalizza spesso sulle omissioni.
+ - *domain-specific*: ulteriore specializzazione dei concetti di dominio e delle operazioni per rendere ancora più guidata la ricerca dei difetti.
+ - *language-based*: specializza la checklist defect-driven ai costrutti specifici del linguaggio e a volte viene parzialmente automatizzata.
+ 
+ Vantaggi: l’ispezione dei requisiti si è verificata più efficace dell’ispezione del codice, ha ampia applicabilità.
+ Svantaggi: il processo di ispezione è costoso (per via della dimensione del materiale da ispezionare, perché richiede tempo e costi per gli ispettori esterni e per i meeting e perché non è incrementale) e non c’è garanzia di trovare tutti i difetti.
+
+- query su uno specifico database (parziali, ma automatiche almeno per controlli superficiali)
+ 
+ Sono usate su specifiche diagrammatiche, mantenute nel database dei requisiti (lo schema logico deriva dalla struttura del diagram language).
+ Le query catturano i controlli per la consistenza strutturale sia intra- che inter- diagrams, attraverso checklist automatiche di domande.
+ Un motore di query diagram-specific può essere generato da un ER meta-spec di un linguaggio di diagramma.
+ 
+ % <img src="C:\Users\alice\AppData\Roaming\Typora\typora-user-images\image-20201125174549137.png" alt="image-20201125174549137" style="zoom:50%;" />
+ 
+ - *press-button mode*: comunemente utilizzata da strumenti CASE, permette di creare query preimpostate per la violazione delle regole. 
+
+- animazioni delle specifiche (parziali e richiede che le specifiche siano eseguibili, ma utile per trovare bug ed è adatto ai non esperti).
+ L’obiettivo è di controllare l’adeguatezza dei requisiti rispetto ai bisogni reali.
+ 
+ - approccio 1: mostrare scenari di interazioni concrete in azione.
+   Vantaggi: strumento di rappresentazione utilizzabile sui diagrammi ET
+   Svantaggi: la copertura dello scenario sul problema.
+ - approccio 2: usare tool di animazione per le specifiche
+   1. estrarre o generare dalle specifiche modelli eseguibili 
+   2. simulare il comportamento del sistema dal modello (sottomettere al modello gli eventi-stimolo per vederne il comportamento di risposta)
+   3. visualizzare la simulazione durante l’esecuzione:
+      - textual format: comandi inpu, traccia dell’esecuzione
+      - diagrammatic: selezione degli eventi di input, processione dei token
+      - domain scenes: pannelli di input, scene animate nell’ambiente
+   4. ricevere il feedback utente
+ 
+ Si tratta di una modalità model-based per la quale sono disponibili molti animators per i linguaggi di specifica.
+ 
+ Vantaggi: miglior modo per controllare l’adeguatezza rispetto ai veri bisogni e all’ambiente reale, supporta il coinvolgimento degli stakeholder, è estendibile a controesempi animati generati da altri tool e gli scenari animati possono essere tenuti per rivederli più avanti.
+ Svantaggi: richiede una progettazione attenta degli scenari che possano mostrare dei problemi, non garantisce la copertura di tutte le inadeguatezze (anche importanti) e richiede delle specifiche formali.
+
+- controllo formale (richiede specifiche formali e esperti; ma può rivelare bug minuziosi)
+ 
+ - language checks (correzione sintattiche, di battitura e di semantica statica)
+   Controllo della sintassi in base alle regole grammaticali, controllo dei tipi, controllo della semantica statica (le variabili usate devono essere dichiarate,  inizializzate e utilizzate all’interno di uno certo scope), circularity checking.
+ 
+ - language-specific consistency/completeness check 
+   Es. quando i servizi o i comportamenti sono specificati come relazioni I/O, queste relazioni sono funzioni? (per evitare il non determinismo). E nel caso sono funzioni totali? (l’output è specificato per ogni possibile input)
+ 
+ - property verification
+   
+   - algoritmica (model checking)
+     Per verificare se un modello di comportamento soddisfa un requisito, un domain property o un’assunzione, attraverso un’esaustiva ricerca attraverso il modello di un’eventuale property violation.
+     La generazione di un controesempio rappresenta una traccia che porta a una violazione.
+     Proprietà che possono essere controllate: rechability (la situazione può o non può essere raggiunta), safety (la condizione desiderata è sempre soddisfatta), liveness (la condizione desiderata alla fine verrà soddisfatta)
+     
+     Vantaggi: controlli completamente automatizzati, ricerca esaustiva (non vien tralasciato alcun eventuale difetto), le tracce dei controesempi possono rivelare errori sottili, difficili da trovare altrimenti, coppia naturale con le animazioni per la visualizzazione delle tracce e sempre più usata dall’industria per i progetti mission-critical.
+     Svantaggi: esplosione combinatoria degli stati (attualmente non è utilizzabile per sistemi troppo grandi e perciò utilizzato per il controllo di modelli limitati e astrazioni, perdendo in accuratezza e completezza), i controesempi possono essere complessi e difficili da capire (mostrano i sintomi dei bug e non le cause).
+   
+   - deduttiva (thereom proving)
+     
+     Generazione di nuove specifiche formali applicando le regole di inferenza alla logica sottostante.
+     Mostrano le conseguenze logiche delle specifiche e evidenziano le incosistenze.
+     Sono generalmente interattive per fornire, accettare e rigettare lemmi e suggerire strategie di dimostrazione.
+     
+     Vantaggi: solidità e completezza del sistema formale usato (ogni conclusione è corretta e ogni corretta conclusione è derivabile), utilizzabile per mostrare specifiche inconsistenti e conseguenze inadeguate, può essere applicato a grandi sistemi (lo spazio infinito degli stati è gestito grazie all’induzione), dimostrazioni fallite possono rivelare la causa di un problema.
+     Svantaggi: difficili da usare (richiedono un’alta expertise), non vengono prodotto controesempi.
+
+\section{Requirement evolution} 
+Una volta completata la nostra prima iterazione del ciclo RE, quello che facciamo e proseguire eseguendo il prossimo ciclo. Si vede una evoluzione dei requisiti maturando mano a mano il nostro sistema. Sui requisiti vengono ri-eseguite le fasi [1-4].
+Come è stato detto queste quattro fasi si ripetono in modo iterativo in modo “a spirale”. Questo viene fatto in quanto si possono avere evoluzioni nel processo nonché correzioni di quanto già fatto che si propagano su tutto il documento. Le evoluzioni e le correzioni possono sopraggiungere durante l’RE stesso, lo sviluppo del software e dopo il deploy del software stesso.\\
+Dopo ogni ciclo si è molto più consci del sistema e si può passare al miglioramento del RE con più efficacia. Questo sistema è molto compatibile con i vari metodi agili.\\
+
+Il problem world (problema derivato dal mondo reale) continua a cambiare, e questo crea un impatto sul nostro sistema. Può capitare che cambiano le organizzazioni, i regolamenti, le opportunità, le alternative tecnologiche, evolvono le priorità e i vincoli e con il passare del tempo si ha sempre una migliore comprensione delle caratteristiche del sistema, i suoi punti di forza e i suoi limiti e difetti.\\
+
+Il problema della gestione dell’informazione sorge un quanto bisogna sempre mantenere la consistenza, propagare i cambiamenti e controllare le versioni. Questo problema è mitigato dall’anticipazione del cambiamento e dalla gestione della tracciabilità, quindi tenere traccia dei legami tra i vari requisiti per non genere problemi.\\
+La gestione dei cambiamenti nei requisiti è il processo di anticipazione, valutazione, accordo e propagazione dei cambiamenti negli items dell’RD.
+\subsection{Prepararsi per i cambiamenti}
+Saper distinguere quali requisiti cambieranno di più e quelli sono più stabili e gestire questi in maniera diversa.\\
+Identificare i possibili cambiamenti, accertarne la probabilità e documentarli serve per anticipare un’adeguata risposta per quando il cambiamento avverrà e per progettare un’architettura che rimanga stabile a prescindere dai cambiamenti.\\
+Per farlo, si associano livelli di stabilità, caratterizzati da gruppi di statement suddivisi per caratteristiche, ai nostri requisiti. Questo ci permette di gestire cambiamenti diversi in base alla tipologia dei requisiti.\\ Si usa un piccolo numero di livelli, ognuno contenente item di pari stabilità.
+I livelli di stabilità sono un metodo di confronto tra requisiti qualitativo e relativo.\\
+Nel livello di stabilità più alto si trovano le feature che vengono mantenute in qualsiasi contrazione, estensione o variante del sistema.
+Aspetti intenzionali e concettuali e aspetti funzionali che incontrano obiettivi chiavi sono più stabili degli aspetti operazionali e quelli non funzionali.
+Le scelte tra opzioni alternative sono meno stabili: potrebbero basarsi su una conoscenza incompleta e assunzioni volatili, generate da risoluzioni conflittuali e contromisure ai rischi.\\
+
+Le parti più stabili tipicamente sono quelle caratteristiche che possiamo immaginiate di trovare in una qualsiasi estensione/variante del sistema.\\
+Altre caratteristiche che sono possibili da prendere in considerazione è che aspetti \textbf{intenzionali e concettuali}, quanto anche aspetti funzionali che corrispondono agli obiettivi principali, sono molto più stabili rispetto a aspetti operazioni e a aspetti non funzionali.\\
+
+\subsection{L’evoluzione richiede una gestione della tracciabilità}
+Un item è tracciabile se è sempre possibile sapere da dove viene, perché è presente, per cosa sarà utilizzato e come. Saper queste informazioni è utile perché risulta poi più facile gestire eventuali cambiamenti, perché sappiamo con quali altri parti si interferisce in che maniera e cosa comporta la sua evoluzione.\\
+La \textbf{gestione della tracciabilità} (TM, Traceability management) identifica, documenta, recupera il razionale e l’impatto degli item dell’RD.
+Gli gli obiettivi della tracciabilità sono valutare l’impatto dei cambiamenti proposti e propagare facilmente i cambiamenti mantenendo la consistenza (tra gli item dell’RD e verso gli item software)\\
+
+La tracciabilità viene rappresentata da collegamenti tra gli items: è bidirezionale identificando l’accessibilità dalla sorgente al target (forward traceability) e l’accessibilità dal target alla sorgente (backward traceability). La tracciabilità può poi essere all’interno di una stessa fase, dove abbiamo che fare con artefatti dello stesso tipo (horizontal traceability), e tra più fasi, che appartengono a fasi diverse dello sviluppo (vertical traceability).\\
+Anche ora possiamo, una volta definiti i collegamenti, rispondere agli stessi quesiti di prima: sapere da dove viene, perché è presente, per cosa sarà utilizzato e come.\\
+Le catene di tracciabilità supportano analisi multiple: 
+\begin{itemize}
+    \item backward traceability: perché un item si trova in una determinata posizione e da dove viene.
+    \item forward traceability: dove verrà utilizzato questo item e quali implicazioni avrà.
+\end{itemize}
+Ciò permette di localizzare e valutare l’impatto dei cambiamenti lungo collegamenti orizzontali e verticali.
+
+\subsection{Tecniche di tracciabilità}
+Ci sono diverse tecnihe che possiamo utilizzare per caprie come tenere traccia dei vari colleganti per garantire che siano efficienti. \\
+Tra le tecniche di tracciabilità, possiamo trovare: cross referencing, matrici di tracciabilità, feature diagram, database di tracciabilità, database di modelli di tracciabilità e gestione della tracciabilità basata sulle specifiche.
+\begin{itemize}
+    \item \textbf{Cross referencing}: consiste nel selezionare gli item da tracciare e assegnargli nomi univoci, definire uno schema di indici/tag per collegarli lessicalmente, configurare un motore di ricerca a questo schema e recuperare gli item seguendo la catena di cross reference.\\
+    Vantaggi: inizialmente sono facili da eseguire, ma se servono tante modifiche poi diventa abbastanza complesso. Leggero e disponibile in lettura, per ogni livello di granularità.\\
+    Svantaggi: singolo tipo di collegamento (referenze lessico) svincolato dalla semantica e informazioni di tracciabilità nascoste e costo di mantenimento dello schema di index: controllo e analisi limitate.
+    \item \textbf{Matrici di tracciabilità} (traceability matrices): Rappresentazione matriciale di un grafo di tracciabilità a singola relazione (ovvero una relazione tra due item esiste o non esiste). (se nella matrice si trova 0 non ci sono collegamenti tra i due requisiti, 1 altrimenti)\\
+    \begin{itemize}
+        \item across $T_i$‘s row: forward retrieval degli elementi che dipendono da $T_i$
+        \item down $T_i$‘s column: backward retrieval degli elementi dai quali $T_i$ dipende
+    \end{itemize}
+    Vantaggi: navigazione forward e backward e semplice forma di analisi.
+    Svantaggi: difficilmente gestibile e incline all’errore per grafici ampi e permette solo relazioni singole..
+    \item \textbf{Feature diagram}: Rappresentazione grafica dei punti in comune e delle variazioni del sistema per i tipi di collegamento che sono soliti a subire variazioni.\\ Se una feature è optional allora si ha un pallino vuoto, pieno altrimenti.
+    Vantaggi: rappresentazione compatta per un gran numero di varianti.
+\end{itemize}

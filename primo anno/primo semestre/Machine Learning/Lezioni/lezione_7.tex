@@ -1,0 +1,23 @@
+\section{Lezione 7 - SVM}
+SVM può essere applicato a problemi non binari tramite il \textbf{one vs rest}, avendo separazioni non più solo tra esempi positivi e negativi ma anche tra più classi, ovvero più gruppi di punti linearmente separabili.\\
+In caso di SVM multiclasse è possibile trasformare il problema di partenza in una serie di sottoproblemi binari derivati (isolando una classe per volta considerata positiva, da tutto il resto dei dati considerato negativo,  \textbf{one vs rest}) sui quali applicare SVM e ricombinare con una qualche logica di classificazione i vari risultati ottenuti.\\
+In input si prende un learner $L$ (ovvero un algoritmo di addestramento per la classificazione binaria), un set di $K$ esempi $\langle x_i, y_i \rangle$ con $y_i$ label associata all’istanza $x_i$.\\
+In output si ottiene una lista di classificatori $f_k$ con $k=1,\ldots K$.
+Per quanto riguarda la procedura quindi, $\forall k\in \{1\ldots K\}$ si costruisce un nuovo vettore di label $z$ tale che: 
+$$\begin{cases}
+    z_i=y_i&\mbox{ se } y_i=k\\
+    z_i=0&\mbox{ altrimenti}
+\end{cases}$$ e si applica poi $L$ a $(X,z)$ per ottenere $f_k$.\\
+Quindi prendere decisioni significa applicare tutti i classificatori ad un nuovo esempio e prevedere l’etichetta $k$ per la quale il classificatore corrispondente riporta il punteggio di confidenza più alto, una sorta di peso per la classificazione dell’esempio.
+
+Questa euristica soffre di diversi problemi:
+\begin{itemize}
+    \item la scala dei valori di confidenza può differire tra vari classificatori binari.
+    \item anche se la distribuzione in classe è bilanciata nel training set, i learner per la classificazione binaria vedono distribuzioni sbilanciate perché tipicamente l’insieme di negativi che vedono è molto più grande dell’insieme di positivi.
+\end{itemize}
+
+Un’alternativa è il \textbf{one vs one} che prende le varie classi e produce sistemi di SVM tra coppie di classi. \\
+Il problema di questa alternativa è che la quantità di problemi derivati esplode in modo quadratico.\\
+Si ha il train di $$\frac{K\cdot (K-1)}{2}$$ classificatori binari per un problema a $K$ classi, ognuno dei quali riceve i campioni di un paio di classi dal training set originale che deve imparare a distinguere.
+In fase di predizione tutti i $\frac{K\cdot (K-1)}{2}$ classificatori sono applicati al nuovo esempio e la classe che con il più alto numero di predizioni positive viene usata come previsione per il classificatore combinato. 
+Anche questa tecnica soffre di ambiguità in quanto alcune regioni del suo spazio di input possono ricevere lo stesso numero di voti.

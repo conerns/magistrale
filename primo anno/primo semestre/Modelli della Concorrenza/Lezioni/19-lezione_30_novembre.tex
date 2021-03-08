@@ -1,0 +1,39 @@
+\section{Lezione del 30 novembre}
+Un processo non sequenziale è una rete causale che registra un possibile comportamento e pertanto non presenta né conflitti né cicli.
+\subsection{Processo ramificato}
+Un processo ramificato altro non è che una rete causale che rappresenta più di un possibile comportamento del sistema. I processi ramificati possono contenere conflitti ma solo in avanti.\\
+
+Una rete elementare $N = (B, E, F)$ è una \textit{rete di occorrenze} $\iff$
+\begin{itemize}
+    \item $\forall b \in B, |^\bullet b| \leq 1$: solo conflitti in avanti; ogni condizione o rappresenta uno stato iniziale e quindi non ha pre eventi o se ha pre eventi ne ha solo uno.
+    \item $\forall x, y \in B \cup E, (x,y) \in F^+ \implies (y,x) \notin F^+$: non ci sono cicli, le ripetizioni di eventi o condizioni vengono registrati come nuovi elementi veri.
+    \item $\forall e \in E, \{x \in B \cup E | xF^*e\}$ (il passato di un evento) è finito. 
+    \item La relazione di conflitto $\#$ non è riflessiva. Dove la relazione $\# \subseteq X \times X$, con $X = B \cup E$, è definita come segue: 
+    \[x \# y \iff \exists e_1, e_2 \in E \; | \; ^\bullet e_1 \cap ^\bullet e_2 \neq \emptyset \; \land \; e_1 \leq x \; \land \; e_2 \leq y\]
+    $x$ e $y$ sono in conflitto perché sono in alternativa uno rispetto all’altro perché dipendono rispettivamente da $e_1$ e $e_2$ in conflitto fra loro.
+    \end{itemize}
+\begin{center}
+    Reti causali $\subseteq$ Reti di occorrenze
+\end{center}
+Per una rete di occorrenze $N$ è possibile assegnare un ordine parziale $(X, \leq) = (B \cup E, F^*)$.\\
+
+Sia $\Sigma = (S,T,F, c_{in})$ un sistema elementare senza contatti e finito, $\langle N = (B,E,F); \phi \rangle$ è un \textit{processo ramificato} di $\Sigma \iff$
+\begin{itemize}
+    \item $(B,E,F)$ è una rete di occorrenze (si ammettono condizioni isolate)
+    \item$\phi : B \cup E \to S \cup T$ è una mappa, che assegna alle condizioni e gli eventi $\to$ le condizione e gli eventi del sistema, tale che:
+    \begin{enumerate}
+        \item $\phi(B)\subseteq S, \phi(E)\subseteq T$, ovvero che le condizioni vengano mappate nelle condizioni del sistema, e gli eventi negli eventi del sistema. 
+        \item $\forall e_1, e_2 \in E: (^\bullet e_1 = {^\bullet e_2} \; \land \; \phi(e_1)= \phi(e_2)) \implies e_1 = e_2$, e quindi se due eventi hanno le stesse precondizioni e corrispondono allo stesso evento del sistema allora necessariamente devono essere lo stesso evento. 
+        \item $\forall e \in E, \phi(^\bullet e) = {^\bullet \phi(e)} \; \land \; \phi(e ^\bullet) = {\phi(e)^\bullet}$, in altre parole di ogni evento, le sue precondizioni e postcondizioni devono coincidere con l’immagine delle precondizioni e postcondizioni.
+        \item $\phi(\min(N)) = c_{in}$, significa che il taglio iniziale (fatto di condizioni) deve corrispondere alla configurazione (caso) iniziale del sistema.
+    \end{enumerate}
+\end{itemize}
+
+\subsection{Sottoprocesso e Unfolding}
+Prima di poter introdurre l'unfolding, dobbiamo prima dare la definizione di sottoprocesso. \\
+Sia $\Sigma = (S,T,F, c_{in})$ un sistema elementare senza contatti e finito e siano $\Pi_1 = \langle N_1; \phi_1 \rangle$, $\Pi_2 = \langle N_2; \phi_2 \rangle$ processi ramificati di $\Sigma$. \\
+Allora diciamo che $\Pi_1 = \langle N_1; \phi_1 \rangle$ è un \textit{prefisso} di $\Pi_2 = \langle N_2; \phi_2 \rangle \iff$ $N_1$ è una sottorete di $N_2$ e $\phi_{2|N_1} = \phi_1$ ($\phi_2$ ristretto a $N_1$ è uguale a $\phi_1$). \\
+
+$\Sigma$ ammette un unico processo ramificato che è massimale rispetto alla relazione di prefisso tra processi. Tale processo massimale è l’\textit{unfolding} di $\Sigma$, denotato $Unf(\Sigma)$.\\
+
+Un processo non sequenziale è un processo ramificato $\Pi = \langle N; \phi \rangle$ tale che $N$ sia una rete causale (senza conflitti), e viene detto \textit{corsa (run)}.

@@ -1,0 +1,94 @@
+\section{Lezione 19 ottobre - Terminazione dei programmi}
+\subsection{Correttezza totale}
+Avevamo detto che per correttezza totale, si intende la tripla viene letta dovendo anche dimostrare che l'esecuzione termini. Si procede quindi prima dimostrando la correttezza parziale aggiungendo poi la dimostrazione per l'esecuzione finita.\\
+La tripla nel nostro caso si mostra nella forma $\{p\}\mbox{ while \textit{B} do \textit{C} endwhile }\{q\}$, che solitamente si andrà ad indicare come $\{p\}\mbox{ W }\{q\}$.
+
+Distinguiamo i due tipi di correttezza, dal punto di vista della derivabilità, tramite: 
+\begin{itemize}
+    \item $\vdash^{parz}\{p\}\mbox{ C }\{q\}$, per indicare che è stata derivata seguendo le regole per la correttezza parziale
+    \item $\vdash^{tot}\{p\}\mbox{ C }\{q\}$, per indicare che è stata derivata seguendo le regole per la  correttezza totale
+\end{itemize}
+Dal punto di vista semantico ($\vDash$) non ha senso distinguere i due casi e quindi si ha solo: $\vDash\{p\}\mbox{ C }\{q\}$
+
+In quanto dal punto di vista semantico o si ha terminazione o non si ha, non si hanno casistiche differenti a seconda di correttezza totale o parziale.Si neccesità quindi di dimostrare la terminazione.\\ 
+Per farlo, innanzitutto consideriamo inizialmente il caso dove: $W=\mbox{ while \textit{B} do \textit{C} endwhile }$. \\
+L'idea di base, per la tecnica di terminazione ci fa supporre che sia $E$ un'espressione aritmetica nella quale compaiono variabili del programma, costanti numeriche e operazioni aritmetiche, e che \textit{inv} sia un’invariante di ciclo per $\textnormal{W}$, scelta in modo che: 
+\begin{itemize}
+    \item $\quad inv \to \textnormal{E} \geq 0$ 
+    \item $\quad \vdash^{tot} \{inv  \land \textnormal{B}  \land  \textnormal{E} = k \}  \textnormal{C}  \{inv  \land  \textnormal{E} < k\} $
+\end{itemize} 
+In pratica, nella seconda condizione, uso $E$ per concludere che una singola esecuzione dell'iterazione mi porta in uno stato in cui vale l'invariante, dove può valere o meno $B$, ma in cui $E$ ha un valore diverso, minore a quello di partenza ma mai minore di 0 per la prima condizione. Quindi, ad un certo punto, $E$ raggiungerà il valore minimo e in quel momento o $B$ è falsa o si ha una contraddizione e quindi si ha la terminazione.\\
+
+ Allora $\vdash^{tot} \{inv\} \ \textnormal{W} \ \{inv \ \land \ \neg \textnormal{B} \}$.
+
+Ciò permette di dimostrare che $\text{C}$ può essere eseguito solo un numero finito di volte (il ciclo termina) per soddisfare entrambe le condizioni. Infatti ad ogni iterazione il valore della variante $\text{E}$ diminuisce e quindi a un certo punto non potrà più essere $\geq 0$.
+
+Possiamo osservare: 
+\begin{itemize}
+    \item $\text{E}$ è un’espressione aritmetica non una formula logica
+    \item Lo $0$ in $E \geq 0$ può essere sostituito da qualsiasi numero.
+\end{itemize}
+La tipica strategia che si applica quando si usa la logica di Hoare è quella di considerare prima la correttezza parziale e poi la correttezza totale
+
+\subsubsection{Correttezza e Completezza}
+In generale quando si sviluppa una logica, con un apparato deduttivo e un'interpretazione delle formule, siamo interessati a due proprietà generali della logica e dell'apparato deduttivo: 
+\begin{enumerate}
+    \item \textbf{correttezza}, ovvero il fatto che tutto quello che si può derivare con l'apparato deduttivo è effettivamente vero, ovvero $vdash\implies\vDash$. Quindi se una tripla è derivabile è anche vera 
+    \item \textbf{completezza}, ovvero il fatto che l'apparato deduttivo sia in grado di derivare tutte le formule vere (ovvero tutte le triple). Si ha quindi $\vDash\implies\vdash$
+\end{enumerate}
+
+L’aritmetica come teoria matematica è incompleta, in quanto alcune formule aritmetiche sono vere ma non dimostrabili. Questa incompletezza si riverbera sulla logica di Hoare che pertanto assicura una completezza relativa. Dal punto di vista deduttivo sulle triple è comunque completa. 
+
+\subsubsection{Possibili precondizioni}
+
+Dati un comando $\text{C}$ e una formula $q$, trovare una formula $p$ tale che $\vdash \{p\} \ \text{C} \ \{q\}$ (Sia valida e quindi vera). 
+\\
+Ci possono essere diverse possibili precondizioni, ma esiste una precondizione \textit{migliore}? Se si, quale criterio ci permette di confrontare le varie precondizioni per trovare la migliore. 
+
+\begin{itemize} 
+    \item $V$ è l'insieme della variabili di $C$ 
+    \item $\Sigma=\{\sigma|\,\sigma:V\to\mathbb{Z}\}$ è l'insieme degli stati della memoria (ricordando che posso avere solo valori interi nel nostro linguaggio) 
+    \item $\Pi$ è l'insieme di tutte le formule sull'insieme $V$ 
+    \item $\sigma \vDash p$ significa che la formula $p$ è vera nello stato $\sigma$ e si ha che $\vDash\subseteq\Sigma\times \Pi$, con $\vDash$ che indica la veridicità di una formula in uno stato.
+    \item $t(\sigma)=\{ p \in \Pi | \sigma \vDash p\}$, si applica agli stati della memoria: $t(\sigma)$ è la funzione che assegna ad uno stato $\sigma$ l'insieme delle proposizioni che sono vere in $\sigma$ 
+    \item $m(p)=\{\sigma \in \Sigma | \,\sigma\vDash p\}$, la funzione assegna un valore che corrisponde al valore di tutti gli stati che soddisfano p.
+\end{itemize}
+
+Dato $S \subseteq \Sigma$, sottoinsieme di stati, e $F \subseteq\Pi$, sottoinsieme di formule,si ha che: 
+\begin{itemize} 
+    \item $t(S)=\{p \in \Pi|\ \forall\ s \in S, \quad: \sigma \vDash p\}= \displaystyle \bigcap_{s \in S} t(s)$ 
+        (ragiono quindi su tutti gli stati di $S$ e quindi sulle formule che sono vere in tutti gli stati di $S$) 
+    \item $m(F)=\{s \in \Sigma| \ \forall\ p\in F\quad: s\vDash p\}=\displaystyle \bigcap_{p \in F}m(p)$ 
+        (ragiono quindi su tutte le formule di $\Pi$ e quindi su tutti gli stati in devono essere soddisfatte tutte queste formule) 
+\end{itemize}
+
+Possiamo capire meglio che rapporto ci sia tra la logica proposizionale e l'insieme degli stati:
+\begin{itemize}
+    \item $m(\neg p) = \Sigma \setminus m(p)$
+    \item $m(p \lor q) = m(p) \cup m(q)$
+    \item $m(p \land q) = m(p) \cap m(q)$
+    \item Un discorso diverso viene fatto invece per l'\textit{Implicazione}. l'\textbf{Implicazione} ha una natura duplice 
+        \begin{enumerate}
+            \item considerabile come connettivo logico: che corrisponde a dire che  $p \implies q$ = $\neg p \lor q$, con le considerazioni precedenti possiamo dire anche che :  $m(p \implies q)$ = $m(\neg p)  \cup m(q)$
+            \item considerabile come relazione, binaria, tra formule: se p implica q, allora $m(p) \subseteq m(q)$. Signfica che in tutti i casi in cui $p$ è vera, viene soddisfatta anche $q$. In questo caso si dirà che $q$ è \textit{più debole} di $p$. Più debole non significa comunque peggiore.
+        \end{enumerate}
+\end{itemize}
+
+Criterio di scelta della precondizione migliore. Un modo è quello di definire la migliore precondizione come la precondizione più debole $p$ tale che presa come precondizione forma una tripla valida: dati un comando $\text{C}$ e una postcondizione $\{q\}$, si cerca la più debole precondizione $p$, ovvero il più grande insieme di stati $p$, tale che $\models \{p\} \; \text{C} \; \{q\}$.
+
+Ciò permette di ottenere la precondizione che pone meno vincoli sullo stato iniziale.
+Data un comando e una postcondizione è sempre possibile calcolare la precondizione più debole. \\
+Indichiamo, fissati $C$ comando e $q$ formula di postcondizione, con $wp(C, q)$ la precondizione più debole (\textbf{weakest precondition (\textit{wp})}). L’estensione di $wp(\text{C}, q)$ è formata da tutti gli stati a partire dai quali l’esecuzione di $\text{C}$ porta a uno stato finale in cui vale $q$, e solo da quegli stati.
+\begin{itemize}
+  \item \textbf{assegnamento:} la precondizione più debole è quella determinata dalla regola di derivazione introdotta per la correttezza parziale. Quindi dato un assegnamento del tipo $x := E$ e una postcondizione $q$ ho che la precondizione più debole si ottiene sostituendo in $q$ ogni occorrenza di $x$ con l'espressione $E$, ottenendo quindi: \[\{q[E/x]\}\]
+  
+  \item \textbf{sequenza:} se ho la sequenza di due comando $C_1$ e $C_2$ allora la precondizione più debole si calcola nel seguente modo: calcolo la precondizione più debole per $C_2$, ottenendo $wp(C_2,q)$, che sarà quindi la formula usata come postcondizione per calcolare la precondizione più debole di $C_1$, ovvero: $wp(C_1,wp(C_2,q))$. Questo non è altro che la precondizione più debole per: \[wp((C_1;C_2),q)\equiv wp(C_1,wp(C_2,q))\]
+  
+  \item \textbf{scelta:} avendo: $S = if \quad  B \quad then \quad C_1 \quad  else\quad  C_2\quad endif \quad$ fisso la postcondizione $q$ e procedo come per la regola di derivazione. Separo i due casi in cui sia vera $B$ o meno:
+  \begin{itemize}
+      \item Se $B$ è vera devo eseguire $C_1$ quindi calcolo, eseguendo $C_1$ la precondizione più debole $wp(C_1,q)$
+      \item Se $B$ è falsa devo fare il calcolo calcolo, eseguendo $C_2$, la precondizione più debole $wp(C_2,q)$
+  \end{itemize}   
+  Nel complesso quindi, facendo la disgiunzione dei due casi, ottengo:    \[wp(S,q)\equiv(B\land wp(C_1,q))\lor (\neg B\land wp(C_2,q))\]
+  
+\end{itemize}

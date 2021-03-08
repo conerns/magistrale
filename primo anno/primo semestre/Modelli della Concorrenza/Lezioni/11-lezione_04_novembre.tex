@@ -1,0 +1,123 @@
+\section{Lezione del 4 novembre}
+\subsection{Esempio utilizzando Buffer}
+Cerco quindi di astrarre dalle interazioni interne ($\tau$), introducendo l'\textbf{equivalenza debole}, volendo astrarre rispetto alle azioni $\tau$, introducendo la \textbf{bisimulazione debole} (e nell'esempio precedente i due processi sono debolmente equivalenti sia per le tracce che per la bisimulazione).
+Vediamo l'esempio dei buffer, dato un buffer di capacità $r$ che contiene $i$ elementi ho $B_i^R$.\\ Sia quindi, su $A=\{in,out\},\quad \overline{A}=\{\overline{in},\overline{out}\}$, con $A$ per azioni di ricezione e $\overline{A}$ per azioni di invio, il buffer a capacità 1: $B_0^1=in\cdot B_1^1$, $B_1^1=\overline{out}\cdot  B_0^1$. Avendo il corrispondente LTS nella figura [\ref{figura_lts_buffer1}] \\
+Passo poi successivamente al buffer a capacità 2, e abbiamo $B_0^2=in \cdot B_1^2$, $B_1^2=\overline{out} \cdot B_0^2+in \cdot B_2^2$, $B_2^2=\overline{out}\cdot B_1^2$: questo corrisponde ad avere un LTS che si presenta come in figura [\ref{figura_lts_buffer2}]\\
+\begin{figure}[ht]
+\centering
+    \begin{minipage}[b]{0.3\textwidth}
+    \centering
+    \begin{tikzpicture}[shorten >=1pt,node distance=2cm,on grid,auto] 
+        \node[state] (q_0) {$B_0^1$};  
+        \node[state] (q_1) [below =of q_0] {$B_1^1$};
+        
+        \path[->]
+        (q_0) edge [bend right = 25]node[left] {$in$} (q_1)
+        (q_1) edge [bend right = 25] node [right]{$\overline{out}$} (q_0)
+        ;
+    \end{tikzpicture}
+    \caption{LTS rappresentante Buffer 1}
+    \label{figura_lts_buffer1}
+    \end{minipage}
+    \hspace{3cm}% NO SPACE!
+    \begin{minipage}[b]{0.3\textwidth}
+    \centering
+       \begin{tikzpicture}[shorten >=1pt,node distance=2cm,on grid,auto] 
+          \node[state] (q_0) {$B_0^2$};  
+          \node[state] (q_1) [below =of q_0] {$B_1^2$};
+          \node[state] (q_2) [below =of q_1] {$B_2^2$};
+          \path[->]
+          (q_0) edge [bend right = 25]node[left] {$in$} (q_1)
+          (q_1) edge [bend right = 25] node [right]{$\overline{out}$} (q_0)
+          (q_1) edge [bend right = 25]node[left] {$in$} (q_2)
+          (q_2) edge [bend right = 25] node [right]{$\overline{out}$} (q_1)
+          ;
+        \end{tikzpicture}
+    \caption{LTS rappresentante Buffer 2}
+    \label{figura_lts_buffer2}
+    \end{minipage}
+\end{figure}
+
+Provo ora a sincronizzare due buffer a capacità 1: $B_0^1|B_0^1$. Avendo il corrispondente LTS, non avendo la sincronizzazione:
+\begin{center}
+    \begin{tikzpicture}[shorten >=1pt,node distance=3.5cm,on grid,auto] 
+        \node[state] (q_0) {$B_0^1|B_0^1$};  
+        \node[state] (q_1) [below left =of q_0] {$B_1^1|B_0^1$};
+        \node[state] (q_2) [below right =of q_0] {$B_0^1|B_1^1$};
+        \node[state] (q_3) [below right =of q_1] {$B_1^1|B_1^1$};
+        \path[->]
+        (q_0) edge [bend right = 25] node [above left]{$in$} (q_1)
+        (q_0) edge [bend left = 25] node[above right]{$in$} (q_2)
+        (q_1) edge [bend right = 25] node [above left]{$\overline{out}$} (q_0)
+        (q_2) edge [bend left = 25] node [above right]{$\overline{out}$} (q_0)
+        (q_1) edge [bend right = 25] node [below left]{$in$} (q_3)
+        (q_2) edge [bend left = 25] node [below right]{$in$} (q_3)
+        (q_3) edge [bend right = 25] node [below left]{$\overline{out}$} (q_1)
+        (q_3) edge [bend left = 25] node [below right]{$\overline{out}$} (q_2)
+        ;
+    \end{tikzpicture}
+\end{center}
+Si ha quindi, in quest'ultimo modello, una \textbf{simulazione sequenziale non deterministica della concorrenza}.\\ Vediamo se si ha che: $(B_0^1|B_0^1)\stackrel{Bis}{\sim}B_0^2$, notiamo che $B_0^2$ può essere messo in relazione con $B_0^1|B_0^1$ in quanto se vado in uno tra $B_1^1|B_0^1$ e $B_0^1|B_1^1$ posso sempre fare $in $ e $\overline{out}$. Inoltre Posso fare un discorso analogo per $B_2^2$ e $B_1^1|B_1^1$. Essendo questi ultimi quindi bisimili lo sono anche il nodo centrale coi due possibili nodi nel caso della composizione e di conseguenza lo sono anche $B_0^2$ e $B_0^1|B_0^1$. Diciamo in questo modo che sono bisimili il LTS del buffer a due posizioni [\ref{figura_lts_buffer2}] sequenziale e quello a due contenitori diversi a una postazione.(sopra)
+Proprietà della bisimulazione forte:
+\begin{itemize}
+    \item La bisimulazione forte è una congruenza rispetto agli operatori del CCS.
+        Se $p \stackrel{Bis}{\sim} q$ con $p,q \in Proc_{CCS}$, allora: 
+        \begin{itemize}
+            \item $\forall \alpha \in Act$, $\; \alpha \cdot p \stackrel{Bis}{\sim} \alpha \cdot q$, dove $\alpha$ è un contesto
+            \item $\forall r \in Proc_{CCS}$, $\; p + r \stackrel{Bis}{\sim} q +r \; \land \; r + p \stackrel{Bis}{\sim} r + q$, ricordiamo che in questo caso abbiamo che $+$ è il contesto preso in considerazione
+            \item $\forall \alpha \in Act$, $\; p | r \stackrel{Bis}{\sim} q|r \; \land \; r | p \stackrel{Bis}{\sim} r | q$, il contesto è la composizione parallela $|$
+            \item $\forall f : Act \to Act$ funzione di rietichettatura, $\; p_{[f]} \stackrel{Bis}{\sim} q_{[f]}$, si ricorda che deve valere che la funzione $f$ è tale che $f(\tau) = \tau$ e $f(\overline a) = \overline{f(a)}$
+            \item $\forall L \in A$, $\; p_{\setminus L} \stackrel{Bis}{\sim} q_{\setminus L}$
+        \end{itemize}
+\end{itemize}
+Per gli operatori che abbiamo osservato prima, ci sono delle proprietà avendo sempre con $p,q,r \in Proc_{CCS}$:
+\begin{itemize}
+    \item Proprietà commutativa: 
+        \begin{itemize}
+            \item $p + q \stackrel{Bis}{\sim} q + p$
+            \item $p | q \stackrel{Bis}{\sim} q | p$
+        \end{itemize}
+    \item Proprietà distributiva:
+        \begin{itemize}
+          \item $(p + q) + r \stackrel{Bis}{\sim} p + (q + r)$
+          \item $(p | q) | r \stackrel{Bis}{\sim} p | (q | r)$
+        \end{itemize}
+    \item Leggi di assorbimento:
+        \begin{itemize}
+          \item $p + Nil \stackrel{Bis}{\sim} p$
+          \item $p | Nil \stackrel{Bis}{\sim} p$
+        \end{itemize}
+\end{itemize}
+\subsection{Equivalenza debole rispetto alle tracce}
+Si vuole poter astrarre rispetto alle sincronizzazioni interne ($\tau$). Questo perché la bisimulazione forte rischia di essere troppo restrittiva. Motivazione per quale si passa quindi all’equivalenza debole rispetto alle tracce, $\stackrel{T}{\approx}$, e alla bisimulazione debole, $\stackrel{Bis}{\approx}$.\\
+Per poterlo fare bisogna cambiare la regola di transizione, passando da $p\stackrel{a}{\rightarrow}p'$ a $p\stackrel{a}{\Rightarrow}p'$. \\
+Dove $p\stackrel{a}{\Rightarrow}p'$ sta a indicare che $p$ interagisce sicuramente con l’ambiente attraverso $a$, ma prima o dopo potrebbe fare un numero qualsiasi di sincronizzazioni interne $\tau$; dopodiché si comporta come $p'$.
+\subsubsection{Relazione/regola di transizione debole}
+Definiamo la nostra relazione/regole di transizione debole nel modo: $\Rightarrow\subseteq Proc_{CCS}\times Act\times Proc_{CCS}$. \\ Quindi $p\stackrel{a}{\Rightarrow}p'$, con $a\in A\cup \overline{A}\cup \tau \iff$
+\begin{enumerate}
+    \item se $a=\tau$, allora $p\stackrel{\tau}{{\to}{^*}}p'$, ovvero è possibile eseguire una sequenza qualsiasi anche nulla di $\tau$, arrivando a $p'$, questo lo possiamo classificare dicendo 
+    $\begin{cases}
+        \textnormal{Se } a = 0 & \textnormal{ allora } $p=p'$. \\
+        \textnormal{oppure } & p\stackrel{\tau}{\rightarrow} \; \dots \; \stackrel{\tau}{\rightarrow}p'.
+    \end{cases} 
+    $
+    \item  se $\alpha\in A\cup\overline{A}$, allora $p\stackrel{\tau}{\rightarrow^*} \; \stackrel{\alpha}{\rightarrow}\; \stackrel{\tau}{\rightarrow^*}p'$.
+
+\end{enumerate}
+Estendiamo ora la relazione a sequenze di azioni $\forall w \in Act^*$: 
+$p\stackrel{w}{\Rightarrow}p' \iff$ vale una delle due casistiche:
+\begin{enumerate}
+    \item se $w=\varepsilon$ (sequenza vuota) $\; \lor \; w=\tau^*$ (sequenza di $\tau$), allora in questo caso posso dire che $p\stackrel{\tau}{\Rightarrow^*}p'$.
+    \item se $w=a_1\ldots a_n$, con $a_i\in A\cup \overline{A}$, allora $p\stackrel{a_1}{\Rightarrow}\cdots \stackrel{a_n}{\Rightarrow}p'$, dove ogni $a_i$ può essere preceduto/seguito da una qualsiasi sequenza di $\tau$.
+\end{enumerate}
+A questo punto possiamo avere come notazione, siano gli esempi:
+\begin{itemize}
+    \item $p\stackrel{ab}{\Rightarrow}p'$ potrebbe corrispondere a: $p\stackrel{\tau}{\rightarrow^*}p_2\stackrel{a}{\rightarrow}p_3\stackrel{\tau}{\rightarrow^*}p_4\stackrel{b}{\rightarrow}p_5\stackrel{\tau}{\rightarrow^*}p'$, dove $p_1$ e $p_2$ possono essere lo stesso. 
+    \item $p_1\stackrel{\varepsilon}{\Rightarrow}p_1'$, in questo caso significa che: 
+    $p_1 = p_1' \lor p\stackrel{\tau}{\rightarrow^*}p_1'$ questa è equivalente al fatto di scrivere 
+    $p_1\stackrel{\tau}{\Rightarrow}{p_1}'$
+\end{itemize}
+\textbf{Equivalenza debole rispetto alle tracce con regola debole} \\
+$p\stackrel{T}{\approx} q \iff Tracce_{\Rightarrow}(p)=Tracce_{\Rightarrow}(q)$ ovvero $\forall w\in(A\cup \bar{A})^*$, se ho che posso eseguire $p\stackrel{w}{\Rightarrow} \ \iff \ q\stackrel{w}{\Rightarrow}$ (i due processi possono fare la stessa sequenza). Possiamo quindi a dire: $p\stackrel{w}{\Rightarrow} \equiv \exists p' : \ p\stackrel{w}{\Rightarrow} p'$. \\
+Dove $Tracce_{\Rightarrow}(p)=\{w\in(a\cup \overline{A})^*| p\stackrel{w}{\Rightarrow}\}$.
+Quindi o si hanno le stesse tracce con la regola debole o ogni sequenza del primo processo deve trovarsi nel secondo processo. Banalmente si prendono le tracce forti e si cancella $\tau$.

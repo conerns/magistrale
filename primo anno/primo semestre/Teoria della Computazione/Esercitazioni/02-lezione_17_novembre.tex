@@ -1,0 +1,79 @@
+\section{Lezione del 17}
+\subsection{Scansione del testo}
+La ricerca di $P$ in $T$, partendo da uno stato iniziale $s_0 = 0$, avviene leggendo il testo $T$ dal simbolo in posizione 1 al simbolo in posizione $n$. \\  
+Ad ogni posizione $q$ da 1 a $n$ è associato uno stato $s_q$, ottenuto effettuando la transizione dallo stato $s_{q-1}$ tramite il simbolo $T[q]$.\\
+
+Si supponga che l’algoritmo abbia appena letto il simbolo $T[q]$ e che stia per effettuare la transizione dallo stato $s_{q-1}$ a $s_q$.\\
+Si supponga che $j$ sia la lunghezza del più lungo prefisso di $P$ che ha un’occorrenza in $T$ che finisce in posizione $q-1$ (e che inizia quindi in posizione $q-j$).\\
+Si supponga che $j$ sia lo stato $s_{q-1}$ a cui l’algoritmo arriva dopo aver letto il simbolo $T[q-1]$. \\
+L’algoritmo dopo aver letto il simbolo $T[q]$, passa al nuovo stato $s_q = \delta(j, T[q])$.\\
+Il calcolo di $s_q = \delta(j, T[q])$ dipende dal verificarsi di uno dei seguenti casi:
+\begin{enumerate}
+    \item caso 1: $j<m$ e $P[j+1] = T[q]$	(in posizione $j+1$ del pattern, c’è lo stesso simbolo appena letto nel testo)\\
+    Questo significa che quando mi trovo in $P$ in posizione $j+1$, trovo lo stesso carattere presente in $T$ in posizione $q$: $s_q = j+1$		\\
+    In poche parole stiamo dicendo che $P[1, j+1]$ ha un’occorrenza in $T$ che inizia in $q-j$ e finisce in $q$, significa che il matching si amplifica ma la posizione di partenza resta medesima. \\
+    
+    La transizione da uno stato $j$ allo stato successivo $j+1$, dopo aver letto il simbolo $T[q]$, implica che il prefisso $P[1,j+1]$ ha un’occorrenza su $T$ che inizia in posizione $q-(j+1)+1$. Che in termini di conti non cambia nulla, ma viene specificato il punto di arriva che non è più $j$, bensì $j+1$, e sapendo che si parte comunque dalla posizione $q-j$ bisogna fare i giusti aggiustamenti. E questo rappresenta il caso generale.\\
+    
+    
+    In particolare per $j+1= m$:
+    La transizione da uno stato $m-1$ allo stato successivo $m$, dopo aver letto il simbolo $T[q]$, implica che il prefisso $P[1,m] = P$ ha un’occorrenza su $T$ che inizia in posizione $q-(m)+1$.
+    \item caso 2: $j=m$ oppure $P[j+1] \neq T[q]$. Semplifichiamo questo caso introducendo due casi in cui andiamo a valutare separatamente le due possibili componenti.
+    
+    \begin{enumerate}
+        \item $j < m$ e $P[j+1] \neq T[q]$	(in posizione $j+1$ del pattern, c’è un simbolo diverso da quello appena letto nel testo)\\
+        La configurazione in questo caso ci dice $s_q = k$, dove $k$ è la lunghezza del bordo di $P[1,j]T[q]$\\		
+        $P[1,k]$ ha un’occorrenza in $T$ che inizia in $q-j$ (che viene scartata perché già controllata) e un’altra che inizia in $q-k+1$ e che finisce in $q$.\\
+        La transizione da uno stato $j$ allo stato $k \leq j$, dopo aver letto il simbolo $T[q]$, implica che il prefisso $P[1,k]$ ha un’occorrenza su $T$ che inizia in posizione $q-k+1$.
+        
+        \item $j = m$	(il più lungo prefisso del pattern che ha un’occorrenza nel testo che finisce in $q-1$ è tutto il pattern; il pattern occorre in posizione $q-j = q-m$)\\
+        Esiste un’occorrenza di $P$ in $T$ che finisce in $q-1$. In questo caso abbiamo $s_q = k$, dove $k$ è la lunghezza del bordo di $P[1,m]T[q]$\\
+        $P[1,k]$ ha un’occorrenza in $T$ che inizia in $q-m$ e un’altra che inizia in $q-k+1$ e finisce in $q$. \\
+        La transizione da uno stato $j=m$ allo stato $k \leq m$, dopo aver letto il simbolo $T[q]$, implica che il prefisso $P[1,k]$ ha un’occorrenza su $T$ che inizia in posizione $q-k+1$.\\
+        
+        È possibile passare da uno stato $m$ a uno stato $m$ tramite $T[q]$.\\
+        Lo stato iniziale $m$ indica un’occorrenza di $P$ in $T$. Lo stato di arrivo $k$ è sicuramente $\leq m$. Se $k=m$, allora esiste una nuova occorrenza di $P$ in $T$ che risulta essere sovrapposta con la precedente di $m-1$ simboli.
+        \end{enumerate} 
+\end{enumerate}
+
+I tre casi (1, 2(a) e 2(b)) possono essere generalizzati: partendo dallo stato $s_{q-1} = j$, con $j \leq m$, dopo aver letto il simbolo $T[q]$, si passa a $s_{q} = f$, con $f \leq m$.
+Il prefisso $P$ di lunghezza $f$ occorre in $T$ in posizione $q-f+1$.\\
+Se $f=m$, allora $P$ occorre in $T$ alla posizione $q-m+1$.
+
+\subsection{Scansione del testo}
+I passi da eseguire per portare a termine il quesito sono:
+\begin{enumerate}
+    \item Si parte dallo stato iniziale $s_0=0$ e si effettua una scansione di $T$ dal primo all’ultimo simbolo. 
+    \item Per ogni posizione $q$ di $T$ si effettua una transizione dallo stato corrente $s$ al nuovo stato $f=\delta(s, T[q])$.
+    \item Ogni volta che il nuovo stato $f$ coincide con $m$, viene prodotta in output l’occorrenza $q-m+1$.
+\end{enumerate}
+
+\begin{lstlisting}
+    Procedure scan-text(delta, T, m)
+    begin
+        n <- |T|
+        s <- 0						//stato corrente
+        for q <- 1 to n do 
+            f <- delta(s,T[q])
+            if f = m then
+                output q-m+1		//occorrenza di P in T
+		s <- f
+    end
+\end{lstlisting}
+
+
+Complessità: $\mathcal{O}(n)$.
+
+\subsection{KMP (Knuth-Morris-Pratt)}
+
+\textbf{Algoritmo}:\\
+\begin{enumerate}
+    \item Preprocessing in tempo $\mathcal{O}(m)$ del pattern $P$ di lunghezza $m$, tramite il calcolo della prefix-function $\varphi$ (funzione di fallimento).
+    \item Scansione in tempo $\mathcal{O}(n)$ del testo $T$ di lunghezza $n$ per ricercare le occorrenze esatte di $P$.
+\end{enumerate}
+
+Dato il pattern $P$ di lunghezza $m$, la prefix-function $\varphi : \{0, \dots, m\} \to \{-1, \dots, m-1\}$ è tale che:
+\begin{enumerate}
+    \item se $1 \leq j \leq m$, allora $\varphi (j) = |B(P[1,j])|$
+    \item se $j=0$, allora $\varphi (j) = -1$.
+\end{enumerate}

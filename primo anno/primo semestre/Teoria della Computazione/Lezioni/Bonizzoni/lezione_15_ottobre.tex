@@ -1,0 +1,28 @@
+\section{Lezione del 15 ottobre - Bonizzoni}
+Un \textbf{gadget} è una rappresentazione dell'input del problema $A$ di partenza e ogni \textbf{gadget} rappresenta una clausola.\\ Ricordiamo che $\phi$ è soddisfacibile sse esiste un assegnamento delle variabili della formula tale per cui almeno un letterale di ogni clausola è vero. \\
+Inoltre il concetto di \textbf{riduzione} è quindi ritrovabile nella capacità di rappresentare un problema in un'altra forma, studiabile con un altro algoritmo.
+\subsection{Riduzione 3-SAT a INDIPENDENT SET}
+Vogliamo dimostrare 3-SAT (A) si riduce polinomialmente a INDIPENDENT SET (B). [3-SAT $\leq_p$ IND-SET] \\
+
+Abbiamo dimostrato l'esistenza della funzione $f$, che trasforma $\phi$ (ovvero l'input di $A$) in $\langle G, k\rangle$, ovvero l'input di $B$, e che essa è in tempo polinomiale. \\
+Abbiamo quindi che $w\in L_A$ sse $f(w)\in L_B$. Se $\phi$ è vera allora esiste un \textit{independent-set} di dimensione $k$ per $\langle G, k\rangle$.\\ Nell'altro verso abbiamo che se esiste un \textit{independent-set} di dimensione $k$ per $\langle G, k\rangle$ allora $\phi$ è vera. Dimostrare questi due versi equivale a dimostrare la riduzione.\\
+
+\subsection{Dimostrazione}
+\begin{enumerate}
+    \item $\exists f$ che trasforma $\phi$ (input di $A$) in $\langle G,k \rangle$ (input di $B$) e $f$ è polinomiale.
+    \item  $w \in L_A$ sse $f(w) \in L_B$. Quindi $\phi$ è vera sse esiste un insieme indipendente di dimensione $k$ per $\langle G,k \rangle$.
+    
+    Se $\phi$ è vera esiste un insieme indipendente di dim $k$ per $\langle G,k \rangle$. Dato un assegnamento di verità, si seleziona un letterale (un vertice) vero da ogni triangolo ottenendo $S$. Questo insieme $S$ è indipendente e di dimensione $k$. \\
+    Se $\phi$ è vera, allora $\forall$ clausola $c_i$, $\exists$ letterale $l_{ij}$ che rende vera $c_i$ tale letterale è un vertice del triangolo del gadget $G_{c_{i}}$. Poiché tutte le clausole sono vere, si ha la scelta di $k$ vertici se $k$ sono le clausole. Per cui esiste un insieme indipendente di dimensione $k$.\\
+        
+    \textbf{\textit{Osservazione}: per definizione se scelgo di rendere vera $c_i$ con $x_j=1$, non posso rendere vera $c_k$ con $\overline{x_j} = 0$.} \\
+    \textbf{Dimostrazione per costruzione/assurdo} \\
+    
+    Se si rende vera la clausola $c_s$ con $l_s$, significa che la variabile $x_i$ è usata o come 1 o come 0 nell’assegnamento di verità in un altro letterale $l_t$ che rende vera la clausola $c_t$. $x_i$ se usata non può essere usata con valore opposto a quello usato per $c_s$. Quindi non esiste un arco di collegamento tra $c_s$ e $c_t$. \\ 
+    Si può dimostrare anche per \textbf{assurdo}. Se esiste un arco tra i due letterali $l_s$ e $l_t$ che rendono vere le clausole $c_s$ e $c_t$, allora ottengo una contraddizione sugli assegnamenti di verità, asserendo che i due letterali sono uno la negazione dell'altro ma entrambi sono veri, per poter rendere vere le clausole.\\
+    
+    Se esiste un insieme indipendente di dimensione $k$ per $\langle G,k \rangle$, allora è possibile trovare un assegnamento alle variabili $\langle x_1, x_2, \dots, x_m \rangle$ che rende vera $\phi$.\\
+    Se esiste un insieme indipendente, di dimensione $k$, significa che $\forall$ gadget (clausola) $G_{c_i}$, esiste un vertice nell’insieme indipendente. Quindi esiste un letterale $\forall$ clausola tale che non è collegato ad un altro letterale di un altro gadget. Pertanto, data la clausola $c_s$ esiste un letterale $l_s$ della clausola che non è collegato, in quanto indipendente, a $l_t$ letterale per la clausola $c_t$. \\
+        
+    Vado $\forall$ letterale $l_i$ c’è una variabile che rende vera $l_i$. Con il valore dato alla variabile, si costruisce l’assegnamento 0/1 a quella variabile, cioè se $l_i=\overline{x_j}$, pongo $x_j = 0$, mentre se $l_i = x_j$ pongo $x_j = 1$. In questo modo si trova un assegnamento di valori alle variabili che è di verità per $\phi$, dimostrando che $\phi$ è vera.
+\end{enumerate}

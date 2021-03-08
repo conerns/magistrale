@@ -1,0 +1,29 @@
+\section{Lezione 23 ottobre - Semantica di programmi sequenziali}
+Abbiamo diversi tipi di semantica che possiamo considerare:
+\begin{itemize}
+    \item \textbf{semantica assiomatica}: ci sono degli assiomi e delle regole di inferenza che permettono di costruire la prova che un programma soddisfa una tripla. Man mano che viene eseguito un programma, si vanno a vedere le asserzioni che vengono verificate. 
+    \item s\textbf{emantica denotazionale}: un programma è visto come una funzione da un dominio di input a un dominio dei dati in output. Si basa sul $\lambda$-calcolo che caratterizza le funzioni computabili e componibili
+    \item \textbf{semantica operazionale}: dato un programma, gli viene associata una computazione su una macchina astratta, andando a vedere come viene modificata la memoria man mano che viene eseguito il programma. 
+\end{itemize}
+Devono essere garantiti i seguenti punti:
+\begin{enumerate}
+    \item Problema della terminazione: è fondamentale che un programma termini, altrimenti non realizza un algoritmo e non ottiene un risultato finale.
+    \item Composizionalità :\begin{itemize}
+        \item \textbf{dei programmi}: un programma è ottenuto componendo sottoprogrammi
+        \item \textbf{della semantica relativa}: la semantica è ottenuta, nel caso assiomatico componendo triple, nel caso denotazionale componendo funzioni, nel caso operazionale componendo azioni della macchina astratta. Se due programmi soddisfano la stessa specifica allora è possibile sostituire uno con l’altro.
+    \end{itemize}
+\end{enumerate}
+\subsection{Programmi concorrenti}
+Fino ad ora abbiamo considerato programmi sequenziali e abbiamo studiato la loro verifica, tramite le triple di Hoare. Si passa ora dal sequenziale al \textbf{concorrente}. Prendiamo quindi $S_1$ e $S_2$ e vogliamo eseguire i due in contemporanea  $s_1|s_2$.\\ L'esecuzione in concorrenza può portare a diverse complicanze qualora non venga rispettato, per esempio, un certo ordine di esecuzione. Si ha quindi il \textbf{non determinismo}, potendo avere più risultati a seconda dell'ordine di esecuzione. Si perde la \textbf{composizionalità}.
+
+Prendiamo per esempio $\{x = V\} S_1 | S_2$, eseguendo il parallelo, lavorando quindi sulla stessa memoria dati, in base all'esecuzione possiamo riportare diversi risultato,  difatti potrebbe presentarsi la situazione \\ $\{x = V\} S_1 | S_2 \{x = 3 \lor x = 2\}$ in quanto lavora sulla stessa area di memoria.
+
+\subsubsection{Semantica di programmi concorrenti (o paralleli/distribuiti)}
+Durante la fine degli anni 70, Hoare introduce un nuovo paradigma di programmazione, il\textbf{CSP (Communicating Sequential Processes)}. Un aspetto del paradagima è il non avere memoria condivisa. Si ha un insieme di processi, ognuno dei quali ha un comportamento del tutto autonomo e una memoria privata, questi processi interagiscono tra di loro scambiandosi messaggi e l'interazione si basa sul modello \textbf{hand-shaking}.  La memoria condivisa viene vista come un processo che può ricevere valori da altri processi o inviarne. \\
+
+Milner ponendosi l’obiettivo di passare da un $\lambda-$calcolo sequenziale a una sorta di versione concorrente, per risolvere il problema della composizionalità nei programmi concorrenti, introduce il $CCS$, in maniera indipendente da Hoare. \\
+\textbf{CCS (Calculus of Communicating Systems)}, consiste in un calcolo algebrico per sistemi comunicanti. I sistemi vengono costituiti da componenti, detti processi, ognuno con una memoria privata che comunicano attraverso scambio di messaggi in maniera sincrona. In linea di principio i processi possono interagire non solo fra di loro ma anche con l’esterno, ovvero con l’ambiente esterno al sistema. Questi processi hanno un comportamento descritto a livello di un calcolo algebrico. Questo modo di interagire consente di avere la composizionalità. \\
+\textbf{Algebra di processi}: linguaggi di specifica di sistemi concorrenti che si ispirano al calcolo dei sistemi comunicanti.  \\
+
+Ogni processo può essere visto come insieme di sottoprocessi. Per uno stesso processo si possono inoltre associare diversi insiemi. Nel sequenziale si possono sostituire due processi se sono equivalenti perché trasformano lo stesso input nello stesso output (calcolano la stessa funzione) o se eseguono la stessa sequenza di trasformazioni nella memoria. Nel concorrente, si può sostituire un processo con un altro se sono equivalenti rispetto all’osservazione.  \\
+\textbf{Equivalenza all’osservazione}:, in particolare viene vista la \textbf{bisimulazione}, un qualsiasi osservatore dei comportamenti dei due processi non è in grado di distinguerli. Per osservare si intende interagire con il sistema. Quindi l’osservatore gioca il ruolo dell’ambiente con cui i processi interagiscono.

@@ -1,0 +1,57 @@
+\section{Repliche}
+La \textbf{replica} è il processo di cerare e mantenere istanze dello stesso db allineate tra loro, consentendo la condivisione di dati ma anche comportando cambiamenti progettuali del database. Si ha che le eventuali modifiche devono essere viste da tutti i nodi. L'elemento fondamentale è la sincronizzazione.
+
+La \textbf{sincronizzazione} è il processo che mi consente di avere le copie \textit{allineate}, prima o poi. In base alla definizione di sincronizzazione possiamo capire che spesso le copie non sono aggiornate istantaneamente. Si ha quindi la \textbf{replica sincrona} o la \textbf{replica asincrona} (non avendo allineamento \textit{realtime}). In seguito si vedrà come \textbf{IBM Topolohy based and Mode base} e \textbf{Microsoft SQL Server Snapshot vs Transactional vs Merge} hanno implementato la replica.
+
+Abbiamo detto che esistono due tipo di repliche:
+\begin{enumerate}
+    \item \textbf{replica sincrona}: cercano che tutte le repliche vengano aggiornate contemporaneamente (come nel protocollo ROWA ad esempio). Scrivo in modo sincrono su tutti nodi e solo quando tutte le repliche confermano la scrittura avanzo con le transazioni. Nelle repliche sincrone si necessitano molti scambi di messaggi per coordinare la sincronizzazione. Obbliga a aggiornare due o più \textbf{storage} contemporaneamente, se un aggiornamento dei storage non va a buon fine eseguo il \textbf{roll back} della transazione. Questo mi garantisce un'alta disponibilità, un auto \textbf{fail over}(per via dei roll back) e limito la perdita di dati. Viene principalmente utilizzata in una situazione di \textbf{Disaster recover}. Gli svantaggi delle repliche sincrone sono la necessità di una rete valida, si hanno problemi di scalabilità, di costi e minor flessibilità.
+    
+    \item \textbf{replica asincrona}:  prima si aggiorna il database \textit{target} e poi le repliche (normalmente dopo pochi secondi ma anche dopo giorni). Si hanno evidenti vantaggi di costo, scalabilità e flessibilità questo perché in caso di problemi, vado a lavorare immediatamente sul database principale, avendo però come rischio il \textit{data loss} (nell'intervallo di tempo tra la scrittura del database principale e delle repliche). Normalmente si usano soluzioni asincrone per accessi online e la loro efficienza, per bilanciamento del calcolo.
+\end{enumerate}
+
+Ci sono vari contesti che si indirizzano verso la replicazione
+\begin{itemize}
+    \item \textbf{condivisione di dati} da utenti tra loro scollegati. Uno scenario possibile è rappresentato dal commesso viaggiatore, loro infatti hanno una copia locale dei dati aziendali e aggiornano i dati (puntando il lavoro svolto ad esempio) solamente alcune volte al giorno. Si possono avere conflitti nel momento in cui più utenti con database replicati lavorano offline (quantità dei prodotti disponibile non sempre aggiornata). Si ha il \textit{merge conflict} .
+    
+    \item \textbf{data consolidation}, ovvero quando un'azienda vuole tenere più copie dei dati in vari punti e alla fine bisogna riportare i dati a livello centrale a cadenza periodica. Può servire per fare data warehousing o anche solo semplicemente per monitorare le vendite delle varie filiali o per aggiornare il catalogo.
+    
+    \item \textbf{data distribution}: è il caso degli \textit{e-commerce}. È un caso tipicamente \textit{mission-critical} e bisogna aumentare l'accesso ai dati e si ha una costante sincronizzazione realtime bidirezionale per evitare problemi. Aiuta le organizzazioni a migliorare l'esperienza di e-commerce. In questo caso nessuno ci garantisce la correttezza di un protocollo ROWA.\\
+    Un altro caso è la distribuzione tra diversi uffici, dove le repliche locali hanno magari dati non presenti nel database globale.
+    
+    \item \textbf{prestazioni, accesso efficiente, load balancing e accesso offline}: Se non si hanno necessità di update immediati (tipo un sito vetrina), allora la replica garantisce la disponibilità e l'accessibilità a basso costo. Prendendo invece l'aspetto \textbf{load balancing}, man mano che la nostra organizzazione cresce ci si potrebbe in una situazione in cui un singolo server database è utilizzato da troppi utenti. Quello che si potrebbe fare è gestire l'utenza indirizzando le richieste su un sistema multi-server. Un altro aspetto è la \textbf{improve availability} (aumentare la disponibilità), consiste nel replicare le transazioni dal server centrale su un server di supporto \textbf{standby server}. Così che se il server principale dovesse avere dei problemi, il carico dati può essere inviato al server di supporto. Questo aspetto richiede un ottimo planning e testing del servizio.  
+    
+    \item \textbf{separazione tra data entry e reporting}, se si usa lo stesso server per data entry e reporting (che in pratica sono lettura costante  scrittura costante) può essere utile separare il carico su due server. Si evitano così i rallentamenti dati dai \textit{lock}. Bisogna studiare i tempi di sincronizzazione.
+    
+    \item \textbf{coesistenza di applicazioni}, questo è un caso particolare. Qualora sia necessario cambiare applicazione devo, eventualmente, cambiare anche i sistemi. Bisogna quindi travasare i dati vecchi e durante il trasferimento bisogna comunque mantenere funzionanti le applicazioni. Quindi bisogna far coesistere i due database durante il trasferimento (facendo il travaso di notte bloccando le transazioni). I costi sono incredibili e si può avere anche coesistenza delle applicazioni e non solo dei dati, con migrazioni parziali (magari per area geografica). Questo comporta che magari due filiali devono collaborare con due applicazioni e due database diversi.
+\end{itemize}
+
+Ci sono momenti in cui la replicazione del database non andrebbe utilizzata. Anche se la replicazione dei dati comporta numerosi benefici e risolve molti problemi all'interno dei sistemi distribuiti (\textbf{distribuited-database processing}, in alcune situazioni il loro utilizzo non risulta ideale. I casi principali sono due:
+\begin{enumerate}
+    \item quando ci sono frequenti update su più copie, portando le copie a possibili conflitti che devono essere scoperti e gestiti manualmente.
+    \item quando la consistenza in real time è fondamentale. In questo caso solitamente si impone un protocollo ROWA (con transazioni \textit{ACID compliant}), riducendo le prestazioni, ma garantisco la consistenza questo nell'ottica di poter avere l'autorizzazione dei \textit{commit} da parte delle repliche.
+\end{enumerate}
+
+Spesso bisogna comunque replicare scegliendo il male minore (ad esempio nelle banche) e bisogna quindi analizzare il singolo caso, anche in base al budget.\\ Concludendo si ha che i benefici della replica sono: 
+\begin{itemize} 
+    \item disponibilità 
+    \item affidabilità 
+    \item prestazioni 
+    \item riduzione di carico 
+    \item possibilità di lavorare 
+    \item supporto a molti utenti 
+\end{itemize}
+Distinguiamo anche delle classi di tipologie di replica: 
+\begin{itemize} 
+    \item \textbf{data distribution}, di tipo \textit{1:many}, con un \textit{source} che distribuisce, in modo sincrono o asincrono, le varie copie passive ai \textit{target} 
+    \item \textbf{Peer-to-Peer}, dove i vari nodi sono interconnessi e si aggiornano tra di loro. Si usa un approccio ROWA.
+    \item \textbf{data consolidation}, di tipo \textit{many:1}, dove ho più \textit{source} che aggiornano un \textit{target} a livello centrale 
+    \item \textbf{bi-directional} (per il \textit{conflict detention resolution}), dove una copia primaria e uno secondaria possono leggere e scrivere a vicenda tra loro (è quindi una versione semplificata del \textit{Peer-to-Peer} con due Peer) 
+    \item \textbf{multi-Tier staging}, in cui si hanno meccanismi intermedi tra \textit{source} e \textit{target} con aree di deposito dei dati dette aree di \textit{staging}.
+\end{itemize}
+Per realizzare una replica posso fare in diversi modi:
+\begin{itemize}
+    \item faccio letteralmente il backup del disco con una persona che stacca il disco dal server e lo copia, riattaccando infine copia e disco originale 
+    \item posso fare il backup e fare il restore dei dati da un'altra parte, per farlo si attacca un altro disco alla macchina sulla quale vogliamo eseguire il backup, e poi mettere nella nuova macchina il disco copia .
+    \item posso fare una \textit{replica incrementale}, ovvero faccio un \textit{full backup} e sposto solo il file di \textit{log} delle transazioni nel nuovo server. Un'alternativa è l'\textbf{event publish}. \\ Un \textbf{event publish} è una replica senza \textit{apply} e leggo i file di log. Analizzando gli eventi tramite particolari meccanismi riscrivo quindi sull'architettura target. Esiste un'altra modalità dove da un \textit{publisher} si passa ad un \textit{distributor} e infine ai \textit{subscriber} passando tutti i dati richiesti. 
+\end{itemize}

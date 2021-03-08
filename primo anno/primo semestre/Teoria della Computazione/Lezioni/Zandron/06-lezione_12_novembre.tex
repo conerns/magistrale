@@ -1,0 +1,64 @@
+\section{Lezione del 12 novembre}
+Ordiniamo i problemi in base alla difficoltà in queste due classi, questo possiamo farlo, ad esempio, utilizzando le \textbf{riduzioni polinomiali} tra problemi, che ipotizziamo solo di decisione per praticità, $A\to B$. 
+Cerco una procedura che per ogni istanza del problema $A$ la trasforma in un'istanza per un problema diverso $B$. 
+Quindi un'istanza di $A$, che nominiamo come $I_A$, ha due possibili risposte, $Y$ o $N$, ma quello che posso fare è passare tramite una certa $f:I_A\to I_B$ avendo poi una istanza, $I_B$, tale che $B$ avrà risposte uguali a quelle di $A$, ovvero $Y$ o $N$.\\
+
+Dato in input $x$, una istanza possibile di $A$. Voglio sapere se la stringa $x$ appartenga o meno al linguaggio associato ad $A$. Se la trasformazione mantiene la risposta in termini di $Y$ e $N$, ho che $f(x)$ trasforma la stringa del linguaggio $A$ in una stringa del linguaggio $B$, nascondendo il passaggio per $B$. Il tempo è pari alla somma tra il tempo della trasformazione più quello dell'algoritmo $B$.\\ 
+
+Vediamo, ad esempio, se possiamo risolvere il problema del ciclo hamiltoniano usando TSP, entrambi decisionali. Per farlo partiamo da un'istanza del grafo per il ciclo hamiltoniano creo un'istanza con gli stessi vertici. Al risultato vengono aggiunti gli archi per ottenere un grafo completo visto che TSP ha un grafo completo mentre ciclo hamiltoniano no. Aggiungo anche i pesi dato che TSP ha un grafo pesato mentre ciclo hamiltoniano no, mettendo il peso a 1 per i vecchi archi e $K$, con $k\neq 1$, a quelli appena aggiunti.
+Manca quindi solo il bound, che è $B=|V|$ per il ciclo hamiltoniano che ipotizziamo con archi solo pesati a $1$. Questo comporta che all'interno del TSP non posso usare quelli aggiunti in quanto uscirei per forza dal bound se usassi anche uno degli archi aggiunti.\\
+Ho un ciclo hamiltoniano sse nel grafo trasformato possiamo ottenere come risposta $Y$ se chiediamo l'esistenza di un bound $B=|V|$. Ho quindi ridotto il
+ciclo hamiltoniano a TSP.\\
+
+Controlliamo quindi i tempi. Voglio un costo della riduzione polinomiale e si ha che l'aggiunta di archi, pesi e bound sono operazioni polinomiali. La trasformazione possiamo pensare che non sia polinomiale, ma per quanto sappiamo si svolge in tempo esponenziale. Un vincolo che devono aggiungere è quello di eseguire la trasformazione in tempo polinomiale.
+\subsection{Riduzione polinomiale}
+
+Un problema $B$ è più difficile di un problema $A$, che ha in input la stringa  $x$ se: \\
+Sia $A\to B$, il costo in termini di tempo di un algoritmo per $A$ è certamente minore del costo per la trasformazione sommato al costo dell'algoritmo per B.  Cosi facendo si pone un limite di tempo di esecuzione avente la seguente espressione: $T(A(x))\leq F(x)+T(B(x))$\\
+
+Definiamo formalmente riduzione polinomiale tra un linguaggio $L_1$ e un linguaggio $L_2$ come:  $\displaystyle f:\Sigma_1^*\to \Sigma_2^*$ tale che: $x\in L_1\iff f(x)\in L_2$ con $f$ calcolabile in tempo polinomiale rispetto alla dimensione di x ($\mathcal{O}(|x|)$) da una DTM. Si ha quindi che: $L_1<_T L_2$.
+
+\begin{teorema}{Teoremna}{}
+  Se si ha che un linguaggio $L_1$ si riduce a $L_2$ ($L_1<_T L_2$ e si ha che $L_2 \in P$ allora sicuramente $L_1\in P$. Infatti e esiste un algoritmo polinomiale per $L_2$ allora, avendo una trasformazione polinomiale ho che $f(x)+L_2$ è ancora polinomiale.\\
+  
+  Se si ha che un linguaggio $L_1$ si riduce a $L_2$ e $L_2 \in NP$ o $L_2 \notin P$ non avrei informazioni su $L_1$. Mi dice solo che non posso utilizzare la trasformazione, ma non mi dice se ci sono algoritmi che potrebbero risolvere $L_1$. Invece Se si ha che $L_1<_T L_2$ e si ha che $L_1\notin P$ allora ho che $L_2\notin P$.
+\end{teorema} 
+\subsubsection{Proprietà della riduzione}
+Le riduzioni godono di alcune proprietà, quali:
+\begin{itemize}
+  \item riflessiva, $A\to A$
+  \item transitiva, $A\to B \quad \land \quad B\to C \implies A\to C$, che essendo due trasformazioni in tempo polinomiale avrò comunque una trasformazione
+  polinomiale 
+ \end{itemize}
+Le riduzioni polinomiali \textbf{non sono sempre simmetriche} e quindi non sono una relazione di equivalenza.\\
+Abbiamo però una classe di equivalenza interna ai problemi NP, dove i problemi contenuti sono i più difficili di NP e si riducono l'uno all'altro. Tali problemi sono i problemi \textbf{NP-complete}.
+
+Un linguaggio è \textbf{NP-complete} sse ha due caratteristiche fondamentali: 
+\begin{itemize}
+    \item $L\in NP$
+    \item $\forall L'\in NP, \, L'<_T L$. Qualunque linguaggio $L'$ che sta in $P$ si riduce al linguaggio al $NP-complete$ e tutti i linguaggi in $NP$ si riducono a $L \in NP-complete$ e quindi i problemi in $NP-complete$ sono i più difficili di $NP$. 
+\end{itemize}
+Se ne risolvessi uno in tempo polinomiale risolverei tutti i problemi in NP in tempo polinomiale (ma ormai è assunto che non possa succedere anche se non si può dimostrare).
+
+\begin{teorema}{P = NP}{}
+  Ho che $P=NP$ sse esiste un linguaggio $L$ che è NP-complete e che sta in P, quindi che  $$L\in NP-complete\cap P$$
+\end{teorema}
+
+Se $P=NP$ allora sappiamo già che sarebbero polinomiali.\\ Per l'altro verso ho che: $L\in NP-complete\cap P$,e siccome $L\in NP-complete$ abbiamo che $\forall L'\in N, \,\,L'<_T L$ e che $L \in P$ e quindi esiste un algoritmo polinomiale che risolve $L$ con una DTM, e quindi avrei un algoritmo polinomiale per ogni $L'\in NP$ per una DTM. Quindi se trovassi un algoritmo polinomiale per un NP-complete lo avrei per tutti gli NP. La difficoltà sta nel poter risolvere un problema in $NP-complete$.
+
+\begin{teorema}{$P \notin NP$}{}
+  Se esiste un $L\in NP$ ma $L\notin P$ allora: $\forall L''\in \mbox{NP-complete}$ ho che $L''\notin P$.
+\end{teorema}
+
+Dimostrando quindi che $P \neq NP$.\\ Andrebbe benissimo avere le prove di una di queste due situazioni, ma non esiste ancora.\\ 
+Per gli NP-complete vale anche la simmetria in quanto ogni problema NP-complete è riducibile ad ogni altro problema NP-complete. Riprendendo l'esempio sopra so che ciclo hamiltoniano è TSP, anche nelle forme decisionali, e quindi so che TSP decisionale è NP-complete. La difficoltà è trovare almeno un problema NP-complete, poi saprò che ogni altro a cui posso ridurlo è NP-complete.\\ 
+Conosciamo moltissimi problemi NP-complete, molti riconosciuti tramite riduzioni ma il primo è ottenuto tramite il \textbf{teorema di Cook}. Definiamo prima SAT.\\
+Abbiamo n variabili booleane immaginando di avere una formula booleana in forma normale congiunta (FNC). FNC significa che ci siano una serie di letterali collegati in $\lor, \,(x_1 \dots x_n$ che raffigurano le clausole ($c_i$), le clausole poi possono essere congiunte $c_1 \land c_2 \land \dots \land c_n$. Q
+
+\begin{teorema}{Teorema di Cook}{}
+  Quello che ci chiediamo è se $\exists$, per SAT, un assegnamento che richiede un assegnamento di verità sulla formula $\phi$ in base all'assegnamento delle variabili $x_1,\ldots,x_n$. Nessuno ha mai creato una NDTM che lo risolva in tempo polinomiale, quindi è un NP-complete.  
+\end{teorema}
+
+Si ha che SAT può essere risolto in tempo esponenziale, $O(2^n)$, provando tutti i possibili assegnamenti di verità possibili.\\ Posso usare inoltre una NDTM che fa tutti i rami in parallelo, con ogni possibilità di assegnamento fatta in un ramo oppure posso dire che spara un assegnamento a caso, che si suppone giusto, su un ramo e verifica che è giusto. In ogni caso con una NDTM avrei tempo polinomiale, $O(n\cdot m)$ per $n$ variabili e $m$ clausole.\\
+
+Per vedere che ogni problema NP, per semplicità decisionali, si riduce a SAT bisogna osservare cosa i problemi in NP hanno in comune. Osserviamo che tutti i problemi in NP hanno una NDTM che li risolve in tempo polinomiale che decide il linguaggio associato. A questo punto possiamo quindi dire che $\forall\Pi'\in NP$ ha associato una NDTM $N_\Pi'$ che lavora in tempo polinomiale. Basta in seguito vedere che ogni NDTM che lavora in tempo polinomiale si può trasformare in una formula FNC sfruttando poi gli stati finali della computazione di SAT. Se SAT dice che è soddisfacibile allora lo è il problema iniziale e quindi il problema è riducibile a SAT.

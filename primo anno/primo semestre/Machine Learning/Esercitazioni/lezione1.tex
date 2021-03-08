@@ -1,0 +1,37 @@
+
+\section{Esercitazione 1} 
+\subsection{Terminolgia} 
+\begin{itemize} 
+    \item $X$, \textbf{spazio delle istanze}, ovvero la collezione di tutte le possibili \textbf{istanze} utili per qualche compito di \textit{learning}.
+    \item $x\in X$, \textbf{istanza}, ovvero un singolo oggetto preso dallo \textbf{spazio delle istanze}. Ogni \textbf{istanza} è rappresentata tramite un vettore di attributi  
+    \item $c$, \textbf{concetto}, $c\subseteq X$, ovvero un sottoinsieme dello \textit{spazio delle istanze} che descrive una \textit{classe} di oggetti (ovvero di istanze) alla quale siamo interessati per costruire un modello di \textit{machine learning}. 
+    \item \textbf{esempio}, coppia formata da un’istanza e una sua possibile label che dovrebbe indicare la sua classe di appartenenza.
+    \item $D=\{(x_1,f(x_1)),\ldots,(x_n,f(x_n))\}$, \textbf{training set} coppia formata da un’istanza e una sua possibile label che dovrebbe indicare la sua classe di appartenenza.
+    \item $h$, \textbf{ipotesi}, $h\subseteq X$ 
+    \item $H$, \textbf{spazio delle ipotesi} 
+    \item $(x, f(x))$, \textbf{esempio}, ovvero prendo un'istanza e la vado ad etichettare con la sua classe di appartenenza. La funzione $f$ è detta \textbf{funzione target} 
+    \item un \textbf{modello di machine learning} (dove \textit{machine learning} viene anche definito come lo studio di diverse strategie, più precisamente di ottimizzazione, per cercare ipotesi soddisfacenti/efficienti nello spazio delle ipotesi) è quindi l'\textit{ipotesi migliore}. 
+    \item \textbf{linguaggio delle ipotesi}, è il linguaggio che definisce lo \textit{spazio delle ipotesi/modelli} 
+    \item \textbf{cross validation}, ovvero ripeto $m$ volte la validazione su campioni diversi di input per evitare che un certo risultato derivi dalla fortuna 
+    \item \textbf{concept learning}, problema di cercare all’interno di uno spazio delle ipotesi quelle funzioni che assumono valore all’interno dell’insieme $\to \{0,1\}$
+    \item \textbf{funzione target}, spazio delle ipotesi/istanze $\to \{0,1\}$
+    \item \textbf{ipotesi H}, ovvero una congiunzione $\land$ di vincoli sugli attributi. Tale ipotesi è \textbf{consistente}, ovvero è coerente con tutti gli esempi 
+        \begin{itemize}
+            \item \textbf{ipotesi più generale possibile}: per ogni attributo è ammesso ogni valore, non ci sono vincoli
+            \item \textbf{ipotesi più ristrettiva possibile}: per nessun attributo non c’è alcun valore ammissibile .
+        \end{itemize}
+    \item \textbf{soddisfazione di un'ipotesi}: un'istanza $x$ soddisfa un'ipotesi $h$ sse tutti i vincoli espressi da $h$ sono soddisfatti dai valori di $x$ e si indica con: \[h(x)=1\]
+\end{itemize}
+
+General-to-specific relationship o More-general-than-or-equal-to relationship: definisce una relazione d’ordine parziale tra due ipotesi definite su uno stesso spazio delle ipotesi. $h_j$ è più generale o uguale a  $h_k$ ($h_k \geq h_j$) se e solo se $\forall x \in X$ (per ogni istanza nello spazio delle istanze) $h_k(x) = 1 \to h_j(x) = 1$
+
+Un concetto deve appartenere allo spazio delle ipotesi considerato, affinché sia possibile trovare la strategia opportuna che lo rappresenti. 
+
+Un istanza $x$ soddisfa un’ipotesi $h$  se e solo se tutti i vincoli espressi da $h$ sono soddisfatti grazie al valore di $x$. $x$ soddisfa $h \iff h(x) = 1$
+
+Un’ipotesi è consistente con un determinato training set $D$ se per ogni esempio $x$ che appartiene a $D$ allora l’ipotesi applicata a $x$ è pari all’effettiva label/classe di $x$.
+$$Consistent(h,D) = \forall \langle x,c(x) \rangle \in D \quad h(x) = c(x) $$ 
+
+Cardinalità dello spazio delle istanze: prodotto delle cardinalità degli attributi. ($|X| = |A_1 x A_2 x \dots A_n|$)\\
+Cardinalità dello spazio dei concetti: $2^{\textnormal{cardinalità dello spazio delle istanze}}$ \\
+Cardinalità dello spazio delle ipotesi: Ogni ipotesi con un qualche $\varnothing$ è semanticamente equivalente, in quanto inconsistente. Quindi: (prodotto delle cardinalità $+$ 1(per il simbolo $?$) degli attributi) $+$ 1 per le ipotesi inconsistenti. 

@@ -1,0 +1,141 @@
+\section{Ricerca esatta con KMP}
+\subsection{Bordo di una stringa}
+\subsubsection{Definizione non ricorsiva di bordo di una stringa}
+Il bordo di una stringa $X$ è il più lungo prefisso proprio di $X$ che è anche uguale a un suffisso di $X$.
+
+\subsubsection{Definizione ricorsiva di bordo di una stringa}
+Il bordo della stringa vuota è la stringa vuota stessa: $B(\varepsilon) = \varepsilon$.\\
+Il bordo di una stringa composta da un solo simbolo è la stringa vuota: $B(\sigma) = \varepsilon$.\\
+Il bordo $B(X\sigma)$ della concatenazione tra una stringa $X$ e un simbolo $\sigma$ è: 
+\begin{itemize}
+    \item $B(X\sigma) = B(X)\sigma$, se $\sigma$ è il simbolo di $X$ in posizione $|B(X)|+1$
+    \item $B(X\sigma) = B(B(X)\sigma)$, se $\sigma$ non è il simbolo di $X$ in posizione $|B(X)|+1$
+\end{itemize}
+
+\subsection{Calcolo di \texorpdfstring{$\varphi$}{} per induzione}
+Per $j=0$ e $j=1$ il calcolo è immediato: $\varphi(0) = -1$ e $\varphi(1) = 0$. \\
+Per calcolare $\varphi(j)$ per $j>1$, si suppone che $\varphi$ sia nota per tutti gli indici precedenti tra $0$ e $j-1$. \\
+
+Se prendiamo in considerazione ad esempio una stringa $P$, di lunghezza $j$ dobbiamo sapere come ci comportiamo alla posizione $j-1$ per sapere come calcolare la nostra  $\varphi$.
+Quindi il probleam si pone nei termini seguenti $P[1,j] = P[1, j-1]P[j]$. Quindi, teoricamente, siamo in grado di calcolare $\displaystyle \varphi$ facendo \[\varphi(j)=|B(P[1,j])| = |B( P[1, j-1]P[j])|\]
+Dove:
+\begin{itemize}
+    \item $P[1, j-1]$ sarà la nostra $X$ vista in precedenza
+    \item $P[j]$ è invece la nostra $\sigma$
+\end{itemize}
+Questo ci porta ad avere il bordo come espresso in precedenza $B(X\sigma)$
+
+Per definizione:  
+\begin{itemize}
+    \item $|B(P[1,j-1])| = k_1 = \varphi(j-1) \implies B(P[1, j-1]) = P[1, k_1]$
+    \item $|B(P[1,k_1])| = k_2 = \varphi(k_1) = \varphi(\varphi(j-1)) \implies B(P[1,k_1]) = P[1, k_2]$
+    \item $|B(P[1, k_2])| = k_3 = \varphi(k_2) = \varphi(\varphi(k_1)) = \varphi(\varphi(\varphi(j-1)))$
+\end{itemize}
+Per applicare la definizione ricorsiva per il calcolo di $\varphi(j)$ io devo prevedere due casi:
+\begin{itemize}
+    \item \textbf{Caso 1}: $P[k_1 + 1] = P[j]$, significa che $\sigma$ appare immediatamente dopo il bordo di $X$, quindi il simbolo $\sigma$, che nel nostro caso è $P[j]$, è uguale a $P[k_1 + 1]$. Questo lo possiamo suddividere in alcuni sottocasi:
+        \begin{itemize}
+            \item $B(P[1, j-1] P[j]) = B(P[1, j-1]) P[j] \implies |B(P[1, j-1] P[j])| = |B(P[1, j-1])| +1$. Quello che ci dice la nostra definizione, è che questo è di conseguenza uguale a $k_1 + 1 = \varphi(j-1) + 1$.
+        \end{itemize}
+    \item \textbf{Caso 2}: $P[k_1 + 1] \neq P[j]$, significa che $\sigma$ non appare immediatamente dopo il bordo di $X$, quindi il simbolo $\sigma$, che nel nostro caso è $P[j]$, non è uguale a $P[k_1 + 1]$.
+        \begin{itemize}
+            \item $B(P[1, j-1] P[j]) = B(B(P[1, j-1]) P[j])$. Sappiamo che nella definizione del bordo abbiamo detto che $B(P[1, j-1]) = k_1 = \varphi(j-1)$. Possiamo eseguire allora delle sostituzioni, raggiungiamo quindi: $B(B(P[1, j-1]) P[j]) = B(P[1,k_1]P[j])$
+            \item Andando avanti con le considerazioni, la stessa che ci ha portati a dire  $B(P[1, j-1]) = k_1$, ottenendo in modo ricorsivo che  $B(P[1, k_1]) = k_2 = \varphi(k_1) = \varphi(\varphi(j-1))$, sempre per definizione del bordo. 
+        \end{itemize}
+        Con quanto eseguito fin'ora, ci rendiamo conto che il caso 2, vada ulteriormente diviso, trovando.
+        \begin{enumerate}
+            \item $P[k_1 + 1] \neq P[j] \land P[k_2 + 1] = P[j]$ , eseguendo i passi visti in precedenza ci ritroviamo ad avere a che fare con $B(P[1, k_1])P[j]$. Per intenderci siamo nel caso di $B(X)\sigma$. Questo implica dire che $|B(P[1, j-1] P[j])| = |B(P[1, k_1])| + 1 $.\\
+            Questo altro che non è, per come visto in precedenza, $|B(P[1, k_1])| + 1 = k_2 + 1$ che altro non è , per definizione, che $\varphi(k_1) +1 = \varphi(\varphi(j - 1)) +1$
+            \item $P[k_1 + 1] \neq P[j] \land P[k_2 + 1] \neq P[j]$. Come nel caso visto prima $B(P[1, j-1] P[j]) = B(B(P[1, k_1]) P[j])$. Anche qui, per definizione, ci ritroviamoa  scrivere $B(P[1, k_2] P[j])$
+        \end{enumerate}
+\end{itemize}
+Questi passaggi possono essere eseguiti fino a quando non ci ritroviamo a considerare il \[P[k_1 + 1] \neq P[j] \land P[k_2 + 1] \neq P[j] \land \dots \land P[k_{p}+1] (\neq)(=) P[j]\]
+
+In generale, se si raggiunge un valore $k_p$ (con $p$ = numero di chiamate ricorsive) tale per cui $P[k_p + 1] = P[j]$, allora $\varphi(j) = k_p +1$.\\
+Altrimenti, si raggiungerà a un certo punto un valore $k_p = -1$ che implica che il bordo di $P[1, j]$ è nullo e quindi $\varphi(j) = 0$ (cioè ancora uguale a $k_p +1$).
+
+\subsubsection{Algoritmo di calcolo di \texorpdfstring{$\varphi$}{}}
+
+\begin{lstlisting}
+    phi(0) <- -1
+    phi(1) <- 0
+    j <- 2
+    k <- phi(j-1)
+    caso 1: P[k+1] = P[j]
+	    phi(j) <- k+1
+        j <- j + 1
+        ritorno alla riga 4
+    caso 2: P[k+1] != P[j]
+        k <- phi(k)
+        if k = -1
+            phi(j) <- k+1
+            j <- j+1
+            ritorno alla riga 4
+        else
+        	ritorno a testare i due casi
+\end{lstlisting}
+
+\begin{lstlisting}
+    Procedure Compute-Prefix-Function(P)
+    begin
+        m <- |P|
+        phi(0) <- -1
+        phi(1) <- 0
+        for j <- 2 to m do
+            k <- phi(j-1)
+            while k >= 0 & P[k+1] != P[j] then
+                k <- phi(k)
+                phi(j) <- k+1
+        return phi
+    end
+\end{lstlisting}
+
+
+\subsection{Scansione del testo}
+La scansione del testo $T$ alla ricerca di $P$ avviene tramite una finestra $W$ di confronto lunga $m$ che scorre lungo $T$ da sinistra a destra, e inizialmente è posizionata in corrispondenza della posizione $i=1$ di $T$.\\
+Per ogni posizione $j$ di $W$, ogni simbolo di $P$ viene confrontato con il corrispondente simbolo del testo T in W, procedendo da sinistra a destra. \\
+Se tutti i simboli sono confrontati con successo, allora nella posizione $i$ di $T$ esiste un’occorrenza esatta di $P$. La finestra viene poi spostata verso destra in una nuova posizione e si ripete il confronto.\\
+
+La finestra $W$ viene spostata anche di più posizioni utilizzando la funzione $\varphi$.
+Il confronto riparte dal simbolo del testo che aveva dato \textit{mismatch} con il pattern quando $W$ era nella presente posizione.
+
+\subsubsection{Spostamento di W}
+Si assuma che la finestra $W$ si trovi in posizione $i$ su $T$ e il primo carattere di $P$, che determina un \textit{mismatch} con $T$, sia in posizione $j>1$ (il simbolo di \textit{mismatch} su $T$ sarà quindi in posizione $i+j-1$).\\
+Per definizione, il valore $k = \varphi(j-1)$ è la lunghezza del bordo del prefisso $P[1, j-1]$. Quindi $P[1,k]$ ha un’occorrenza su $T$ che inizia in posizione $i$ e una che inizia in $p=i+j-k-1 = i + j - \varphi(j-1) - 1$.\\
+
+Il salto di $W$ da $i$ a $p$ garantisce di non perdere occorrenze di $P$ e che i primi $k = \varphi(j-1)$ simboli di $P$ abbiano un matching con $T$ a partire dalla nuova posizione $p$.
+
+Il confronto tra i simboli di $T$ e di $P$ con $W$ nella nuova posizione $p$ può ripartire dalle posizioni: $i+j-1$ su $T$ e $k+1$ su $P$.
+
+Quindi, $W$ viene spostata alla posizione $p = i+j-\varphi(j-1) -1$ e i primi $\varphi(j-1)$ simboli di $P$ non vengono più confrontati con i corrispondenti simboli su $T$.\\
+
+Si devono considerare però alcuni casi particolari:
+\begin{enumerate}
+    \item $\varphi(j-1)=0$, il bordo è nullo \\
+        $W$ viene spostata alla posizione $p = i+j-1$ e i primi $0$ simboli di $P$ non vengono più confrontati con i corrispondenti simboli su $T$.
+        Quindi il confronto riparte dal simbolo in posizione $i+j-1$ su $T$ e dal primo simbolo su $P$.
+    \item $j=1$, il \textit{mismatch} avviene sui primi due simboli di testo e pattern
+        $W$ viene spostata alla posizione $p = i+j-\varphi(0) -1 = i + 1$ e i primi $\varphi(0) = 0$ simboli di $P$ non vengono più confrontati con i corrispondenti simboli su $T$. Quindi il confronto riparte dal simbolo in posizione $i+1$ su $T$ e dal primo simbolo su $P$.
+    \item $j = m+1$, in posizione $i$ c’è un’occorrenza esatta del pattern
+        $W$ viene spostata alla posizione $p = i+m-\varphi(m)$ e i primi $\varphi(m)$ simboli di $P$ non vengono più confrontati con i corrispondenti simboli su $T$. Quindi il confronto riparte dal simbolo in posizione $i+m$ su $T$ e dal simbolo in posizione $\varphi(m) + 1$ su $P$.
+\end{enumerate}
+
+
+\subsubsection{Pseudocodice della scansione del testo T}
+
+\begin{lstlisting}
+KMP(P,T,phi)
+    begin
+        m <- |P|
+        n <- |T|
+        j <- 0
+        for q <- 1 to n do
+            while j >= 0 & P[j+1] != T[q] then
+                j <- phi(j)
+            j <- j+1
+            if j = m then
+                return q-m+1
+    end
+\end{lstlisting}
+
+Complessità: $\mathcal{O}(n)$.

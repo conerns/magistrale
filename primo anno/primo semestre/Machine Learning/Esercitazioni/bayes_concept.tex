@@ -1,0 +1,49 @@
+\section{Bayes concept learning}
+\subsection{RECAP}
+Avevamo detto che, mentre in un normale approccio di learning si andava a cercare l'ipotesi migliore all'interno dello spazio $H$ . Nel approccio Bayesiano si va a cercare l'ipotesi più probabile $h$. Si ha quindi un approccio probabilistico, si ha una probabilità a priori denotata come $P(h)$. Si hanno inoltre:
+\begin{itemize}
+    \item $P(D)$, questa viene denotata come evidenza 
+    \item $P(D|h)$, una probabilità condizionata, rappresenta la probabilità di osservazione di alcune informazioni conoscendo una determinata ipotesi
+\end{itemize}
+Siano rispettivamente 
+\begin{itemize}
+  \item $D$ è il dataset
+  \item $\theta$ che per noi è l'ipotesi (o grado di incertezza che si ha in merito all'ipotesi?)
+  \item $P(\theta|D)$ che è la distribuzione a posteriori, di una ipotesi 
+  \item $P(\theta)$ è la distribuzione a priori
+  \item $P(D|\theta)$ è la verosimiglianza
+  \item $P(D)$ è l'evidenza
+\end{itemize}
+Andioamo a riprendere la formula che rappresenta l'approccio di Bayes:
+\[P(\theta|D)=\frac{P(D|\theta)P(\theta)}{P(D)}\]
+Sapendo che: 
+\[P(D)=\sum_i P(D, \theta_i)=\sum_i P(D|\theta_i)P(\theta_i)\]
+Spesso $P(D)$ è difficile da calcolare attraverso una sommatoria, richiederebbe molto tempo per essere calcolata, quindi molto spesso vengono considerate solamente la probabilità a posteriori è considerata. Questo ci va bene perché $P(D)$ è invariante rispetto al valore dell'ipotesi e quindi possiamo benissimo rimuoverlo nel calcolo in quanto non influisce sulla probabilità a posteriori:
+\[P(\theta_i|D)\varpropto P(D|\theta_i)P(\theta_i)\]
+(si ricorda che $\varpropto$ indica \textbf{proposizionale a} quindi che due cose sono uguali al più di una costante)\\ Ricordiamo inoltre che la massima ipotesi a posteriori è:
+\begin{equation*}
+    \begin{split}
+        h_{MAP}&=\operatorname*{argmax}_{h\in H}P(h|D) \\
+        & = \operatorname*{argmax}_{h\in H}\frac{P(D|h)P(h)}{P(D)} \\
+        & = \operatorname*{argmax}_{h\in H}P(D|h)P(h)
+    \end{split}
+\end{equation*}
+Se si sa che anche la conoscenza a priori è ininfluente, essendo distribuita seconda una distribuzione uniforme, e si parla di ipotesi di massima verosimiglianza:
+\[h_{ML}=\operatorname*{argmax}_{h\in H}P(D|h)\]
+L'approccio di Bayes nel machine learning è abbastanza oneroso, dovendo
+calcolare tutte le probabilità a posteriori di ogni ipotesi (se $H$ è grande diventa molto costoso).
+
+\subsection{Naive recap}
+Ricordiamo che per Naive Bayes si ha, avendo una sequenza $d_1,d_2\ldots d_n$ di osservazioni: 
+\begin{equation*}
+    \begin{split}
+        h_{MAP}&=\operatorname*{argmax}_{h\in H}P(h|d_1,d_2\ldots d_n) \\
+        &=\operatorname*{argmax}_{h\in H}\frac{P(d_1,d_2\ldots d_n|h)P(h)}{P(D)} \\
+        &\varpropto\operatorname*{argmax}_{h\in H}P(d_1,d_2\ldots d_n|h)P(h)
+    \end{split}
+\end{equation*}
+Per semplificare, tramite naive Bayes,si può assumere:
+\[P(d_1,d_2\ldots d_n|h)=\prod_iP(d_i|h)\]
+ovvero indipendenza condizionata (dicendo che un valore $d:i$ è indipendente da
+un qualunque $d_j$) e quindi si ha, sostituendo:
+\[h_{MAP}=\operatorname*{argmax}_{h\in H}P(h)\prod_iP(d_i|h)\]

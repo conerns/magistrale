@@ -1,0 +1,24 @@
+\section{Key value store}
+È un modello abbastanza semplice dove si hanno appunto rapporti chiave-valore. I valori sono considerati come dei blob dato che al loro interno possono essere strutturati in maniera di principio key-value, non essendo accessibili/interpretabili direttamente dal db. Si hanno poche operazioni: inserire un valore data la chiave, trovare un valore data la chiave, modificare un valore data la chiave e cancellare una chiave e il suo valore.\\
+È inoltre possibile associare un tipo ad un valore, per esempio \textit{string, integer}.\\ 
+Si ha accesso veloce ai dati tramite strutture di hash e posso avere scalabilità orizzontale. I modelli key-value funzionano solitamente \textit{in memory}, anche nel caso della condivisione dati.\\
+Dal punto di vista della nomenclatura si ha:relazionale che corrisponde a key-value, tabella che corrisponde a bucket, riga che corrisponde a key-value e id-riga che corrisponde a key.
+
+\subsection{Redis} 
+Nasce a causa dei limiti del modello relazionale, non riuscendo a fare le interrogazioni in realtime.\\ 
+Redis può gestire chiavi espresse in ASCII. I valori primitivi sono le \textit{string} ma si hanno vari container di stringhe: hashes, lists, sets, sorted sets. 
+Non si può sempre fare una ricerca per valore all'interno di questi elementi.\\ Sono stati poi aggiunti i \textbf{moduli} per vari formati di file, per memorizzare file \textit{json} ma anche per \textit{video in streaming}. \\
+Offre quindi blob più strutturati per memorizzare i dati, alcuni a pagamento.\\ 
+Si ha una versione distribuita enterprise, a pagamento. Si possono fare repliche e avere una soluzione in cluster con un certo numero di shard.\\ 
+Per lo sharding bisogna stabilire una \textit{policy} per capire come dividere i dati. Inoltre bisogna capire dove distribuire i dati,quindi stabilire il \textbf{placement}, e si hanno due soluzioni:
+\begin{enumerate}
+  \item quella di default, detta \textbf{dense}, dove il meccanismo di sharding è gestito tramite un meccanismo incrementale, ovvero quando si riempie la memoria della macchina si crea un'altro shard su un'altra macchina e cosi via
+  \item una detta \textbf{sparse} dove avendo già definito il numero di nodi vado a popolarli fin da subito.
+\end{enumerate}
+Si ha l'alta disponibilità in base a due soluzioni high availability:
+\begin{enumerate}
+  \item una soluzione, detta \textbf{Redis replica of setup} in cui si hanno dei nodi che formano il cluster su un datacenter , su cui si effettuando le operazioni di scrittura e lettura, e altri nodi che formano altri cluster su altri datacenter verso cui sincronizzo e dai quali si può solamente leggere. È quindi un master/slave, replicando per disaster-recovery
+  \item una soluzione, chiamata \textbf{active-active setup}, in cui posso scrivere e leggere sui cluster presenti in due datacenters diversi avendo in entrambi i datacenter sia i db principali che le repliche.
+\end{enumerate}
+
+\textbf{FA UNA DOMANDA SU QUESTO MODELLO} 

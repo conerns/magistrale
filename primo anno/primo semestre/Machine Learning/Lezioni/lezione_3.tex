@@ -1,0 +1,56 @@
+\section{Lezione 3}
+\subsection{Decioson Tree}
+Tornando a parlare di concept learning, possiamo utilizzare un altro metodo di rappresentazione dei dati , al posto delle classiche funzioni booleane, \textbf{alberi di decisione} per rappresentare un modello che applicato ad esempi non visti ci dirà se applicare in output un'etichetta vera o falsa in base a quanto appreso. Siamo in ambito di \textbf{apprendimento supervisionato}.\\ 
+Un albero di decisione è costruito in modo che ad ogni nodo interno controlla un attributo, ogni ramo corrisponde al valore di un attributo e ogni foglia assegna una classificazione (Si/No). Aggiungiamo anche che si esistono attributi che hanno anche più di due valori\textbf{}
+
+Possiamo dire che gli alberi decisionali descrivono tutte le funzioni booleane. Avendo $n$ funzioni booleane avremo un numero distinto di tabelle di verità (e quindi di alberi decisionali), ciascuna con $2^n$ righe, pari a $2^{2^{n}}$.\\
+Riassumiamo alcune caratteristiche degli alberi decisionali:
+\begin{itemize}
+  \item abbiamo attributi con valori discreti, che possiamo elencare
+  \item abbiamo un target di uscita discreto, le foglie hanno valori precisi
+  \item posso costruire ipotesi anche con disgiunzioni 
+  \item può esserci rumore nel training dei dati, cioè i dati non hanno sempre una corretta corrispondenza istanza e valore target da attribuire
+  \item possono esserci attributi di cui non ho informazioni
+\end{itemize}
+\subsection{Algoritmo ID3}
+L'idea di base è trovare un albero piccolo di partenza, scelto tra i tanti alberi disponibili, e applicare un criterio di crescita dell'albero che sia sempre coerente con le istanze ricevute in addestramento. Si punta ad arrivare ad un albero valido per tutti gli esempi ricevuti e anche per quelli non visti
+
+L'algoritmo prevede la scelta di un un attributo A, che denomineremo come il ``miglior'' attributo di decisione per il prossimo nodo. Quindi ci serve un buon attributo secondo il quale dividere le istanze è uno che divide le negative dalle positive.
+Per eseguire la decisione introduciamo il seguente concetto : [$esempi \ positivo+, esempi \ negativo-$], entrambi rappresentati con un valore intero. Gli esempi positivi sono gli esempi che già mi hanno restituito \textit{yes} mentre quelli negativi mi hanno restituito \textit{no}. In generale sono tutti esempi su cui devo ancora valutare l'attributo. E proseguo così assegnando etichette positive e negative.
+\newline
+
+Per ora stabiliamo ad occhio lo sbilanciamento, in base alle etichette positive e negative.\\ Il criterio di scelta ci porta a preferire lo sbilanciamento, preferendo, in modo ideale, un subset con \textit{tutti positivi} o \textit{tutti negativi}. Quindi se un attributo ha divisioni sbilanciate è da ritenersi migliore.
+
+\subsection{Entropia}
+Sia S un training set, con possibili valori $v_i$ con $i = 1 \dots n$, se l’entropia di un insieme di bit misura più o meno la sua quantità di informazione, si può richiamare la seguente formula: $$I(P(v_1),\dots,P(v_n))=\displaystyle \sum_{i=1}{-P(v_i)\log_2P(v_i)}$$
+Dove:
+\begin{itemize}
+    \item $I(valore)$ indica il valore dell'entropia sul valore preso in considerazione
+    \item $v_i$  sono i possibili valori assumibili dalle istanze del training set
+    \item $P(v_i)$ è la probabilità che un’istanza assuma quel valore.
+\end{itemize}
+
+Nella variabile $p$ conto i valori di $S$ con etichetta positiva e con $n$ negativa (esempi positivi e negativi). Se inoltre diciamo che $p_+$ è la proporzione di esempi positivi e $p_-$ di quelli negativi (saranno quindi tra 0 e 1) possiamo misurare l'\textbf{impurità} (la confusione) contenuta in $S$ con l'entropia: $Entropy(S)=-p_+\log_2 p_+-p_-\log_2 p_-$
+\\
+Se l’entropia è alta, è perché le istanze sono ben divise tra positive e negative, se è bassa è perché sono tutte o positive o negative e quindi ho poche informazioni.
+Parliamo quindi di \textbf{information gain} $IG$ che viene calcolato su ogni attributo $A$ e su $S$: \[IG(S,A)=I\left(\frac{p}{p+n},\frac{n}{p+n}\right)-remainder(A)\] dove: 
+\[remainder(A)=\sum_{i=1}^v \frac{p_i+n_i}{p+n}I\left(\frac{p_i}{p_i+n_i},\frac{n_i}{p_i+n_i}\right)\] 
+e quindi l'information gain è la riduzione aspettata nell'entropia per ordinare $S$ sull'attributo $A$. Per scegliere l’attributo migliore per ogni nodo si utilizza l’information gain (IG più alto).
+
+
+Facciamo qualche osservazione finale sull'\textbf{algoritmo ID3}:
+\begin{itemize}
+  \item lo spazio delle ipotesi è completo e sicuramente contiene il target
+  \item ho in output una singola ipotesi
+  \item non si ha backtracking sugli attributi selezionati, si procede con una ricerca greedy (ma trovo scelte buone localmente e non ottime)
+  \item fa scelte basate su una ricerca statistica, facendo sparire incertezze sui dati
+  \item il bias non è sulla classe iniziale, essendo lo spazio delle ipotesi completo, ma sulla scelta di solo alcune funzioni, preferendo alberi corti (e più semplici) e posizionando attributi ad alto information gain vicino alla radice. 
+  \item $H$ è l'insieme potenza delle istanze $X$
+\end{itemize}
+
+\subsection{Overfitting}
+
+Viene introdotto però l'\textbf{overfitting}. Se misuro l'errore di una ipotesi $h$ sul training set ($error_{traini}(h)$) e poi misuro l'errore di quella ipotesi sull'intero set delle possibili istanze $D$ ($error_D(h)$) ho che l'ipotesi $h$ va in \textbf{overfit} sul quel data set se: 
+$$error_{train}(h) < error_{train}(h') \land error_D(h)>error_D(h')$$
+Cosa possiamo fare per evitare l’overfitting? \textbf{pruning}, potatura dopo aver addestrato un albero completo oppure 
+\textbf{Misura di complessità delle ipotesi}: MDL (Minimum Description Length)
